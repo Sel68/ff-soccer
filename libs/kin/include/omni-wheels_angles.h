@@ -2,7 +2,7 @@
 #define OMNI_WHEELS_ANGLES_H
 
 #include <vector>
-#include "external/eigen/Eigen/Dense"
+#include <Eigen/Dense>
 
 class ChassisVelocity {
 public:

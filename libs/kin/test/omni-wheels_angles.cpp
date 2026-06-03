@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../include/omni-wheels_angles.h"
+#include <omni-wheels_angles.h>
 #include <cmath>
 #include <vector>
 
