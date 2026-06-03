@@ -1,8 +1,9 @@
-#include "OmniKinematics.h"
 #include <cmath>
 #include <vector>
 #include <algorithm>
 #include <Eigen/Dense>
+
+#include "OmniKinematics.h"
 
 OmniKinematics::OmniKinematics(const std::vector<WheelConfig>& wheel_configs, double max_wheelspin)
     : wheels(wheel_configs), max_wheel_vel(max_wheelspin) {}
