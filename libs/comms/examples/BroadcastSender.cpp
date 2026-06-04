@@ -33,7 +33,7 @@ int main() {
         if (ec) std::cerr << "Broadcast send error: " << ec.message() << "\n";
       });
       timer.expires_after(std::chrono::milliseconds(500));
-      timer.async_wait([&](const asio::error_code&){ send_loop(); });
+      timer.async_wait([&](const asio::error_code&) { send_loop(); });
     };
 
     send_loop();

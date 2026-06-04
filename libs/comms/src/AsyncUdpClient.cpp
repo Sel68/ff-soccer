@@ -1,8 +1,5 @@
-#include <iostream>
-#include <thread>
-#include <future>
-
 #include "AsyncUdpClient.hpp"
+#include <iostream>
 
 namespace comms {
 
@@ -11,62 +8,32 @@ bool AsyncUdpClient::request_response(const asio::ip::udp::endpoint& peer,
                                       int timeout_ms) {
   try {
     asio::io_context ioc;
-    std::shared_ptr<UdpSocket> sock = std::make_shared<UdpSocket>(ioc);
+    asio::ip::udp::socket sock(ioc, asio::ip::udp::v4());
 
-    // bind ephemeral port
-    asio::ip::udp::endpoint local_ep(asio::ip::udp::v4(), 0);
     if (peer.address().is_loopback()) {
-      local_ep = asio::ip::udp::endpoint(peer.address(), 0);
-    }
-    sock->bind(local_ep);
-
-    std::shared_ptr<std::promise<std::vector<uint8_t>>> prom =
-        std::make_shared<std::promise<std::vector<uint8_t>>>();
-    auto fut = prom->get_future();
-
-    // start receive
-    sock->start_receive(
-        [prom, sock](const asio::ip::udp::endpoint& from, const std::vector<uint8_t>& data) {
-          // set value only once
-          try {
-            prom->set_value(data);
-          } catch (...) {
-          }
-        });
-
-    // send request
-    std::shared_ptr<std::promise<bool>> sent_prom = std::make_shared<std::promise<bool>>();
-    auto sent_fut = sent_prom->get_future();
-    sock->async_send_to(peer, req, [sent_prom](const asio::error_code& ec, std::size_t) {
-      sent_prom->set_value(!ec);
-    });
-
-    // run io_context in background
-    std::thread runner([&ioc]() { ioc.run(); });
-
-    bool sent_ok = sent_fut.get();
-    if (!sent_ok) {
-      ioc.stop();
-      runner.join();
-      sock.reset();
-      return false;
+      sock.bind(asio::ip::udp::endpoint(peer.address(), 0));
     }
 
-    // wait for response
-    if (fut.wait_for(std::chrono::milliseconds(timeout_ms)) == std::future_status::ready) {
-      resp = fut.get();
-      ioc.stop();
-      runner.join();
-      sock.reset();
-      return true;
-    }
+    asio::error_code ec;
+    sock.send_to(asio::buffer(req), peer, 0, ec);
+    if (ec) return false;
 
-    ioc.stop();
-    runner.join();
-    sock.reset();
-    return false;
-  } catch (std::exception& e) {
-    std::cerr << "AsyncUdpClient exception: " << e.what() << std::endl;
+    bool received = false;
+    std::vector<uint8_t> buf(1400);
+    asio::ip::udp::endpoint sender;
+
+    sock.async_receive_from(asio::buffer(buf), sender,
+                            [&](const asio::error_code& error, std::size_t bytes) {
+                              if (!error && bytes > 0) {
+                                resp.assign(buf.begin(), buf.begin() + bytes);
+                                received = true;
+                              }
+                            });
+
+    ioc.run_for(std::chrono::milliseconds(timeout_ms));
+    return received;
+  } catch (const std::exception& e) {
+    std::cerr << "AsyncUdpClient error: " << e.what() << "\n";
     return false;
   }
 }

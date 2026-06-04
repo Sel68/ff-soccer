@@ -7,7 +7,7 @@ int main() {
   try {
     comms::AsyncUdpClient client;
 
-    std::vector<uint8_t> req({'H','e','l','l','o'});
+    std::vector<uint8_t> req({'H', 'e', 'l', 'l', 'o'});
     std::vector<uint8_t> resp;
     asio::ip::udp::endpoint server_ep(asio::ip::make_address("127.0.0.1"), 9000);
 

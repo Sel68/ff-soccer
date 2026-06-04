@@ -7,7 +7,8 @@
 int main() {
   try {
     asio::io_context ioc;
-    auto server = std::make_shared<comms::AsyncUdpServer>(ioc, asio::ip::udp::endpoint(asio::ip::udp::v4(), 9000));
+    auto server = std::make_shared<comms::AsyncUdpServer>(
+        ioc, asio::ip::udp::endpoint(asio::ip::udp::v4(), 9000));
     server->start();
 
     std::cout << "UDP echo server listening on port 9000" << std::endl;

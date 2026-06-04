@@ -12,10 +12,12 @@ int main() {
     sock.bind(asio::ip::udp::endpoint(asio::ip::udp::v4(), 9005));
 
     int recv_count = 0;
-    const int max_recv = 10; // stop after this many packets
-    sock.start_receive([&ioc, &recv_count](const asio::ip::udp::endpoint& peer, const std::vector<uint8_t>& data){
+    const int max_recv = 10;  // stop after this many packets
+    sock.start_receive([&ioc, &recv_count](const asio::ip::udp::endpoint& peer,
+                                           const std::vector<uint8_t>& data) {
       std::string s(data.begin(), data.end());
-      std::cout << "Received from " << peer.address().to_string() << ":" << peer.port() << " -> " << s << std::endl;
+      std::cout << "Received from " << peer.address().to_string() << ":" << peer.port() << " -> "
+                << s << std::endl;
       if (++recv_count >= max_recv) {
         // stop the event loop after receiving enough packets
         ioc.stop();
