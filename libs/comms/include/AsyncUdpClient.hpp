@@ -5,6 +5,7 @@
 #include <vector>
 #include <functional>
 #include <chrono>
+
 #include "UdpSocket.hpp"
 
 namespace comms {
@@ -19,4 +20,4 @@ class AsyncUdpClient : public std::enable_shared_from_this<AsyncUdpClient> {
                         std::vector<uint8_t>& resp, int timeout_ms = 1000);
 };
 
-}
+}  // namespace comms

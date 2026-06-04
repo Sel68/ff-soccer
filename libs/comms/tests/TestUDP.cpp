@@ -9,7 +9,8 @@ class UdpEchoTest : public ::testing::Test {
  protected:
   void SetUp() override {
     server_ioc_ = std::make_unique<asio::io_context>();
-    server_ = std::make_shared<comms::AsyncUdpServer>(*server_ioc_, asio::ip::udp::endpoint(asio::ip::udp::v4(), 9001));
+    server_ = std::make_shared<comms::AsyncUdpServer>(
+        *server_ioc_, asio::ip::udp::endpoint(asio::ip::udp::v4(), 9001));
     server_->start();
     server_thread_ = std::thread([this]() { server_ioc_->run(); });
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -29,7 +30,7 @@ class UdpEchoTest : public ::testing::Test {
 
 TEST_F(UdpEchoTest, RoundTripEcho) {
   comms::AsyncUdpClient client;
-  std::vector<uint8_t> req({'T','e','s','t'});
+  std::vector<uint8_t> req({'T', 'e', 's', 't'});
   std::vector<uint8_t> resp;
   asio::ip::udp::endpoint server_ep(asio::ip::make_address("127.0.0.1"), 9001);
 
@@ -43,10 +44,7 @@ TEST_F(UdpEchoTest, MultipleMessages) {
   asio::ip::udp::endpoint server_ep(asio::ip::make_address("127.0.0.1"), 9001);
 
   std::vector<std::vector<uint8_t>> requests = {
-    {'H','e','l','l','o'},
-    {'W','o','r','l','d'},
-    {'T','e','s','t','1','2','3'}
-  };
+      {'H', 'e', 'l', 'l', 'o'}, {'W', 'o', 'r', 'l', 'd'}, {'T', 'e', 's', 't', '1', '2', '3'}};
 
   for (const auto& req : requests) {
     std::vector<uint8_t> resp;
@@ -59,7 +57,7 @@ TEST_F(UdpEchoTest, MultipleMessages) {
 
 TEST_F(UdpEchoTest, Timeout) {
   comms::AsyncUdpClient client;
-  std::vector<uint8_t> req({'T','e','s','t'});
+  std::vector<uint8_t> req({'T', 'e', 's', 't'});
   std::vector<uint8_t> resp;
   // Use a different port (no server listening)
   asio::ip::udp::endpoint bad_ep(asio::ip::make_address("127.0.0.1"), 9999);

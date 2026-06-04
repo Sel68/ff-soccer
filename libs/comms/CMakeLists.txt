@@ -1,4 +1,4 @@
-## Build instructions (from this directory):
+# # Build instructions (from this directory):
 # mkdir -p build && cd build
 # cmake .. && cmake --build .
 
@@ -10,7 +10,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Threads REQUIRED)
 
-find_path(ASIO_INCLUDE_DIR asio.hpp)
+find_path(ASIO_INCLUDE_DIR asio.hpp HINTS "${CMAKE_CURRENT_SOURCE_DIR}/../external/asio/include")
+
 if(NOT ASIO_INCLUDE_DIR)
   message(FATAL_ERROR "asio.hpp not found. Install standalone Asio and set ASIO_INCLUDE_DIR or update CMAKE_MODULE_PATH.")
 endif()

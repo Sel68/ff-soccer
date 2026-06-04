@@ -1,12 +1,14 @@
-#include "AsyncUdpClient.hpp"
 #include <iostream>
 #include <thread>
 #include <future>
 
+#include "AsyncUdpClient.hpp"
+
 namespace comms {
 
-bool AsyncUdpClient::request_response(const asio::ip::udp::endpoint& peer, const std::vector<uint8_t>& req,
-                                      std::vector<uint8_t>& resp, int timeout_ms) {
+bool AsyncUdpClient::request_response(const asio::ip::udp::endpoint& peer,
+                                      const std::vector<uint8_t>& req, std::vector<uint8_t>& resp,
+                                      int timeout_ms) {
   try {
     asio::io_context ioc;
     std::shared_ptr<UdpSocket> sock = std::make_shared<UdpSocket>(ioc);
@@ -14,16 +16,19 @@ bool AsyncUdpClient::request_response(const asio::ip::udp::endpoint& peer, const
     // bind ephemeral port
     sock->bind(asio::ip::udp::endpoint(asio::ip::udp::v4(), 0));
 
-    std::shared_ptr<std::promise<std::vector<uint8_t>>> prom = std::make_shared<std::promise<std::vector<uint8_t>>>();
+    std::shared_ptr<std::promise<std::vector<uint8_t>>> prom =
+        std::make_shared<std::promise<std::vector<uint8_t>>>();
     auto fut = prom->get_future();
 
     // start receive
-    sock->start_receive([prom, sock](const asio::ip::udp::endpoint& from, const std::vector<uint8_t>& data) {
-      // set value only once
-      try {
-        prom->set_value(data);
-      } catch (...) {}
-    });
+    sock->start_receive(
+        [prom, sock](const asio::ip::udp::endpoint& from, const std::vector<uint8_t>& data) {
+          // set value only once
+          try {
+            prom->set_value(data);
+          } catch (...) {
+          }
+        });
 
     // send request
     std::shared_ptr<std::promise<bool>> sent_prom = std::make_shared<std::promise<bool>>();

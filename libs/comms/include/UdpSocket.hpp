@@ -7,7 +7,8 @@
 
 namespace comms {
 
-using UdpHandler = std::function<void(const asio::ip::udp::endpoint& peer, const std::vector<uint8_t>& data)>;
+using UdpHandler =
+    std::function<void(const asio::ip::udp::endpoint& peer, const std::vector<uint8_t>& data)>;
 
 class UdpSocket {
  public:

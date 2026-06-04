@@ -4,6 +4,7 @@
 #include <functional>
 #include <memory>
 #include <vector>
+
 #include "UdpSocket.hpp"
 
 namespace comms {
