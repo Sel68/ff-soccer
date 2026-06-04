@@ -10,7 +10,7 @@ class UdpEchoTest : public ::testing::Test {
   void SetUp() override {
     server_ioc_ = std::make_unique<asio::io_context>();
     server_ = std::make_shared<comms::AsyncUdpServer>(
-        *server_ioc_, asio::ip::udp::endpoint(asio::ip::udp::v4(), 9001));
+        *server_ioc_, asio::ip::udp::endpoint(asio::ip::make_address("127.0.0.1"), 9001));
     server_->start();
     server_thread_ = std::thread([this]() { server_ioc_->run(); });
     std::this_thread::sleep_for(std::chrono::milliseconds(100));

@@ -14,7 +14,11 @@ bool AsyncUdpClient::request_response(const asio::ip::udp::endpoint& peer,
     std::shared_ptr<UdpSocket> sock = std::make_shared<UdpSocket>(ioc);
 
     // bind ephemeral port
-    sock->bind(asio::ip::udp::endpoint(asio::ip::udp::v4(), 0));
+    asio::ip::udp::endpoint local_ep(asio::ip::udp::v4(), 0);
+    if (peer.address().is_loopback()) {
+      local_ep = asio::ip::udp::endpoint(peer.address(), 0);
+    }
+    sock->bind(local_ep);
 
     std::shared_ptr<std::promise<std::vector<uint8_t>>> prom =
         std::make_shared<std::promise<std::vector<uint8_t>>>();
