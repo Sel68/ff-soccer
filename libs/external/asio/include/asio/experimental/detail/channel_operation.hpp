@@ -2,7 +2,7 @@
 // experimental/detail/channel_operation.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -31,7 +31,6 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
-ASIO_INLINE_NAMESPACE_BEGIN
 namespace experimental {
 namespace detail {
 
@@ -109,8 +108,7 @@ public:
   void post(const IoExecutor& io_exec, Function& function, Handler&)
   {
     (asio::detail::initiate_post_with_executor<IoExecutor>(io_exec))(
-        static_cast<Function&&>(function),
-        asio::detail::empty_work_function());
+        static_cast<Function&&>(function));
   }
 
   template <typename Function, typename Handler>
@@ -270,10 +268,8 @@ public:
     immediate_ex_type immediate_ex = (get_associated_immediate_executor)(
         handler, base1_type::get_executor());
 
-    (asio::detail::initiate_dispatch_with_executor<
-          immediate_ex_type>(immediate_ex))(
-        static_cast<Function&&>(function),
-        asio::detail::empty_work_function());
+    (asio::detail::initiate_dispatch_with_executor<immediate_ex_type>(
+          immediate_ex))(static_cast<Function&&>(function));
   }
 
   template <typename Function>
@@ -291,8 +287,7 @@ public:
     (asio::detail::initiate_post_with_executor<
         typename base1_type::executor_type>(
           base1_type::get_executor()))(
-        static_cast<Function&&>(function),
-        asio::detail::empty_work_function());
+        static_cast<Function&&>(function));
   }
 };
 
@@ -337,10 +332,8 @@ public:
     immediate_ex_type immediate_ex = (get_associated_immediate_executor)(
         handler, base1_type::get_executor());
 
-    (asio::detail::initiate_dispatch_with_executor<
-          immediate_ex_type>(immediate_ex))(
-        static_cast<Function&&>(function),
-        asio::detail::empty_work_function());
+    (asio::detail::initiate_dispatch_with_executor<immediate_ex_type>(
+          immediate_ex))(static_cast<Function&&>(function));
   }
 
   template <typename Function>
@@ -361,7 +354,6 @@ public:
 
 } // namespace detail
 } // namespace experimental
-ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

@@ -2,7 +2,7 @@
 // detail/win_mutex.hpp
 // ~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -17,17 +17,15 @@
 
 #include "asio/detail/config.hpp"
 
-#if defined(ASIO_HAS_WINDOWS_SRWLOCK)
+#if defined(ASIO_WINDOWS)
 
 #include "asio/detail/noncopyable.hpp"
 #include "asio/detail/scoped_lock.hpp"
 #include "asio/detail/socket_types.hpp"
-#include <synchapi.h>
 
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
-ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
 
 class win_mutex
@@ -37,44 +35,44 @@ public:
   typedef asio::detail::scoped_lock<win_mutex> scoped_lock;
 
   // Constructor.
-  win_mutex()
-  {
-    ::InitializeSRWLock(&srw_lock_);
-  }
+  ASIO_DECL win_mutex();
 
-  // Destructor. SRWLock does not require explicit cleanup.
+  // Destructor.
   ~win_mutex()
   {
-  }
-
-  // Try to lock the mutex.
-  bool try_lock()
-  {
-    return ::TryAcquireSRWLockExclusive(&srw_lock_) != 0;
+    ::DeleteCriticalSection(&crit_section_);
   }
 
   // Lock the mutex.
   void lock()
   {
-    ::AcquireSRWLockExclusive(&srw_lock_);
+    ::EnterCriticalSection(&crit_section_);
   }
 
   // Unlock the mutex.
   void unlock()
   {
-    ::ReleaseSRWLockExclusive(&srw_lock_);
+    ::LeaveCriticalSection(&crit_section_);
   }
 
 private:
-  ::SRWLOCK srw_lock_;
+  // Initialisation must be performed in a separate function to the constructor
+  // since the compiler does not support the use of structured exceptions and
+  // C++ exceptions in the same function.
+  ASIO_DECL int do_init();
+
+  ::CRITICAL_SECTION crit_section_;
 };
 
 } // namespace detail
-ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"
 
-#endif // defined(ASIO_HAS_WINDOWS_SRWLOCK)
+#if defined(ASIO_HEADER_ONLY)
+# include "asio/detail/impl/win_mutex.ipp"
+#endif // defined(ASIO_HEADER_ONLY)
+
+#endif // defined(ASIO_WINDOWS)
 
 #endif // ASIO_DETAIL_WIN_MUTEX_HPP

@@ -2,7 +2,7 @@
 // impl/serial_port_base.ipp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 // Copyright (c) 2008 Rep Invariant Systems, Inc. (info@repinvariant.com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -27,7 +27,7 @@
 
 #if defined(GENERATING_DOCUMENTATION)
 # define ASIO_OPTION_STORAGE implementation_defined
-#elif defined(ASIO_WINDOWS) || defined(ASIO_CYGWIN_W32_SOCKETS)
+#elif defined(ASIO_WINDOWS) || defined(__CYGWIN__)
 # define ASIO_OPTION_STORAGE DCB
 #else
 # define ASIO_OPTION_STORAGE termios
@@ -36,12 +36,11 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
-ASIO_INLINE_NAMESPACE_BEGIN
 
 ASIO_SYNC_OP_VOID serial_port_base::baud_rate::store(
     ASIO_OPTION_STORAGE& storage, asio::error_code& ec) const
 {
-#if defined(ASIO_WINDOWS) || defined(ASIO_CYGWIN_W32_SOCKETS)
+#if defined(ASIO_WINDOWS) || defined(__CYGWIN__)
   storage.BaudRate = value_;
 #else
   speed_t baud;
@@ -128,7 +127,7 @@ ASIO_SYNC_OP_VOID serial_port_base::baud_rate::store(
 ASIO_SYNC_OP_VOID serial_port_base::baud_rate::load(
     const ASIO_OPTION_STORAGE& storage, asio::error_code& ec)
 {
-#if defined(ASIO_WINDOWS) || defined(ASIO_CYGWIN_W32_SOCKETS)
+#if defined(ASIO_WINDOWS) || defined(__CYGWIN__)
   value_ = storage.BaudRate;
 #else
   speed_t baud = ::cfgetospeed(&storage);
@@ -221,7 +220,7 @@ serial_port_base::flow_control::flow_control(
 ASIO_SYNC_OP_VOID serial_port_base::flow_control::store(
     ASIO_OPTION_STORAGE& storage, asio::error_code& ec) const
 {
-#if defined(ASIO_WINDOWS) || defined(ASIO_CYGWIN_W32_SOCKETS)
+#if defined(ASIO_WINDOWS) || defined(__CYGWIN__)
   storage.fOutxCtsFlow = FALSE;
   storage.fOutxDsrFlow = FALSE;
   storage.fTXContinueOnXoff = TRUE;
@@ -288,7 +287,7 @@ ASIO_SYNC_OP_VOID serial_port_base::flow_control::store(
 ASIO_SYNC_OP_VOID serial_port_base::flow_control::load(
     const ASIO_OPTION_STORAGE& storage, asio::error_code& ec)
 {
-#if defined(ASIO_WINDOWS) || defined(ASIO_CYGWIN_W32_SOCKETS)
+#if defined(ASIO_WINDOWS) || defined(__CYGWIN__)
   if (storage.fOutX && storage.fInX)
   {
     value_ = software;
@@ -339,7 +338,7 @@ serial_port_base::parity::parity(serial_port_base::parity::type t)
 ASIO_SYNC_OP_VOID serial_port_base::parity::store(
     ASIO_OPTION_STORAGE& storage, asio::error_code& ec) const
 {
-#if defined(ASIO_WINDOWS) || defined(ASIO_CYGWIN_W32_SOCKETS)
+#if defined(ASIO_WINDOWS) || defined(__CYGWIN__)
   switch (value_)
   {
   case none:
@@ -386,7 +385,7 @@ ASIO_SYNC_OP_VOID serial_port_base::parity::store(
 ASIO_SYNC_OP_VOID serial_port_base::parity::load(
     const ASIO_OPTION_STORAGE& storage, asio::error_code& ec)
 {
-#if defined(ASIO_WINDOWS) || defined(ASIO_CYGWIN_W32_SOCKETS)
+#if defined(ASIO_WINDOWS) || defined(__CYGWIN__)
   if (storage.Parity == EVENPARITY)
   {
     value_ = even;
@@ -434,7 +433,7 @@ serial_port_base::stop_bits::stop_bits(
 ASIO_SYNC_OP_VOID serial_port_base::stop_bits::store(
     ASIO_OPTION_STORAGE& storage, asio::error_code& ec) const
 {
-#if defined(ASIO_WINDOWS) || defined(ASIO_CYGWIN_W32_SOCKETS)
+#if defined(ASIO_WINDOWS) || defined(__CYGWIN__)
   switch (value_)
   {
   case one:
@@ -470,7 +469,7 @@ ASIO_SYNC_OP_VOID serial_port_base::stop_bits::store(
 ASIO_SYNC_OP_VOID serial_port_base::stop_bits::load(
     const ASIO_OPTION_STORAGE& storage, asio::error_code& ec)
 {
-#if defined(ASIO_WINDOWS) || defined(ASIO_CYGWIN_W32_SOCKETS)
+#if defined(ASIO_WINDOWS) || defined(__CYGWIN__)
   if (storage.StopBits == ONESTOPBIT)
   {
     value_ = one;
@@ -507,8 +506,8 @@ serial_port_base::character_size::character_size(unsigned int t)
 ASIO_SYNC_OP_VOID serial_port_base::character_size::store(
     ASIO_OPTION_STORAGE& storage, asio::error_code& ec) const
 {
-#if defined(ASIO_WINDOWS) || defined(ASIO_CYGWIN_W32_SOCKETS)
-  storage.ByteSize = static_cast<BYTE>(value_);
+#if defined(ASIO_WINDOWS) || defined(__CYGWIN__)
+  storage.ByteSize = value_;
 #else
   storage.c_cflag &= ~CSIZE;
   switch (value_)
@@ -527,7 +526,7 @@ ASIO_SYNC_OP_VOID serial_port_base::character_size::store(
 ASIO_SYNC_OP_VOID serial_port_base::character_size::load(
     const ASIO_OPTION_STORAGE& storage, asio::error_code& ec)
 {
-#if defined(ASIO_WINDOWS) || defined(ASIO_CYGWIN_W32_SOCKETS)
+#if defined(ASIO_WINDOWS) || defined(__CYGWIN__)
   value_ = storage.ByteSize;
 #else
   if ((storage.c_cflag & CSIZE) == CS5) { value_ = 5; }
@@ -544,7 +543,6 @@ ASIO_SYNC_OP_VOID serial_port_base::character_size::load(
   ASIO_SYNC_OP_VOID_RETURN(ec);
 }
 
-ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

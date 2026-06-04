@@ -2,7 +2,7 @@
 // mutual_exclusion_2.cpp
 // ~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -17,6 +17,7 @@ using asio::as_tuple;
 using asio::awaitable;
 using asio::dynamic_buffer;
 using asio::co_spawn;
+using asio::deferred;
 using asio::detached;
 using asio::experimental::channel;
 using asio::io_context;
@@ -85,7 +86,7 @@ private:
       {
         // Read an entire line from the client.
         std::size_t length = co_await async_read_until(socket_,
-            dynamic_buffer(data, max_line_length), '\n');
+            dynamic_buffer(data, max_line_length), '\n', deferred);
 
         // Claim the write lock by sending a message to the channel. Since the
         // channel signature is void(), there are no arguments to send in the
@@ -94,12 +95,12 @@ private:
         // non-blocking send.
         if (!write_lock_.try_send())
         {
-          co_await write_lock_.async_send();
+          co_await write_lock_.async_send(deferred);
         }
 
         // Respond to the client with a message, echoing the line they sent.
-        co_await async_write(socket_, "<line>"_buf);
-        co_await async_write(socket_, dynamic_buffer(data, length));
+        co_await async_write(socket_, "<line>"_buf, deferred);
+        co_await async_write(socket_, dynamic_buffer(data, length), deferred);
 
         // Release the lock by receiving the message back again.
         write_lock_.try_receive([](auto...){});
@@ -110,7 +111,7 @@ private:
       stop();
     }
   }
-
+ 
   awaitable<void> send_heartbeats()
   {
     steady_timer timer{socket_.get_executor()};
@@ -120,7 +121,7 @@ private:
       {
         // Wait one second before trying to send the next heartbeat.
         timer.expires_after(1s);
-        co_await timer.async_wait();
+        co_await timer.async_wait(deferred);
 
         // Claim the write lock by sending a message to the channel. Since the
         // channel signature is void(), there are no arguments to send in the
@@ -129,7 +130,7 @@ private:
         // non-blocking send.
         if (!write_lock_.try_send())
         {
-          co_await write_lock_.async_send();
+          co_await write_lock_.async_send(deferred);
         }
 
         // Send a heartbeat to the client. As the content of the heartbeat
@@ -137,7 +138,7 @@ private:
         // bytes of the message. The memory associated with a buffer literal is
         // valid for the lifetime of the program, which mean that the buffer
         // can be safely passed as-is to the asynchronous operation.
-        co_await async_write(socket_, "<heartbeat>\n"_buf);
+        co_await async_write(socket_, "<heartbeat>\n"_buf, deferred);
 
         // Release the lock by receiving the message back again.
         write_lock_.try_receive([](auto...){});
@@ -155,7 +156,7 @@ awaitable<void> listen(tcp::acceptor& acceptor)
 {
   for (;;)
   {
-    auto [e, socket] = co_await acceptor.async_accept(as_tuple);
+    auto [e, socket] = co_await acceptor.async_accept(as_tuple(deferred));
     if (!e)
     {
       std::make_shared<line_based_echo_session>(std::move(socket))->start();

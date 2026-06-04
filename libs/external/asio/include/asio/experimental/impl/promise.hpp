@@ -25,7 +25,6 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
-ASIO_INLINE_NAMESPACE_BEGIN
 namespace experimental {
 
 template<typename Signature = void(),
@@ -188,7 +187,7 @@ struct promise_impl<void(Ts...), Executor, Allocator>
 
 template<typename Signature = void(),
     typename Executor = asio::any_io_executor,
-    typename Allocator = std::allocator<void>>
+    typename Allocator = any_io_executor>
 struct promise_handler;
 
 template<typename... Ts,  typename Executor, typename Allocator>
@@ -249,7 +248,6 @@ struct promise_handler<void(Ts...), Executor, Allocator>
 
 } // namespace detail
 } // namespace experimental
-ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

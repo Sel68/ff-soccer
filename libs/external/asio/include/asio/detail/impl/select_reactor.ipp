@@ -2,7 +2,7 @@
 // detail/impl/select_reactor.ipp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -37,7 +37,6 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
-ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
 
 #if defined(ASIO_HAS_IOCP)
@@ -66,14 +65,14 @@ select_reactor::select_reactor(asio::execution_context& ctx)
     interrupter_(),
 #if defined(ASIO_HAS_IOCP)
     stop_thread_(false),
-    thread_(),
+    thread_(0),
     restart_reactor_(this),
 #endif // defined(ASIO_HAS_IOCP)
     shutdown_(false)
 {
 #if defined(ASIO_HAS_IOCP)
   asio::detail::signal_blocker sb;
-  thread_ = thread(thread_function(this));
+  thread_ = new asio::detail::thread(thread_function(this));
 #endif // defined(ASIO_HAS_IOCP)
 }
 
@@ -88,13 +87,18 @@ void select_reactor::shutdown()
   shutdown_ = true;
 #if defined(ASIO_HAS_IOCP)
   stop_thread_ = true;
-  if (thread_.joinable())
+  if (thread_)
     interrupter_.interrupt();
 #endif // defined(ASIO_HAS_IOCP)
   lock.unlock();
 
 #if defined(ASIO_HAS_IOCP)
-  thread_.join();
+  if (thread_)
+  {
+    thread_->join();
+    delete thread_;
+    thread_ = 0;
+  }
 #endif // defined(ASIO_HAS_IOCP)
 
   op_queue<operation> ops;
@@ -238,7 +242,7 @@ void select_reactor::run(long usec, op_queue<operation>& ops)
       max_fd = fd_sets_[i].max_descriptor();
   }
 
-#if defined(ASIO_WINDOWS) || defined(ASIO_CYGWIN_W32_SOCKETS)
+#if defined(ASIO_WINDOWS) || defined(__CYGWIN__)
   // Connection operations on Windows use both except and write fd_sets.
   have_work_to_do = have_work_to_do || !op_queue_[connect_op].empty();
   fd_sets_[write_op].set(op_queue_[connect_op], ops);
@@ -247,7 +251,7 @@ void select_reactor::run(long usec, op_queue<operation>& ops)
   fd_sets_[except_op].set(op_queue_[connect_op], ops);
   if (fd_sets_[except_op].max_descriptor() > max_fd)
     max_fd = fd_sets_[except_op].max_descriptor();
-#endif // defined(ASIO_WINDOWS) || defined(ASIO_CYGWIN_W32_SOCKETS)
+#endif // defined(ASIO_WINDOWS) || defined(__CYGWIN__)
 
   // We can return immediately if there's no work to do and the reactor is
   // not supposed to block.
@@ -286,11 +290,11 @@ void select_reactor::run(long usec, op_queue<operation>& ops)
   // Dispatch all ready operations.
   if (retval > 0)
   {
-#if defined(ASIO_WINDOWS) || defined(ASIO_CYGWIN_W32_SOCKETS)
+#if defined(ASIO_WINDOWS) || defined(__CYGWIN__)
     // Connection operations on Windows use both except and write fd_sets.
     fd_sets_[except_op].perform(op_queue_[connect_op], ops);
     fd_sets_[write_op].perform(op_queue_[connect_op], ops);
-#endif // defined(ASIO_WINDOWS) || defined(ASIO_CYGWIN_W32_SOCKETS)
+#endif // defined(ASIO_WINDOWS) || defined(__CYGWIN__)
 
     // Exception operations must be processed first to ensure that any
     // out-of-band data is read before normal data.
@@ -326,7 +330,12 @@ void select_reactor::restart_reactor::do_complete(void* owner, operation* base,
   {
     select_reactor* reactor = static_cast<restart_reactor*>(base)->reactor_;
 
-    reactor->thread_.join();
+    if (reactor->thread_)
+    {
+      reactor->thread_->join();
+      delete reactor->thread_;
+      reactor->thread_ = 0;
+    }
 
     asio::detail::mutex::scoped_lock lock(reactor->mutex_);
     reactor->interrupter_.recreate();
@@ -334,7 +343,8 @@ void select_reactor::restart_reactor::do_complete(void* owner, operation* base,
     lock.unlock();
 
     asio::detail::signal_blocker sb;
-    reactor->thread_ = thread(thread_function(reactor));
+    reactor->thread_ =
+      new asio::detail::thread(thread_function(reactor));
   }
 }
 #endif // defined(ASIO_HAS_IOCP)
@@ -377,7 +387,6 @@ void select_reactor::cancel_ops_unlocked(socket_type descriptor,
 }
 
 } // namespace detail
-ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

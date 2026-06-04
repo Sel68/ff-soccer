@@ -24,7 +24,6 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
-ASIO_INLINE_NAMESPACE_BEGIN
 
 class any_io_executor;
 
@@ -48,9 +47,8 @@ namespace experimental {
  * the asynchronous operation completes, and the result of the operation is
  * returned.
  *
- * Note that this token is not the most efficient (use the default completion
- * token @c asio::deferred for that) but does provide type erasure, as it
- * will always return a @c coro.
+ * Note that this token is not the most efficient (use @c asio::deferred
+ * for that) but does provide type erasure, as it will always return a @c coro.
  */
 template <typename Allocator = std::allocator<void>>
 struct use_coro_t
@@ -84,6 +82,7 @@ struct use_coro_t
 #endif // defined(ASIO_ENABLE_HANDLER_TRACKING)
   {
   }
+
 
   /// Specify an alternate allocator.
   template <typename OtherAllocator>
@@ -174,13 +173,12 @@ private:
  * See the documentation for asio::use_coro_t for a usage example.
  */
 #if defined(GENERATING_DOCUMENTATION)
-ASIO_INLINE_VARIABLE constexpr use_coro_t<> use_coro;
+constexpr use_coro_t<> use_coro;
 #else
-ASIO_INLINE_VARIABLE constexpr use_coro_t<> use_coro(0, 0, 0);
+constexpr use_coro_t<> use_coro(0, 0, 0);
 #endif
 
 } // namespace experimental
-ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

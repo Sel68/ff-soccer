@@ -2,7 +2,7 @@
 // impl/write.hpp
 // ~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -32,7 +32,6 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
-ASIO_INLINE_NAMESPACE_BEGIN
 
 namespace detail
 {
@@ -63,9 +62,6 @@ inline std::size_t write(SyncWriteStream& s, const ConstBufferSequence& buffers,
     CompletionCondition completion_condition, asio::error_code& ec,
     constraint_t<
       is_const_buffer_sequence<ConstBufferSequence>::value
-    >,
-    constraint_t<
-      is_completion_condition<CompletionCondition>::value
     >)
 {
   return detail::write(s, buffers,
@@ -101,9 +97,6 @@ inline std::size_t write(SyncWriteStream& s, const ConstBufferSequence& buffers,
     CompletionCondition completion_condition,
     constraint_t<
       is_const_buffer_sequence<ConstBufferSequence>::value
-    >,
-    constraint_t<
-      is_completion_condition<CompletionCondition>::value
     >)
 {
   asio::error_code ec;
@@ -125,9 +118,6 @@ std::size_t write(SyncWriteStream& s,
     >,
     constraint_t<
       !is_dynamic_buffer_v2<decay_t<DynamicBuffer_v1>>::value
-    >,
-    constraint_t<
-      is_completion_condition<CompletionCondition>::value
     >)
 {
   decay_t<DynamicBuffer_v1> b(
@@ -182,9 +172,6 @@ inline std::size_t write(SyncWriteStream& s,
     >,
     constraint_t<
       !is_dynamic_buffer_v2<decay_t<DynamicBuffer_v1>>::value
-    >,
-    constraint_t<
-      is_completion_condition<CompletionCondition>::value
     >)
 {
   asio::error_code ec;
@@ -202,10 +189,7 @@ template <typename SyncWriteStream, typename Allocator,
     typename CompletionCondition>
 inline std::size_t write(SyncWriteStream& s,
     asio::basic_streambuf<Allocator>& b,
-    CompletionCondition completion_condition, asio::error_code& ec,
-    constraint_t<
-      is_completion_condition<CompletionCondition>::value
-    >)
+    CompletionCondition completion_condition, asio::error_code& ec)
 {
   return write(s, basic_streambuf_ref<Allocator>(b),
       static_cast<CompletionCondition&&>(completion_condition), ec);
@@ -230,10 +214,7 @@ template <typename SyncWriteStream, typename Allocator,
     typename CompletionCondition>
 inline std::size_t write(SyncWriteStream& s,
     asio::basic_streambuf<Allocator>& b,
-    CompletionCondition completion_condition,
-    constraint_t<
-      is_completion_condition<CompletionCondition>::value
-    >)
+    CompletionCondition completion_condition)
 {
   return write(s, basic_streambuf_ref<Allocator>(b),
       static_cast<CompletionCondition&&>(completion_condition));
@@ -249,9 +230,6 @@ std::size_t write(SyncWriteStream& s, DynamicBuffer_v2 buffers,
     CompletionCondition completion_condition, asio::error_code& ec,
     constraint_t<
       is_dynamic_buffer_v2<DynamicBuffer_v2>::value
-    >,
-    constraint_t<
-      is_completion_condition<CompletionCondition>::value
     >)
 {
   std::size_t bytes_transferred = write(s, buffers.data(0, buffers.size()),
@@ -291,9 +269,6 @@ inline std::size_t write(SyncWriteStream& s, DynamicBuffer_v2 buffers,
     CompletionCondition completion_condition,
     constraint_t<
       is_dynamic_buffer_v2<DynamicBuffer_v2>::value
-    >,
-    constraint_t<
-      is_completion_condition<CompletionCondition>::value
     >)
 {
   asio::error_code ec;
@@ -401,7 +376,7 @@ namespace detail
         CompletionCondition, WriteHandler>* this_handler)
   {
     return this_handler->start_ == 0 ? true
-      : ASIO_VERSIONED_NAME(handler_cont_helpers)::is_continuation(
+      : asio_handler_cont_helpers::is_continuation(
           this_handler->handler_);
   }
 
@@ -487,6 +462,49 @@ struct associator<Associator,
 
 #endif // !defined(GENERATING_DOCUMENTATION)
 
+template <typename AsyncWriteStream,
+    typename ConstBufferSequence, typename CompletionCondition,
+    ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
+      std::size_t)) WriteToken>
+inline auto async_write(AsyncWriteStream& s, const ConstBufferSequence& buffers,
+    CompletionCondition completion_condition, WriteToken&& token,
+    constraint_t<
+      is_const_buffer_sequence<ConstBufferSequence>::value
+    >)
+  -> decltype(
+    async_initiate<WriteToken,
+      void (asio::error_code, std::size_t)>(
+        declval<detail::initiate_async_write<AsyncWriteStream>>(),
+        token, buffers,
+        static_cast<CompletionCondition&&>(completion_condition)))
+{
+  return async_initiate<WriteToken,
+    void (asio::error_code, std::size_t)>(
+      detail::initiate_async_write<AsyncWriteStream>(s),
+      token, buffers,
+      static_cast<CompletionCondition&&>(completion_condition));
+}
+
+template <typename AsyncWriteStream, typename ConstBufferSequence,
+    ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
+      std::size_t)) WriteToken>
+inline auto async_write(AsyncWriteStream& s,
+    const ConstBufferSequence& buffers, WriteToken&& token,
+    constraint_t<
+      is_const_buffer_sequence<ConstBufferSequence>::value
+    >)
+  -> decltype(
+    async_initiate<WriteToken,
+      void (asio::error_code, std::size_t)>(
+        declval<detail::initiate_async_write<AsyncWriteStream>>(),
+        token, buffers, transfer_all()))
+{
+  return async_initiate<WriteToken,
+    void (asio::error_code, std::size_t)>(
+      detail::initiate_async_write<AsyncWriteStream>(s),
+      token, buffers, transfer_all());
+}
+
 #if !defined(ASIO_NO_DYNAMIC_BUFFER_V1)
 
 namespace detail
@@ -555,7 +573,7 @@ namespace detail
       write_dynbuf_v1_op<AsyncWriteStream, DynamicBuffer_v1,
         CompletionCondition, WriteHandler>* this_handler)
   {
-    return ASIO_VERSIONED_NAME(handler_cont_helpers)::is_continuation(
+    return asio_handler_cont_helpers::is_continuation(
         this_handler->handler_);
   }
 
@@ -631,6 +649,101 @@ struct associator<Associator,
 
 #endif // !defined(GENERATING_DOCUMENTATION)
 
+template <typename AsyncWriteStream, typename DynamicBuffer_v1,
+    ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
+      std::size_t)) WriteToken>
+inline auto async_write(AsyncWriteStream& s,
+    DynamicBuffer_v1&& buffers, WriteToken&& token,
+    constraint_t<
+      is_dynamic_buffer_v1<decay_t<DynamicBuffer_v1>>::value
+    >,
+    constraint_t<
+      !is_dynamic_buffer_v2<decay_t<DynamicBuffer_v1>>::value
+    >)
+  -> decltype(
+    async_initiate<WriteToken,
+      void (asio::error_code, std::size_t)>(
+        declval<detail::initiate_async_write_dynbuf_v1<AsyncWriteStream>>(),
+        token, static_cast<DynamicBuffer_v1&&>(buffers),
+        transfer_all()))
+{
+  return async_initiate<WriteToken,
+    void (asio::error_code, std::size_t)>(
+      detail::initiate_async_write_dynbuf_v1<AsyncWriteStream>(s),
+      token, static_cast<DynamicBuffer_v1&&>(buffers),
+      transfer_all());
+}
+
+template <typename AsyncWriteStream,
+    typename DynamicBuffer_v1, typename CompletionCondition,
+    ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
+      std::size_t)) WriteToken>
+inline auto async_write(AsyncWriteStream& s, DynamicBuffer_v1&& buffers,
+    CompletionCondition completion_condition, WriteToken&& token,
+    constraint_t<
+      is_dynamic_buffer_v1<decay_t<DynamicBuffer_v1>>::value
+    >,
+    constraint_t<
+      !is_dynamic_buffer_v2<decay_t<DynamicBuffer_v1>>::value
+    >)
+  -> decltype(
+    async_initiate<WriteToken,
+      void (asio::error_code, std::size_t)>(
+        declval<detail::initiate_async_write_dynbuf_v1<AsyncWriteStream>>(),
+        token, static_cast<DynamicBuffer_v1&&>(buffers),
+        static_cast<CompletionCondition&&>(completion_condition)))
+{
+  return async_initiate<WriteToken,
+    void (asio::error_code, std::size_t)>(
+      detail::initiate_async_write_dynbuf_v1<AsyncWriteStream>(s),
+      token, static_cast<DynamicBuffer_v1&&>(buffers),
+      static_cast<CompletionCondition&&>(completion_condition));
+}
+
+#if !defined(ASIO_NO_EXTENSIONS)
+#if !defined(ASIO_NO_IOSTREAM)
+
+template <typename AsyncWriteStream, typename Allocator,
+    ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
+      std::size_t)) WriteToken>
+inline auto async_write(AsyncWriteStream& s,
+    asio::basic_streambuf<Allocator>& b,
+    WriteToken&& token)
+  -> decltype(
+    async_initiate<WriteToken,
+      void (asio::error_code, std::size_t)>(
+        declval<detail::initiate_async_write_dynbuf_v1<AsyncWriteStream>>(),
+        token, basic_streambuf_ref<Allocator>(b), transfer_all()))
+{
+  return async_initiate<WriteToken,
+    void (asio::error_code, std::size_t)>(
+      detail::initiate_async_write_dynbuf_v1<AsyncWriteStream>(s),
+      token, basic_streambuf_ref<Allocator>(b), transfer_all());
+}
+
+template <typename AsyncWriteStream,
+    typename Allocator, typename CompletionCondition,
+    ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
+      std::size_t)) WriteToken>
+inline auto async_write(AsyncWriteStream& s,
+    asio::basic_streambuf<Allocator>& b,
+    CompletionCondition completion_condition, WriteToken&& token)
+  -> decltype(
+    async_initiate<WriteToken,
+      void (asio::error_code, std::size_t)>(
+        declval<detail::initiate_async_write_dynbuf_v1<AsyncWriteStream>>(),
+        token, basic_streambuf_ref<Allocator>(b),
+        static_cast<CompletionCondition&&>(completion_condition)))
+{
+  return async_initiate<WriteToken,
+    void (asio::error_code, std::size_t)>(
+      detail::initiate_async_write_dynbuf_v1<AsyncWriteStream>(s),
+      token, basic_streambuf_ref<Allocator>(b),
+      static_cast<CompletionCondition&&>(completion_condition));
+}
+
+#endif // !defined(ASIO_NO_IOSTREAM)
+#endif // !defined(ASIO_NO_EXTENSIONS)
 #endif // !defined(ASIO_NO_DYNAMIC_BUFFER_V1)
 
 namespace detail
@@ -699,7 +812,7 @@ namespace detail
       write_dynbuf_v2_op<AsyncWriteStream, DynamicBuffer_v2,
         CompletionCondition, WriteHandler>* this_handler)
   {
-    return ASIO_VERSIONED_NAME(handler_cont_helpers)::is_continuation(
+    return asio_handler_cont_helpers::is_continuation(
         this_handler->handler_);
   }
 
@@ -774,7 +887,51 @@ struct associator<Associator,
 
 #endif // !defined(GENERATING_DOCUMENTATION)
 
-ASIO_INLINE_NAMESPACE_END
+template <typename AsyncWriteStream, typename DynamicBuffer_v2,
+    ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
+      std::size_t)) WriteToken>
+inline auto async_write(AsyncWriteStream& s,
+    DynamicBuffer_v2 buffers, WriteToken&& token,
+    constraint_t<
+      is_dynamic_buffer_v2<DynamicBuffer_v2>::value
+    >)
+  -> decltype(
+    async_initiate<WriteToken,
+      void (asio::error_code, std::size_t)>(
+        declval<detail::initiate_async_write_dynbuf_v2<AsyncWriteStream>>(),
+        token, static_cast<DynamicBuffer_v2&&>(buffers),
+        transfer_all()))
+{
+  return async_initiate<WriteToken,
+    void (asio::error_code, std::size_t)>(
+      detail::initiate_async_write_dynbuf_v2<AsyncWriteStream>(s),
+      token, static_cast<DynamicBuffer_v2&&>(buffers),
+      transfer_all());
+}
+
+template <typename AsyncWriteStream,
+    typename DynamicBuffer_v2, typename CompletionCondition,
+    ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
+      std::size_t)) WriteToken>
+inline auto async_write(AsyncWriteStream& s, DynamicBuffer_v2 buffers,
+    CompletionCondition completion_condition, WriteToken&& token,
+    constraint_t<
+      is_dynamic_buffer_v2<DynamicBuffer_v2>::value
+    >)
+  -> decltype(
+    async_initiate<WriteToken,
+      void (asio::error_code, std::size_t)>(
+        declval<detail::initiate_async_write_dynbuf_v2<AsyncWriteStream>>(),
+        token, static_cast<DynamicBuffer_v2&&>(buffers),
+        static_cast<CompletionCondition&&>(completion_condition)))
+{
+  return async_initiate<WriteToken,
+    void (asio::error_code, std::size_t)>(
+      detail::initiate_async_write_dynbuf_v2<AsyncWriteStream>(s),
+      token, static_cast<DynamicBuffer_v2&&>(buffers),
+      static_cast<CompletionCondition&&>(completion_condition));
+}
+
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

@@ -2,7 +2,7 @@
 // basic_io_object.hpp
 // ~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -16,16 +16,11 @@
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
 #include "asio/detail/config.hpp"
-
-#if !defined(ASIO_NO_DEPRECATED) \
-  || defined(GENERATING_DOCUMENTATION)
-
 #include "asio/io_context.hpp"
 
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
-ASIO_INLINE_NAMESPACE_BEGIN
 
 namespace detail
 {
@@ -50,7 +45,7 @@ namespace detail
   };
 }
 
-/// (Deprecated) Base class for all I/O objects.
+/// Base class for all I/O objects.
 /**
  * @note All I/O objects are non-copyable. However, when using C++0x, certain
  * I/O objects do support move construction and move assignment.
@@ -61,8 +56,7 @@ template <typename IoObjectService>
 template <typename IoObjectService,
     bool Movable = detail::service_has_move<IoObjectService>::value>
 #endif
-class ASIO_DEPRECATED_MSG("Deprecated without replacement")
-  basic_io_object
+class basic_io_object
 {
 public:
   /// The type of the service that will be used to provide I/O operations.
@@ -71,7 +65,9 @@ public:
   /// The underlying implementation type of I/O object.
   typedef typename service_type::implementation_type implementation_type;
 
-  /// Get the io_context associated with the object.
+#if !defined(ASIO_NO_DEPRECATED)
+  /// (Deprecated: Use get_executor().) Get the io_context associated with the
+  /// object.
   /**
    * This function may be used to obtain the io_context object that the I/O
    * object uses to dispatch handlers for asynchronous operations.
@@ -84,7 +80,8 @@ public:
     return service_.get_io_context();
   }
 
-  /// Get the io_context associated with the object.
+  /// (Deprecated: Use get_executor().) Get the io_context associated with the
+  /// object.
   /**
    * This function may be used to obtain the io_context object that the I/O
    * object uses to dispatch handlers for asynchronous operations.
@@ -96,6 +93,7 @@ public:
   {
     return service_.get_io_context();
   }
+#endif // !defined(ASIO_NO_DEPRECATED)
 
   /// The type of the executor associated with the object.
   typedef asio::io_context::executor_type executor_type;
@@ -192,13 +190,13 @@ private:
 
 // Specialisation for movable objects.
 template <typename IoObjectService>
-class ASIO_DEPRECATED_MSG("Deprecated without replacement")
-  basic_io_object<IoObjectService, true>
+class basic_io_object<IoObjectService, true>
 {
 public:
   typedef IoObjectService service_type;
   typedef typename service_type::implementation_type implementation_type;
 
+#if !defined(ASIO_NO_DEPRECATED)
   asio::io_context& get_io_context()
   {
     return service_->get_io_context();
@@ -208,6 +206,7 @@ public:
   {
     return service_->get_io_context();
   }
+#endif // !defined(ASIO_NO_DEPRECATED)
 
   typedef asio::io_context::executor_type executor_type;
 
@@ -280,12 +279,8 @@ private:
   implementation_type implementation_;
 };
 
-ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"
-
-#endif // !defined(ASIO_NO_DEPRECATED)
-       //   || defined(GENERATING_DOCUMENTATION)
 
 #endif // ASIO_BASIC_IO_OBJECT_HPP

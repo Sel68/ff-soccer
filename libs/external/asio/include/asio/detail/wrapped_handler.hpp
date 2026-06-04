@@ -2,7 +2,7 @@
 // detail/wrapped_handler.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -17,12 +17,10 @@
 
 #include "asio/detail/bind_handler.hpp"
 #include "asio/detail/handler_cont_helpers.hpp"
-#include "asio/detail/initiate_dispatch.hpp"
 
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
-ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
 
 struct is_continuation_delegated
@@ -30,8 +28,7 @@ struct is_continuation_delegated
   template <typename Dispatcher, typename Handler>
   bool operator()(Dispatcher&, Handler& handler) const
   {
-    return ASIO_VERSIONED_NAME(handler_cont_helpers)::is_continuation(
-        handler);
+    return asio_handler_cont_helpers::is_continuation(handler);
   }
 };
 
@@ -44,36 +41,12 @@ struct is_continuation_if_running
   }
 };
 
-template <typename Dispatcher, typename = void>
-struct wrapped_executor
-{
-  typedef Dispatcher executor_type;
-
-  static const Dispatcher& get(const Dispatcher& dispatcher) noexcept
-  {
-    return dispatcher;
-  }
-};
-
-template <typename Dispatcher>
-struct wrapped_executor<Dispatcher,
-    void_type<typename Dispatcher::executor_type>>
-{
-  typedef typename Dispatcher::executor_type executor_type;
-
-  static executor_type get(const Dispatcher& dispatcher) noexcept
-  {
-    return dispatcher.get_executor();
-  }
-};
-
 template <typename Dispatcher, typename Handler,
     typename IsContinuation = is_continuation_delegated>
 class wrapped_handler
 {
 public:
   typedef void result_type;
-  typedef typename wrapped_executor<Dispatcher>::executor_type executor_type;
 
   wrapped_handler(Dispatcher dispatcher, Handler& handler)
     : dispatcher_(dispatcher),
@@ -93,90 +66,66 @@ public:
   {
   }
 
-  executor_type get_executor() const noexcept
-  {
-    return wrapped_executor<Dispatcher>::get(dispatcher_);
-  }
-
   void operator()()
   {
-    detail::initiate_dispatch_with_executor<executor_type>(
-        this->get_executor())(static_cast<Handler&&>(handler_),
-        empty_work_function());
+    dispatcher_.dispatch(static_cast<Handler&&>(handler_));
   }
 
   void operator()() const
   {
-    detail::initiate_dispatch_with_executor<executor_type>(
-        this->get_executor())(handler_, empty_work_function());
+    dispatcher_.dispatch(handler_);
   }
 
   template <typename Arg1>
   void operator()(const Arg1& arg1)
   {
-    detail::initiate_dispatch_with_executor<executor_type>(
-        this->get_executor())(detail::bind_handler(handler_, arg1),
-        empty_work_function());
+    dispatcher_.dispatch(detail::bind_handler(handler_, arg1));
   }
 
   template <typename Arg1>
   void operator()(const Arg1& arg1) const
   {
-    detail::initiate_dispatch_with_executor<executor_type>(
-        this->get_executor())(detail::bind_handler(handler_, arg1),
-        empty_work_function());
+    dispatcher_.dispatch(detail::bind_handler(handler_, arg1));
   }
 
   template <typename Arg1, typename Arg2>
   void operator()(const Arg1& arg1, const Arg2& arg2)
   {
-    detail::initiate_dispatch_with_executor<executor_type>(
-        this->get_executor())(detail::bind_handler(handler_, arg1, arg2),
-        empty_work_function());
+    dispatcher_.dispatch(detail::bind_handler(handler_, arg1, arg2));
   }
 
   template <typename Arg1, typename Arg2>
   void operator()(const Arg1& arg1, const Arg2& arg2) const
   {
-    detail::initiate_dispatch_with_executor<executor_type>(
-        this->get_executor())(detail::bind_handler(handler_, arg1, arg2),
-        empty_work_function());
+    dispatcher_.dispatch(detail::bind_handler(handler_, arg1, arg2));
   }
 
   template <typename Arg1, typename Arg2, typename Arg3>
   void operator()(const Arg1& arg1, const Arg2& arg2, const Arg3& arg3)
   {
-    detail::initiate_dispatch_with_executor<executor_type>(
-        this->get_executor())(detail::bind_handler(handler_, arg1, arg2, arg3),
-        empty_work_function());
+    dispatcher_.dispatch(detail::bind_handler(handler_, arg1, arg2, arg3));
   }
 
   template <typename Arg1, typename Arg2, typename Arg3>
   void operator()(const Arg1& arg1, const Arg2& arg2, const Arg3& arg3) const
   {
-    detail::initiate_dispatch_with_executor<executor_type>(
-        this->get_executor())(detail::bind_handler(handler_, arg1, arg2, arg3),
-        empty_work_function());
+    dispatcher_.dispatch(detail::bind_handler(handler_, arg1, arg2, arg3));
   }
 
   template <typename Arg1, typename Arg2, typename Arg3, typename Arg4>
   void operator()(const Arg1& arg1, const Arg2& arg2, const Arg3& arg3,
       const Arg4& arg4)
   {
-    detail::initiate_dispatch_with_executor<executor_type>(
-        this->get_executor())(
-          detail::bind_handler(handler_, arg1, arg2, arg3, arg4),
-          empty_work_function());
+    dispatcher_.dispatch(
+        detail::bind_handler(handler_, arg1, arg2, arg3, arg4));
   }
 
   template <typename Arg1, typename Arg2, typename Arg3, typename Arg4>
   void operator()(const Arg1& arg1, const Arg2& arg2, const Arg3& arg3,
       const Arg4& arg4) const
   {
-    detail::initiate_dispatch_with_executor<executor_type>(
-        this->get_executor())(
-          detail::bind_handler(handler_, arg1, arg2, arg3, arg4),
-          empty_work_function());
+    dispatcher_.dispatch(
+        detail::bind_handler(handler_, arg1, arg2, arg3, arg4));
   }
 
   template <typename Arg1, typename Arg2, typename Arg3, typename Arg4,
@@ -184,10 +133,8 @@ public:
   void operator()(const Arg1& arg1, const Arg2& arg2, const Arg3& arg3,
       const Arg4& arg4, const Arg5& arg5)
   {
-    detail::initiate_dispatch_with_executor<executor_type>(
-        this->get_executor())(
-          detail::bind_handler(handler_, arg1, arg2, arg3, arg4, arg5),
-          empty_work_function());
+    dispatcher_.dispatch(
+        detail::bind_handler(handler_, arg1, arg2, arg3, arg4, arg5));
   }
 
   template <typename Arg1, typename Arg2, typename Arg3, typename Arg4,
@@ -195,14 +142,55 @@ public:
   void operator()(const Arg1& arg1, const Arg2& arg2, const Arg3& arg3,
       const Arg4& arg4, const Arg5& arg5) const
   {
-    detail::initiate_dispatch_with_executor<executor_type>(
-        this->get_executor())(
-          detail::bind_handler(handler_, arg1, arg2, arg3, arg4, arg5),
-          empty_work_function());
+    dispatcher_.dispatch(
+        detail::bind_handler(handler_, arg1, arg2, arg3, arg4, arg5));
   }
 
 //private:
   Dispatcher dispatcher_;
+  Handler handler_;
+};
+
+template <typename Handler, typename Context>
+class rewrapped_handler
+{
+public:
+  explicit rewrapped_handler(Handler& handler, const Context& context)
+    : context_(context),
+      handler_(static_cast<Handler&&>(handler))
+  {
+  }
+
+  explicit rewrapped_handler(const Handler& handler, const Context& context)
+    : context_(context),
+      handler_(handler)
+  {
+  }
+
+  rewrapped_handler(const rewrapped_handler& other)
+    : context_(other.context_),
+      handler_(other.handler_)
+  {
+  }
+
+  rewrapped_handler(rewrapped_handler&& other)
+    : context_(static_cast<Context&&>(other.context_)),
+      handler_(static_cast<Handler&&>(other.handler_))
+  {
+  }
+
+  void operator()()
+  {
+    handler_();
+  }
+
+  void operator()() const
+  {
+    handler_();
+  }
+
+//private:
+  Context context_;
   Handler handler_;
 };
 
@@ -213,8 +201,15 @@ inline bool asio_handler_is_continuation(
   return IsContinuation()(this_handler->dispatcher_, this_handler->handler_);
 }
 
+template <typename Dispatcher, typename Context>
+inline bool asio_handler_is_continuation(
+    rewrapped_handler<Dispatcher, Context>* this_handler)
+{
+  return asio_handler_cont_helpers::is_continuation(
+      this_handler->context_);
+}
+
 } // namespace detail
-ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

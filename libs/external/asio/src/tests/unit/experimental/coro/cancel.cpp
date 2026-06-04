@@ -28,6 +28,7 @@ namespace this_coro = asio::this_coro;
 
 namespace coro {
 
+
 auto coro_simple_cancel_impl(asio::io_context& ) noexcept
   -> asio::experimental::coro<void() noexcept, asio::error_code>
 {

@@ -2,7 +2,7 @@
 // ssl/impl/host_name_verification.ipp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -26,7 +26,6 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
-ASIO_INLINE_NAMESPACE_BEGIN
 namespace ssl {
 
 bool host_name_verification::operator()(
@@ -50,7 +49,7 @@ bool host_name_verification::operator()(
   const bool is_address = !ec;
   (void)address;
 
-  auto cert = X509_STORE_CTX_get_current_cert(ctx.native_handle());
+  X509* cert = X509_STORE_CTX_get_current_cert(ctx.native_handle());
 
   if (is_address)
   {
@@ -67,7 +66,6 @@ bool host_name_verification::operator()(
 }
 
 } // namespace ssl
-ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

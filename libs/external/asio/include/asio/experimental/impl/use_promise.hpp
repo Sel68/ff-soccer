@@ -23,7 +23,6 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
-ASIO_INLINE_NAMESPACE_BEGIN
 namespace experimental {
 
 template <typename Allocator>
@@ -60,7 +59,6 @@ struct async_result<experimental::use_promise_t<Allocator>, R(Args...)>
 
 #endif // !defined(GENERATING_DOCUMENTATION)
 
-ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

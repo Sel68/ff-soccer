@@ -24,7 +24,6 @@
 #endif // defined(ASIO_HAS_STD_COROUTINE)
 
 namespace asio {
-ASIO_INLINE_NAMESPACE_BEGIN
 namespace experimental {
 namespace detail {
 
@@ -55,12 +54,12 @@ template <typename Allocator>
 struct partial_promise_base
 {
   template <typename Executor, typename Token, typename... Args>
-  void* operator new(std::size_t size, Executor&, Token& tk, Args&...)
+  void* operator new(const std::size_t size, Executor&, Token& tk, Args&...)
   {
     return allocate_coroutine<Allocator>(size, get_associated_allocator(tk));
   }
 
-  void operator delete(void* raw, std::size_t size)
+  void operator delete(void* raw, const std::size_t size)
   {
     deallocate_coroutine<Allocator>(raw, size);
   }
@@ -111,9 +110,10 @@ struct partial_promise : partial_promise_base<Allocator>
   }
 };
 
-} // namespace detail
+
+
+}; // namespace detail
 } // namespace experimental
-ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #if defined(ASIO_HAS_STD_COROUTINE)
@@ -151,7 +151,6 @@ struct coroutine_traits<
 #endif // defined(ASIO_HAS_STD_COROUTINE)
 
 namespace asio {
-ASIO_INLINE_NAMESPACE_BEGIN
 namespace experimental {
 namespace detail {
 
@@ -193,7 +192,6 @@ partial_coro dispatch_coroutine(Context& ctx,
 
 } // namespace detail
 } // namespace experimental
-ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #endif // ASIO_EXPERIMENTAL_DETAIL_PARTIAL_PROMISE_HPP

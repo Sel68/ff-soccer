@@ -2,7 +2,7 @@
 // detail/win_iocp_socket_service_base.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -46,7 +46,6 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
-ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
 
 class win_iocp_socket_service_base
@@ -218,7 +217,7 @@ public:
       = asio::get_associated_cancellation_slot(handler);
 
     bool is_continuation =
-      ASIO_VERSIONED_NAME(handler_cont_helpers)::is_continuation(handler);
+      asio_handler_cont_helpers::is_continuation(handler);
 
     // Allocate and construct an operation to wrap the handler.
     typedef win_iocp_wait_op<Handler, IoExecutor> op;
@@ -549,7 +548,7 @@ public:
   ASIO_DECL void restart_accept_op(socket_type s,
       socket_holder& new_socket, int family, int type,
       int protocol, void* output_buffer, DWORD address_length,
-      LONG* cancel_requested, operation* op);
+      long* cancel_requested, operation* op);
 
 protected:
   // Open a new socket implementation.
@@ -705,7 +704,7 @@ protected:
       o->target_->complete(owner, result_ec, bytes_transferred);
     }
 
-    LONG* get_cancel_requested()
+    long* get_cancel_requested()
     {
       return &cancel_requested_;
     }
@@ -729,7 +728,7 @@ protected:
   private:
     SOCKET socket_;
     operation* target_;
-    LONG cancel_requested_;
+    long cancel_requested_;
   };
 
   // Helper class used to implement per operation cancellation.
@@ -809,7 +808,7 @@ protected:
   // Pointer to NtSetInformationFile implementation.
   void* nt_set_info_;
 
-  // Mutex to protect access to the linked list of implementations.
+  // Mutex to protect access to the linked list of implementations. 
   asio::detail::mutex mutex_;
 
   // The head of a linked list of all implementations.
@@ -817,7 +816,6 @@ protected:
 };
 
 } // namespace detail
-ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

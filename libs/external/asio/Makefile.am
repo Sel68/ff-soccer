@@ -1,7 +1,7 @@
-AUTOMAKE_OPTIONS = foreign dist-bzip2 dist-zip parallel-tests
+AUTOMAKE_OPTIONS = foreign dist-bzip2 dist-zip
 
-noarch_pkgconfigdir = $(datadir)/pkgconfig
-noarch_pkgconfig_DATA = asio.pc
+pkgconfig_DATA = asio.pc
+pkgconfigdir = $(libdir)/pkgconfig
 
 SUBDIRS = include src
 

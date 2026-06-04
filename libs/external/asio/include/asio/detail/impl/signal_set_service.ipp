@@ -2,7 +2,7 @@
 // detail/impl/signal_set_service.ipp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -33,7 +33,6 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
-ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
 
 struct signal_state
@@ -68,15 +67,15 @@ signal_state* get_signal_state()
   return &state;
 }
 
-void ASIO_VERSIONED_NAME(signal_handler)(int signal_number)
+void asio_signal_handler(int signal_number)
 {
 #if defined(ASIO_WINDOWS) \
   || defined(ASIO_WINDOWS_RUNTIME) \
-  || defined(ASIO_CYGWIN_W32_SOCKETS)
+  || defined(__CYGWIN__)
   signal_set_service::deliver_signal(signal_number);
 #else // defined(ASIO_WINDOWS)
       //   || defined(ASIO_WINDOWS_RUNTIME)
-      //   || defined(ASIO_CYGWIN_W32_SOCKETS)
+      //   || defined(__CYGWIN__)
   int saved_errno = errno;
   signal_state* state = get_signal_state();
   signed_size_type result = ::write(state->write_descriptor_,
@@ -85,16 +84,16 @@ void ASIO_VERSIONED_NAME(signal_handler)(int signal_number)
   errno = saved_errno;
 #endif // defined(ASIO_WINDOWS)
        //   || defined(ASIO_WINDOWS_RUNTIME)
-       //   || defined(ASIO_CYGWIN_W32_SOCKETS)
+       //   || defined(__CYGWIN__)
 
 #if defined(ASIO_HAS_SIGNAL) && !defined(ASIO_HAS_SIGACTION)
-  ::signal(signal_number, ASIO_VERSIONED_NAME(signal_handler));
+  ::signal(signal_number, asio_signal_handler);
 #endif // defined(ASIO_HAS_SIGNAL) && !defined(ASIO_HAS_SIGACTION)
 }
 
 #if !defined(ASIO_WINDOWS) \
   && !defined(ASIO_WINDOWS_RUNTIME) \
-  && !defined(ASIO_CYGWIN_W32_SOCKETS)
+  && !defined(__CYGWIN__)
 class signal_set_service::pipe_read_op :
 # if defined(ASIO_HAS_IO_URING_AS_DEFAULT)
   public io_uring_operation
@@ -161,14 +160,14 @@ public:
 };
 #endif // !defined(ASIO_WINDOWS)
        //   && !defined(ASIO_WINDOWS_RUNTIME)
-       //   && !defined(ASIO_CYGWIN_W32_SOCKETS)
+       //   && !defined(__CYGWIN__)
 
 signal_set_service::signal_set_service(execution_context& context)
   : execution_context_service_base<signal_set_service>(context),
     scheduler_(asio::use_service<scheduler_impl>(context)),
 #if !defined(ASIO_WINDOWS) \
   && !defined(ASIO_WINDOWS_RUNTIME) \
-  && !defined(ASIO_CYGWIN_W32_SOCKETS)
+  && !defined(__CYGWIN__)
 # if defined(ASIO_HAS_IO_URING_AS_DEFAULT)
     io_uring_service_(asio::use_service<io_uring_service>(context)),
 # else // defined(ASIO_HAS_IO_URING_AS_DEFAULT)
@@ -176,7 +175,7 @@ signal_set_service::signal_set_service(execution_context& context)
 # endif // defined(ASIO_HAS_IO_URING_AS_DEFAULT)
 #endif // !defined(ASIO_WINDOWS)
        //   && !defined(ASIO_WINDOWS_RUNTIME)
-       //   && !defined(ASIO_CYGWIN_W32_SOCKETS)
+       //   && !defined(__CYGWIN__)
     next_(0),
     prev_(0)
 {
@@ -184,7 +183,7 @@ signal_set_service::signal_set_service(execution_context& context)
 
 #if !defined(ASIO_WINDOWS) \
   && !defined(ASIO_WINDOWS_RUNTIME) \
-  && !defined(ASIO_CYGWIN_W32_SOCKETS)
+  && !defined(__CYGWIN__)
 # if defined(ASIO_HAS_IO_URING_AS_DEFAULT)
   io_uring_service_.init_task();
 # else // defined(ASIO_HAS_IO_URING_AS_DEFAULT)
@@ -192,7 +191,7 @@ signal_set_service::signal_set_service(execution_context& context)
 # endif // defined(ASIO_HAS_IO_URING_AS_DEFAULT)
 #endif // !defined(ASIO_WINDOWS)
        //   && !defined(ASIO_WINDOWS_RUNTIME)
-       //   && !defined(ASIO_CYGWIN_W32_SOCKETS)
+       //   && !defined(__CYGWIN__)
 
   for (int i = 0; i < max_signal_number; ++i)
     registrations_[i] = 0;
@@ -228,7 +227,7 @@ void signal_set_service::notify_fork(execution_context::fork_event fork_ev)
 {
 #if !defined(ASIO_WINDOWS) \
   && !defined(ASIO_WINDOWS_RUNTIME) \
-  && !defined(ASIO_CYGWIN_W32_SOCKETS)
+  && !defined(__CYGWIN__)
   signal_state* state = get_signal_state();
   static_mutex::scoped_lock lock(state->mutex_);
 
@@ -289,11 +288,11 @@ void signal_set_service::notify_fork(execution_context::fork_event fork_ev)
   }
 #else // !defined(ASIO_WINDOWS)
       //   && !defined(ASIO_WINDOWS_RUNTIME)
-      //   && !defined(ASIO_CYGWIN_W32_SOCKETS)
+      //   && !defined(__CYGWIN__)
   (void)fork_ev;
 #endif // !defined(ASIO_WINDOWS)
        //   && !defined(ASIO_WINDOWS_RUNTIME)
-       //   && !defined(ASIO_CYGWIN_W32_SOCKETS)
+       //   && !defined(__CYGWIN__)
 }
 
 void signal_set_service::construct(
@@ -355,22 +354,21 @@ asio::error_code signal_set_service::add(
       using namespace std; // For memset.
       struct sigaction sa;
       memset(&sa, 0, sizeof(sa));
-      sa.sa_handler = ASIO_VERSIONED_NAME(signal_handler);
+      sa.sa_handler = asio_signal_handler;
       sigfillset(&sa.sa_mask);
       if (f != signal_set_base::flags::dont_care)
         sa.sa_flags = static_cast<int>(f);
       if (::sigaction(signal_number, &sa, 0) == -1)
 # else // defined(ASIO_HAS_SIGACTION)
-      if (::signal(signal_number, ASIO_VERSIONED_NAME(signal_handler))
-          == SIG_ERR)
+      if (::signal(signal_number, asio_signal_handler) == SIG_ERR)
 # endif // defined(ASIO_HAS_SIGACTION)
       {
-# if defined(ASIO_WINDOWS) || defined(ASIO_CYGWIN_W32_SOCKETS)
+# if defined(ASIO_WINDOWS) || defined(__CYGWIN__)
         ec = asio::error::invalid_argument;
-# else // defined(ASIO_WINDOWS) || defined(ASIO_CYGWIN_W32_SOCKETS)
+# else // defined(ASIO_WINDOWS) || defined(__CYGWIN__)
         ec = asio::error_code(errno,
             asio::error::get_system_category());
-# endif // defined(ASIO_WINDOWS) || defined(ASIO_CYGWIN_W32_SOCKETS)
+# endif // defined(ASIO_WINDOWS) || defined(__CYGWIN__)
         delete new_registration;
         return ec;
       }
@@ -393,7 +391,7 @@ asio::error_code signal_set_service::add(
         }
         struct sigaction sa;
         memset(&sa, 0, sizeof(sa));
-        sa.sa_handler = ASIO_VERSIONED_NAME(signal_handler);
+        sa.sa_handler = asio_signal_handler;
         sigfillset(&sa.sa_mask);
         sa.sa_flags = static_cast<int>(f);
         if (::sigaction(signal_number, &sa, 0) == -1)
@@ -467,12 +465,12 @@ asio::error_code signal_set_service::remove(
       if (::signal(signal_number, SIG_DFL) == SIG_ERR)
 # endif // defined(ASIO_HAS_SIGACTION)
       {
-# if defined(ASIO_WINDOWS) || defined(ASIO_CYGWIN_W32_SOCKETS)
+# if defined(ASIO_WINDOWS) || defined(__CYGWIN__)
         ec = asio::error::invalid_argument;
-# else // defined(ASIO_WINDOWS) || defined(ASIO_CYGWIN_W32_SOCKETS)
+# else // defined(ASIO_WINDOWS) || defined(__CYGWIN__)
         ec = asio::error_code(errno,
             asio::error::get_system_category());
-# endif // defined(ASIO_WINDOWS) || defined(ASIO_CYGWIN_W32_SOCKETS)
+# endif // defined(ASIO_WINDOWS) || defined(__CYGWIN__)
         return ec;
       }
 # if defined(ASIO_HAS_SIGACTION)
@@ -524,12 +522,12 @@ asio::error_code signal_set_service::clear(
       if (::signal(reg->signal_number_, SIG_DFL) == SIG_ERR)
 # endif // defined(ASIO_HAS_SIGACTION)
       {
-# if defined(ASIO_WINDOWS) || defined(ASIO_CYGWIN_W32_SOCKETS)
+# if defined(ASIO_WINDOWS) || defined(__CYGWIN__)
         ec = asio::error::invalid_argument;
-# else // defined(ASIO_WINDOWS) || defined(ASIO_CYGWIN_W32_SOCKETS)
+# else // defined(ASIO_WINDOWS) || defined(__CYGWIN__)
         ec = asio::error_code(errno,
             asio::error::get_system_category());
-# endif // defined(ASIO_WINDOWS) || defined(ASIO_CYGWIN_W32_SOCKETS)
+# endif // defined(ASIO_WINDOWS) || defined(__CYGWIN__)
         return ec;
       }
 # if defined(ASIO_HAS_SIGACTION)
@@ -650,21 +648,20 @@ void signal_set_service::add_service(signal_set_service* service)
   signal_state* state = get_signal_state();
   static_mutex::scoped_lock lock(state->mutex_);
 
-#if !defined(ASIO_WINDOWS) \
-  && !defined(ASIO_CYGWIN_W32_SOCKETS)
+#if !defined(ASIO_WINDOWS) && !defined(__CYGWIN__)
   // If this is the first service to be created, open a new pipe.
   if (state->service_list_ == 0)
     open_descriptors();
-#endif // !defined(ASIO_WINDOWS)
-       //   && !defined(ASIO_CYGWIN_W32_SOCKETS)
+#endif // !defined(ASIO_WINDOWS) && !defined(__CYGWIN__)
 
   // If a scheduler_ object is thread-unsafe then it must be the only
   // scheduler used to create signal_set objects.
   if (state->service_list_ != 0)
   {
-    if (!config(service->context()).get("scheduler", "locking", true)
-        || !config(state->service_list_->context()).get(
-            "scheduler", "locking", true))
+    if (!ASIO_CONCURRENCY_HINT_IS_LOCKING(SCHEDULER,
+          service->scheduler_.concurrency_hint())
+        || !ASIO_CONCURRENCY_HINT_IS_LOCKING(SCHEDULER,
+          state->service_list_->scheduler_.concurrency_hint()))
     {
       std::logic_error ex(
           "Thread-unsafe execution context objects require "
@@ -682,7 +679,7 @@ void signal_set_service::add_service(signal_set_service* service)
 
 #if !defined(ASIO_WINDOWS) \
   && !defined(ASIO_WINDOWS_RUNTIME) \
-  && !defined(ASIO_CYGWIN_W32_SOCKETS)
+  && !defined(__CYGWIN__)
   // Register for pipe readiness notifications.
   int read_descriptor = state->read_descriptor_;
   lock.unlock();
@@ -696,7 +693,7 @@ void signal_set_service::add_service(signal_set_service* service)
 # endif // defined(ASIO_HAS_IO_URING_AS_DEFAULT)
 #endif // !defined(ASIO_WINDOWS)
        //   && !defined(ASIO_WINDOWS_RUNTIME)
-       //   && !defined(ASIO_CYGWIN_W32_SOCKETS)
+       //   && !defined(__CYGWIN__)
 }
 
 void signal_set_service::remove_service(signal_set_service* service)
@@ -708,7 +705,7 @@ void signal_set_service::remove_service(signal_set_service* service)
   {
 #if !defined(ASIO_WINDOWS) \
   && !defined(ASIO_WINDOWS_RUNTIME) \
-  && !defined(ASIO_CYGWIN_W32_SOCKETS)
+  && !defined(__CYGWIN__)
     // Disable the pipe readiness notifications.
     int read_descriptor = state->read_descriptor_;
     lock.unlock();
@@ -725,7 +722,7 @@ void signal_set_service::remove_service(signal_set_service* service)
 # endif // defined(ASIO_HAS_IO_URING_AS_DEFAULT)
 #endif // !defined(ASIO_WINDOWS)
        //   && !defined(ASIO_WINDOWS_RUNTIME)
-       //   && !defined(ASIO_CYGWIN_W32_SOCKETS)
+       //   && !defined(__CYGWIN__)
 
     // Remove service from linked list of all services.
     if (state->service_list_ == service)
@@ -737,13 +734,11 @@ void signal_set_service::remove_service(signal_set_service* service)
     service->next_ = 0;
     service->prev_ = 0;
 
-#if !defined(ASIO_WINDOWS) \
-  && !defined(ASIO_CYGWIN_W32_SOCKETS)
+#if !defined(ASIO_WINDOWS) && !defined(__CYGWIN__)
     // If this is the last service to be removed, close the pipe.
     if (state->service_list_ == 0)
       close_descriptors();
-#endif // !defined(ASIO_WINDOWS)
-       //   && !defined(ASIO_CYGWIN_W32_SOCKETS)
+#endif // !defined(ASIO_WINDOWS) && !defined(__CYGWIN__)
   }
 }
 
@@ -751,7 +746,7 @@ void signal_set_service::open_descriptors()
 {
 #if !defined(ASIO_WINDOWS) \
   && !defined(ASIO_WINDOWS_RUNTIME) \
-  && !defined(ASIO_CYGWIN_W32_SOCKETS)
+  && !defined(__CYGWIN__)
   signal_state* state = get_signal_state();
 
   int pipe_fds[2];
@@ -776,14 +771,14 @@ void signal_set_service::open_descriptors()
   }
 #endif // !defined(ASIO_WINDOWS)
        //   && !defined(ASIO_WINDOWS_RUNTIME)
-       //   && !defined(ASIO_CYGWIN_W32_SOCKETS)
+       //   && !defined(__CYGWIN__)
 }
 
 void signal_set_service::close_descriptors()
 {
 #if !defined(ASIO_WINDOWS) \
   && !defined(ASIO_WINDOWS_RUNTIME) \
-  && !defined(ASIO_CYGWIN_W32_SOCKETS)
+  && !defined(__CYGWIN__)
   signal_state* state = get_signal_state();
 
   if (state->read_descriptor_ != -1)
@@ -795,7 +790,7 @@ void signal_set_service::close_descriptors()
   state->write_descriptor_ = -1;
 #endif // !defined(ASIO_WINDOWS)
        //   && !defined(ASIO_WINDOWS_RUNTIME)
-       //   && !defined(ASIO_CYGWIN_W32_SOCKETS)
+       //   && !defined(__CYGWIN__)
 }
 
 void signal_set_service::start_wait_op(
@@ -824,7 +819,6 @@ void signal_set_service::start_wait_op(
 }
 
 } // namespace detail
-ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

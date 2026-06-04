@@ -2,7 +2,7 @@
 // require_concept.hpp
 // ~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -27,7 +27,6 @@
 #if defined(GENERATING_DOCUMENTATION)
 
 namespace asio {
-ASIO_INLINE_NAMESPACE_BEGIN
 
 /// A customisation point that applies a concept-enforcing property to an
 /// object.
@@ -102,12 +101,11 @@ struct require_concept_result
   typedef automatically_determined type;
 };
 
-ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #else // defined(GENERATING_DOCUMENTATION)
 
-namespace ASIO_VERSIONED_NAME(require_concept_fn) {
+namespace asio_require_concept_fn {
 
 using asio::conditional_t;
 using asio::decay_t;
@@ -282,25 +280,23 @@ struct static_instance
 template <typename T>
 const T static_instance<T>::instance = {};
 
-} // namespace ASIO_VERSIONED_NAME(require_concept_fn)
+} // namespace asio_require_concept_fn
 namespace asio {
-ASIO_INLINE_NAMESPACE_BEGIN
 namespace {
 
-static constexpr const ASIO_VERSIONED_NAME(require_concept_fn)::impl&
-  require_concept = ASIO_VERSIONED_NAME(
-    require_concept_fn)::static_instance<>::instance;
+static constexpr const asio_require_concept_fn::impl&
+  require_concept = asio_require_concept_fn::static_instance<>::instance;
 
 } // namespace
 
-typedef ASIO_VERSIONED_NAME(require_concept_fn)::impl require_concept_t;
+typedef asio_require_concept_fn::impl require_concept_t;
 
 template <typename T, typename Property>
 struct can_require_concept :
   integral_constant<bool,
-    ASIO_VERSIONED_NAME(require_concept_fn)::call_traits<
+    asio_require_concept_fn::call_traits<
       require_concept_t, T, void(Property)>::overload !=
-        ASIO_VERSIONED_NAME(require_concept_fn)::ill_formed>
+        asio_require_concept_fn::ill_formed>
 {
 };
 
@@ -314,7 +310,7 @@ constexpr bool can_require_concept_v = can_require_concept<T, Property>::value;
 template <typename T, typename Property>
 struct is_nothrow_require_concept :
   integral_constant<bool,
-    ASIO_VERSIONED_NAME(require_concept_fn)::call_traits<
+    asio_require_concept_fn::call_traits<
       require_concept_t, T, void(Property)>::is_noexcept>
 {
 };
@@ -330,7 +326,7 @@ constexpr bool is_nothrow_require_concept_v
 template <typename T, typename Property>
 struct require_concept_result
 {
-  typedef typename ASIO_VERSIONED_NAME(require_concept_fn)::call_traits<
+  typedef typename asio_require_concept_fn::call_traits<
       require_concept_t, T, void(Property)>::result_type type;
 };
 
@@ -338,7 +334,6 @@ template <typename T, typename Property>
 using require_concept_result_t =
   typename require_concept_result<T, Property>::type;
 
-ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #endif // defined(GENERATING_DOCUMENTATION)
