@@ -49,7 +49,7 @@ int main() {
         if (ec) std::cerr << "Broadcast send error: " << ec.message() << "\n";
       });
       // Set a quick timeout to resend if no ACK is received
-      retry_timer.expires_after(std::chrono::milliseconds(100));
+      retry_timer.expires_after(std::chrono::milliseconds(200));
       retry_timer.async_wait([&](const asio::error_code& ec) {
         if (!ec) {
           std::cout << "Timeout, resending " << msg << "\n";
