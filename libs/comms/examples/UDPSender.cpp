@@ -6,14 +6,26 @@ std::string format_message(const std::string& msg_type, const std::string& seria
   return msg_type + ":" + std::to_string(serialized_data.length()) + ":" + serialized_data + "\n";
 }
 
-int main() {
+int main(int argc, char* argv[]) {
   asio::io_context io_context;
   asio::ip::udp::socket udp_socket(io_context);
 
   udp_socket.open(asio::ip::udp::v4());
 
-  std::string target_ip_address = "192.168.1.101";
-  int target_port = 8080;
+  std::string target_ip_address = "192.168.1.101";  // Default
+  if (argc > 1) {
+    target_ip_address = argv[1];
+  }
+
+  int target_port = 8080;  // Default
+  if (argc > 2) {
+    try {
+      target_port = std::stoi(argv[2]);
+    } catch (const std::exception& e) {
+      std::cerr << "Invalid port provided, falling back to " << target_port << "\n";
+    }
+  }
+
   asio::ip::udp::endpoint target_endpoint =
       asio::ip::udp::endpoint(asio::ip::address::from_string(target_ip_address), target_port);
 
