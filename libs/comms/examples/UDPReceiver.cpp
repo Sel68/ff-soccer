@@ -4,6 +4,7 @@
 
 // Standard: MSG_TYPE:PAYLOAD_LENGTH:SERIALIZED_DATA\n
 
+// parser
 void parse_message(const std::string& message) {
   size_t first_colon = message.find(':');
   if (first_colon == std::string::npos) {
@@ -48,18 +49,22 @@ int main(int argc, char* argv[]) {
   asio::io_context io_context;
   asio::ip::udp::socket udp_socket(io_context);
 
-  int host_recv_port = 8080;  // Default
+  std::string host_ip_address = "192.168.1.101";  // default ip
   if (argc > 1) {
+    host_ip_address = argv[1];
+  }
+
+  int host_recv_port = 8080;  // default port
+  if (argc > 2) {
     try {
-      host_recv_port = std::stoi(argv[1]);
+      host_recv_port = std::stoi(argv[2]);
     } catch (const std::exception& e) {
       std::cerr << "Invalid port provided, falling back to " << host_recv_port << "\n";
     }
   }
 
-  // Bind to any address (0.0.0.0) so it works across WiFi or Ethernet without
-  // hardcoding IPs
-  asio::ip::udp::endpoint host_endpoint(asio::ip::udp::v4(), host_recv_port);
+  asio::ip::udp::endpoint host_endpoint(asio::ip::address::from_string(host_ip_address),
+                                        host_recv_port);
 
   udp_socket.open(host_endpoint.protocol());
   udp_socket.bind(host_endpoint);
@@ -67,7 +72,7 @@ int main(int argc, char* argv[]) {
   std::array<char, 1024> buffer;
   asio::ip::udp::endpoint sender_endpoint;
 
-  std::cout << "UDP Receiver listening on port " << host_recv_port << " (all interfaces)\n";
+  std::cout << "UDP Receiver listening on " << host_ip_address << ":" << host_recv_port << "\n";
 
   while (true) {
     std::size_t bytes_received = udp_socket.receive_from(asio::buffer(buffer), sender_endpoint);
