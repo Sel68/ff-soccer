@@ -66,8 +66,19 @@ int main(int argc, char* argv[]) {
   asio::ip::udp::endpoint host_endpoint(asio::ip::address::from_string(host_ip_address),
                                         host_recv_port);
 
-  udp_socket.open(host_endpoint.protocol());
-  udp_socket.bind(host_endpoint);
+  // generated error handling
+  try {
+    udp_socket.open(host_endpoint.protocol());
+    udp_socket.bind(host_endpoint);
+  } catch (const std::exception& e) {
+    std::cerr << "Failed to bind to " << host_ip_address << ":" << host_recv_port << "\n"
+              << "Error: " << e.what() << "\n"
+              << "Make sure " << host_ip_address
+              << " is the actual IP address of THIS machine (the receiver).\n"
+              << "If you are unsure, you can change the code back to bind to 0.0.0.0 (all "
+                 "interfaces).\n";
+    return 1;
+  }
 
   std::array<char, 1024> buffer;
   asio::ip::udp::endpoint sender_endpoint;
