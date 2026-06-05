@@ -10,3 +10,6 @@ target_link_libraries(BroadcastSender PRIVATE comm_lib asio)
 
 add_executable(BroadcastReceiver BroadcastReceiver.cpp)
 target_link_libraries(BroadcastReceiver PRIVATE comm_lib asio)
+
+add_executable(UDPReceiver UDPReceiver.cpp)
+target_link_libraries(UDPReceiver PRIVATE asio)
