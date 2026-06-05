@@ -13,14 +13,26 @@ int main() {
 
     int recv_count = 0;
     const int max_recv = 10;  // stop after this many packets
-    sock.start_receive([&ioc, &recv_count](const asio::ip::udp::endpoint& peer,
-                                           const std::vector<uint8_t>& data) {
+    sock.start_receive([&](const asio::ip::udp::endpoint& peer, const std::vector<uint8_t>& data) {
       std::string s(data.begin(), data.end());
       std::cout << "Received from " << peer.address().to_string() << ":" << peer.port() << " -> "
                 << s << std::endl;
-      if (++recv_count >= max_recv) {
-        // stop the event loop after receiving enough packets
-        ioc.stop();
+
+      if (s.find("broadcast:") == 0) {
+        // Send ACK back to the sender
+        std::string ack_msg = "ACK:" + s.substr(10);
+        std::vector<uint8_t> ack_data(ack_msg.begin(), ack_msg.end());
+        sock.async_send_to(peer, ack_data, [](const asio::error_code&, std::size_t) {});
+
+        int seq = std::stoi(s.substr(10));
+        if (seq == recv_count) {
+          recv_count++;
+        }
+
+        if (recv_count >= max_recv) {
+          // stop the event loop after receiving enough packets
+          ioc.stop();
+        }
       }
     });
 
