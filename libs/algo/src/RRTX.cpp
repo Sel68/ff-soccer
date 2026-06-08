@@ -1,8 +1,9 @@
-#include "RRTX.h"
 #include <iostream>
 #include <random>
 #include <chrono>
 #include <algorithm>
+
+#include "RRTX.h"
 
 RRTX::RRTX() : m_recalculation_time_ms(10.0) {}
 
@@ -30,6 +31,7 @@ void RRTX::updateObstacle(const Obstacle& updated_obstacle) {
 
 void RRTX::setRecalculationTime(double time_ms) { m_recalculation_time_ms = time_ms; }
 
+// l2 norm
 double RRTX::distance(const Point2D& p1, const Point2D& p2) const {
   return std::hypot(p1.x - p2.x, p1.y - p2.y);
 }
@@ -67,6 +69,7 @@ bool RRTX::isCollisionFree(const Point2D& p1, const Point2D& p2) const {
   return true;
 }
 
+// rand functs for distributions
 Point2D RRTX::sampleFree() const {
   static std::random_device rd;
   static std::mt19937 gen(rd());
@@ -74,6 +77,7 @@ Point2D RRTX::sampleFree() const {
   static std::uniform_real_distribution<> dis_y(-field_width / 2, field_width / 2);
   static std::uniform_real_distribution<> dis_prob(0.0, 1.0);
 
+  // 10pc chance to x_rand  = goal
   if (dis_prob(gen) < 0.1) {
     return m_goal;
   }
@@ -95,7 +99,7 @@ std::vector<Point2D> RRTX::plan() {
 
   auto start_time = std::chrono::steady_clock::now();
 
-  // Basic RRT* loop to simulate RRTX growth within time limits
+  // RRT* loop to simulate RRTX growth within time limits
   while (true) {
     auto current_time = std::chrono::steady_clock::now();
     double elapsed_ms =

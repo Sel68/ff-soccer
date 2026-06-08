@@ -6,24 +6,23 @@
 #include <cmath>
 #include "kdTree.h"
 
-// Define basic 2D coordinates for RoboCup SSL domain
 struct Point2D {
   static const int DIM = 2;
   double x;
   double y;
 
+  // handy for dim access
   double operator[](size_t idx) const { return idx == 0 ? x : y; }
 };
 
-// Represents an obstacle (e.g. other robots).
-// Can be extended to have velocity or other dynamics.
+// all other robots
 struct Obstacle {
-  int id;  // Unique identifier (e.g. robot ID)
+  int id;  // Unique identifier=
   Point2D position;
   double radius;
 };
 
-// Internal node structure for RRTX
+// RRTX tree  node
 struct RRTXNode {
   Point2D position;
   double cost_from_start;
@@ -56,14 +55,14 @@ class RRTX {
   kdt::KDTree<Point2D> m_kd_tree;
   std::vector<RRTXNode> m_nodes;
 
-  // Configuration
+  // config
   double step_size = 0.5;
   double search_radius = 2.0;
-  double robot_radius = 0.09;  // Standard SSL robot radius
+  double robot_radius = 0.09;
   double field_length = 12.0;
   double field_width = 9.0;
 
-  // Helpers
+  // helper funcs
   bool isCollisionFree(const Point2D& p1, const Point2D& p2) const;
   Point2D sampleFree() const;
   Point2D steer(const Point2D& nearest, const Point2D& sample) const;
