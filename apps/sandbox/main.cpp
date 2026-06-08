@@ -1,10 +1,9 @@
 #include <window.h>
 
-int main()
-{
-    window Breakout;
+int main() {
+  window Breakout;
 
-    Breakout.windowinit();
+  Breakout.windowinit();
 
-    return 0;
+  return 0;
 }

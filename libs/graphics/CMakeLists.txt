@@ -9,13 +9,13 @@ add_library(graphics STATIC
 
 target_include_directories(graphics
     PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
 target_link_libraries(graphics
     PUBLIC
-        glad
-        glm
-        stb_image
-        game
+    glad
+    glm
+    stb_image
+    game
 )

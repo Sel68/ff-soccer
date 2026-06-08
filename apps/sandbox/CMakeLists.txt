@@ -9,6 +9,6 @@ add_executable(sandbox
 
 target_link_libraries(sandbox
     PRIVATE
-        game
-        glfw
+    game
+    glfw
 )
