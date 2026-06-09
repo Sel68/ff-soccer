@@ -12,7 +12,8 @@ RRTX::RRTX() : m_recalculation_time_ms(10.0) {}
 RRTX::~RRTX() {}
 
 std::vector<Point2D> RRTX::PlanningStep(std::pair<double, double> start,
-                                        std::pair<double, double> goal, std::vector<Obstacle> obstacles) {
+                                        std::pair<double, double> goal,
+                                        std::vector<Obstacle> obstacles) {
   // Algo
   // 1. RRTX Init
 
