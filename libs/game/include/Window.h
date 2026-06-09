@@ -3,8 +3,8 @@
 
 #include <iostream>
 
-#include "GameConstants.h"
 #include "ResourceManager.h"
+#include "SystemConstants.h"
 
 extern bool keys[1024];
 extern bool keys_processed[1024];

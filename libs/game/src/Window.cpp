@@ -28,7 +28,7 @@ void Window::WindowInit() {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_RESIZABLE, false);
-  gl_window = glfwCreateWindow(GameConstants::SCREEN_WIDTH, GameConstants::SCREEN_HEIGHT,
+  gl_window = glfwCreateWindow(SystemConstants::SCREEN_WIDTH, SystemConstants::SCREEN_HEIGHT,
                                "Breakout", nullptr, nullptr);
   glfwMakeContextCurrent(gl_window);
 
@@ -40,7 +40,7 @@ void Window::WindowInit() {
   glfwSetKeyCallback(gl_window, KeyCallback);
   glfwSetFramebufferSizeCallback(gl_window, FramebufferSizeCallback);
 
-  glViewport(0, 0, GameConstants::SCREEN_WIDTH, GameConstants::SCREEN_HEIGHT);
+  glViewport(0, 0, SystemConstants::SCREEN_WIDTH, SystemConstants::SCREEN_HEIGHT);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   return;

@@ -1,12 +1,13 @@
-#ifndef GAME_CONSTANTS_H
-#define GAME_CONSTANTS_H
+#ifndef SYSTEM_CONSTANTS
+#define SYSTEM_CONSTANTS
 
-#include <glm/glm.hpp>
+#include <utility>
 
-struct GameConstants {
+struct SystemConstants {
   static constexpr float PLAYER_RADIUS = 18.5f;
   static constexpr float PLAYER_VELOCITY = 300.0f;
-  static constexpr glm::vec2 INITIAL_BALL_VELOCITY = glm::vec2(150.0f, 150.0f);
+  static constexpr std::pair<float, float> INITIAL_BALL_VELOCITY =
+      std::pair<float, float>(150.0f, 150.0f);
   static constexpr float BALL_RADIUS = 12.5f;
   static constexpr float Stuckerror = 2.0f;
 
@@ -14,4 +15,4 @@ struct GameConstants {
   static constexpr unsigned int SCREEN_HEIGHT = 580;
 };
 
-#endif  // GAME_CONSTANTS_H
+#endif  // SYSTEM_CONSTANTS

@@ -19,6 +19,7 @@ target_link_libraries(game
     graphics
     glfw
     algo_lib
+    cfg_lib
 )
 
 target_compile_definitions(game

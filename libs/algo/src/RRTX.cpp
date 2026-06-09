@@ -1,13 +1,34 @@
+#include "RRTX.h"
+
+#include <algorithm>
+#include <chrono>
 #include <iostream>
 #include <random>
-#include <chrono>
-#include <algorithm>
 
-#include "RRTX.h"
+#include "SystemConstants.h"
 
 RRTX::RRTX() : m_recalculation_time_ms(10.0) {}
 
 RRTX::~RRTX() {}
+
+std::vector<Point2D> RRTX::PlanningStep(std::pair<double, double> start,
+                                        std::pair<double, double> goal, std::vector<Obstacle> obstacles) {
+  // Algo
+  // 1. RRTX Init
+
+  // 2. Starts and Goals
+  setStart(start);
+  setGoal(goal);
+
+  // 3. Obstacles
+
+  setObstacles(obstacles);
+
+  // 4. Planning
+  std::vector<Point2D> path = plan();
+
+  return path;
+}
 
 void RRTX::setGoal(const Point2D& goal) { m_goal = goal; }
 
