@@ -112,11 +112,16 @@ Point2D RRTX::sampleFree() const {
 std::vector<Point2D> RRTX::plan() {
   std::vector<Point2D> path;
 
-  if (m_nodes.empty()) {
-    m_nodes.emplace_back(m_start);
-    m_nodes[0].cost_from_start = 0;
-    m_kd_tree.insert(m_start);
+  if (isCollisionFree(m_start, m_goal)) {
+    return {m_start, m_goal};
   }
+
+  m_nodes.clear();
+  m_kd_tree.clear();
+
+  m_nodes.emplace_back(m_start);
+  m_nodes[0].cost_from_start = 0;
+  m_kd_tree.insert(m_start);
 
   auto start_time = std::chrono::steady_clock::now();
 

@@ -79,40 +79,45 @@ void Game::Init() {
                      resource_manager.GetTexture("robot"), false);
   team1_players.push_back(p1);
 
-  glm::vec2 playerPos2 = glm::vec2(
-      this->Width * 0.25f, this->Height * 0.25f - SystemConstants::PLAYER_RADIUS);  // defender1
+  glm::vec2 playerPos2 =
+      glm::vec2(this->Width * 0.25f,
+                this->Height * 0.25f - SystemConstants::PLAYER_RADIUS);  // defender1
   BallObject* p2 =
       new BallObject(playerPos2, SystemConstants::PLAYER_RADIUS,
                      glm::vec2(SystemConstants::PLAYER_VELOCITY, SystemConstants::PLAYER_VELOCITY),
                      resource_manager.GetTexture("robot"), true);
   team1_players.push_back(p2);
 
-  glm::vec2 playerPos3 = glm::vec2(
-      this->Width * 0.25f, this->Height * 0.75f - SystemConstants::PLAYER_RADIUS);  // defender2
+  glm::vec2 playerPos3 =
+      glm::vec2(this->Width * 0.25f,
+                this->Height * 0.75f - SystemConstants::PLAYER_RADIUS);  // defender2
   BallObject* p3 =
       new BallObject(playerPos3, SystemConstants::PLAYER_RADIUS,
                      glm::vec2(SystemConstants::PLAYER_VELOCITY, SystemConstants::PLAYER_VELOCITY),
                      resource_manager.GetTexture("robot"), true);
   team1_players.push_back(p3);
 
-  glm::vec2 playerPos4 = glm::vec2(
-      this->Width * 0.4f, this->Height * 0.15f - SystemConstants::PLAYER_RADIUS);  // midfielder1
+  glm::vec2 playerPos4 =
+      glm::vec2(this->Width * 0.4f,
+                this->Height * 0.15f - SystemConstants::PLAYER_RADIUS);  // midfielder1
   BallObject* p4 =
       new BallObject(playerPos4, SystemConstants::PLAYER_RADIUS,
                      glm::vec2(SystemConstants::PLAYER_VELOCITY, SystemConstants::PLAYER_VELOCITY),
                      resource_manager.GetTexture("robot"), true);
   team1_players.push_back(p4);
 
-  glm::vec2 playerPos5 = glm::vec2(
-      this->Width * 0.4f, this->Height * 0.5f - SystemConstants::PLAYER_RADIUS);  // midfielder2
+  glm::vec2 playerPos5 =
+      glm::vec2(this->Width * 0.4f,
+                this->Height * 0.5f - SystemConstants::PLAYER_RADIUS);  // midfielder2
   BallObject* p5 =
       new BallObject(playerPos5, SystemConstants::PLAYER_RADIUS,
                      glm::vec2(SystemConstants::PLAYER_VELOCITY, SystemConstants::PLAYER_VELOCITY),
                      resource_manager.GetTexture("robot"), true);
   team1_players.push_back(p5);
 
-  glm::vec2 playerPos6 = glm::vec2(
-      this->Width * 0.4f, this->Height * 0.85f - SystemConstants::PLAYER_RADIUS);  // midfielder3
+  glm::vec2 playerPos6 =
+      glm::vec2(this->Width * 0.4f,
+                this->Height * 0.85f - SystemConstants::PLAYER_RADIUS);  // midfielder3
   BallObject* p6 =
       new BallObject(playerPos6, SystemConstants::PLAYER_RADIUS,
                      glm::vec2(SystemConstants::PLAYER_VELOCITY, SystemConstants::PLAYER_VELOCITY),
@@ -129,40 +134,45 @@ void Game::Init() {
                      resource_manager.GetTexture("robot"), true);
   team2_players.push_back(Tp1);
 
-  glm::vec2 TplayerPos2 = glm::vec2(
-      this->Width * 0.75f, this->Height * 0.25f - SystemConstants::PLAYER_RADIUS);  // defender1
+  glm::vec2 TplayerPos2 =
+      glm::vec2(this->Width * 0.75f,
+                this->Height * 0.25f - SystemConstants::PLAYER_RADIUS);  // defender1
   BallObject* Tp2 =
       new BallObject(TplayerPos2, SystemConstants::PLAYER_RADIUS,
                      glm::vec2(SystemConstants::PLAYER_VELOCITY, SystemConstants::PLAYER_VELOCITY),
                      resource_manager.GetTexture("robot"), true);
   team2_players.push_back(Tp2);
 
-  glm::vec2 TplayerPos3 = glm::vec2(
-      this->Width * 0.75f, this->Height * 0.75f - SystemConstants::PLAYER_RADIUS);  // defender2
+  glm::vec2 TplayerPos3 =
+      glm::vec2(this->Width * 0.75f,
+                this->Height * 0.75f - SystemConstants::PLAYER_RADIUS);  // defender2
   BallObject* Tp3 =
       new BallObject(TplayerPos3, SystemConstants::PLAYER_RADIUS,
                      glm::vec2(SystemConstants::PLAYER_VELOCITY, SystemConstants::PLAYER_VELOCITY),
                      resource_manager.GetTexture("robot"), true);
   team2_players.push_back(Tp3);
 
-  glm::vec2 TplayerPos4 = glm::vec2(
-      this->Width * 0.6f, this->Height * 0.15f - SystemConstants::PLAYER_RADIUS);  // midfielder1
+  glm::vec2 TplayerPos4 =
+      glm::vec2(this->Width * 0.6f,
+                this->Height * 0.15f - SystemConstants::PLAYER_RADIUS);  // midfielder1
   BallObject* Tp4 =
       new BallObject(TplayerPos4, SystemConstants::PLAYER_RADIUS,
                      glm::vec2(SystemConstants::PLAYER_VELOCITY, SystemConstants::PLAYER_VELOCITY),
                      resource_manager.GetTexture("robot"), true);
   team2_players.push_back(Tp4);
 
-  glm::vec2 TplayerPos5 = glm::vec2(
-      this->Width * 0.6f, this->Height * 0.5f - SystemConstants::PLAYER_RADIUS);  // midfielder2
+  glm::vec2 TplayerPos5 =
+      glm::vec2(this->Width * 0.6f,
+                this->Height * 0.5f - SystemConstants::PLAYER_RADIUS);  // midfielder2
   BallObject* Tp5 =
       new BallObject(TplayerPos5, SystemConstants::PLAYER_RADIUS,
                      glm::vec2(SystemConstants::PLAYER_VELOCITY, SystemConstants::PLAYER_VELOCITY),
                      resource_manager.GetTexture("robot"), true);
   team2_players.push_back(Tp5);
 
-  glm::vec2 TplayerPos6 = glm::vec2(
-      this->Width * 0.6f, this->Height * 0.85f - SystemConstants::PLAYER_RADIUS);  // midfielder3
+  glm::vec2 TplayerPos6 =
+      glm::vec2(this->Width * 0.6f,
+                this->Height * 0.85f - SystemConstants::PLAYER_RADIUS);  // midfielder3
   BallObject* Tp6 =
       new BallObject(TplayerPos6, SystemConstants::PLAYER_RADIUS,
                      glm::vec2(SystemConstants::PLAYER_VELOCITY, SystemConstants::PLAYER_VELOCITY),
@@ -218,8 +228,11 @@ void Game::Update(float dt) {
       for (BallObject* p : team1_players) add_obstacle(p);
       for (BallObject* p : team2_players) add_obstacle(p);
 
-      std::pair<double, double> start(movableBot->Position.x, movableBot->Position.y);
-      std::pair<double, double> goal(ball->Position.x, ball->Position.y);
+      // std::pair<double, double> start(movableBot->Position.x, movableBot->Position.y);
+      // std::pair<double, double> goal(ball->Position.x, ball->Position.y);
+      std::pair<double, double> start =
+          screenToRRTX(movableBot->Position.x, movableBot->Position.y);
+      std::pair<double, double> goal = screenToRRTX(ball->Position.x, ball->Position.y);
 
       std::vector<Point2D> path = Plan(start, goal, obstacles);
 
@@ -358,7 +371,8 @@ Direction VectorDirection(glm::vec2 target) {
   return (Direction)best_match;
 }
 
-Collision CheckCollision(BallObject& one, BallObject& two)  // Circle - Circle collision
+Collision CheckCollision(BallObject& one,
+                         BallObject& two)  // Circle - Circle collision
 {
   glm::vec2 centerOne(one.Position + one.Radius);
   glm::vec2 centerTwo(two.Position + two.Radius);
@@ -398,6 +412,4 @@ void Game::DoCollisions() {
   for (BallObject* p : team2_players) handleCollision(p);
 }
 
-void Game::SetCurrentAlgo(AlgoName algo) {
-  current_algo = algo;
-}
+void Game::SetCurrentAlgo(AlgoName algo) { current_algo = algo; }

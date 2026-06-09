@@ -17,4 +17,5 @@ target_link_libraries(graphics
     glad
     glm
     stb_image
+    glfw # graphic needs glfw
 )
