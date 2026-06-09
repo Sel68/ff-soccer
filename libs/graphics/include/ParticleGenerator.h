@@ -1,13 +1,13 @@
 #ifndef PARTICLE_GENERATOR_H
 #define PARTICLE_GENERATOR_H
+#include <glad/glad.h>
+
+#include <glm/glm.hpp>
 #include <vector>
 
-#include <glad/glad.h>
-#include <glm/glm.hpp>
-
-#include <shaders.h>
-#include "texture.h"
-#include <gameobject.h>
+#include "GameObject.h"
+#include "Shaders.h"
+#include "Texture.h"
 
 struct Particle {
   glm::vec2 Position, Velocity;

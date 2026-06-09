@@ -1,11 +1,4 @@
-file(GLOB_RECURSE SANDBOX_SOURCES
-    CONFIGURE_DEPENDS
-    *.cpp
-)
-
-add_executable(sandbox
-    ${SANDBOX_SOURCES}
-)
+add_executable(sandbox SimulatorApp.cpp)
 
 target_link_libraries(sandbox
     PRIVATE

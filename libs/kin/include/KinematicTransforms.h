@@ -5,8 +5,8 @@
 
 class KinematicTransforms {
  public:
-  static ChassisVelocity worldToRobot(const ChassisVelocity& world_vel, double robot_theta);
-  static ChassisVelocity robotToWorld(const ChassisVelocity& robot_vel, double robot_theta);
+  static ChassisVelocity WorldToRobot(const ChassisVelocity& world_vel, double robot_theta);
+  static ChassisVelocity RobotToWorld(const ChassisVelocity& robot_vel, double robot_theta);
 };
 
 #endif

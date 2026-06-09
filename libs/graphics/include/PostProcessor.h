@@ -2,12 +2,13 @@
 #ifndef POST_PROCESSOR_H
 #define POST_PROCESSOR_H
 
+#include <SpriteRenderer.h>
 #include <glad/glad.h>
+
 #include <glm/glm.hpp>
 
-#include <texture.h>
-#include <SpriteRenderer.h>
-#include <shaders.h>
+#include "Shaders.h"
+#include "Texture.h"
 
 class PostProcessor {
  public:

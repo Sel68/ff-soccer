@@ -1,7 +1,7 @@
 #include <fstream>
 #include <sstream>
 
-#include "gamelevel.h"
+#include "GameLevel.h"
 
 void GameLevel::Load(const char* file, unsigned int levelWidth, unsigned int levelHeight) {
   Bricks.clear();

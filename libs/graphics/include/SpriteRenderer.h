@@ -1,8 +1,9 @@
 #pragma once
 
-#include <shaders.h>
-#include <texture.h>
 #include <iostream>
+
+#include "Shaders.h"
+#include "Texture.h"
 
 class SpriteRenderer {
  public:

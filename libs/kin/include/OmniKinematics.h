@@ -33,6 +33,7 @@ class WheelConfig {
 
 class OmniKinematics {
  private:
+  // TODO:
   /*
     Please use std::array with fixed number of wheels. Number of wheels
     will be a constant (constexpr). This code will go inside the microcontroller
@@ -44,8 +45,8 @@ class OmniKinematics {
  public:
   OmniKinematics(const std::vector<WheelConfig>& wheel_configs, double max_wheelspin);
 
-  Eigen::VectorXd chassisToWheels(ChassisVelocity target, bool scale_limits = true);
-  ChassisVelocity wheelsToChassis(const Eigen::VectorXd& wheel_vels);
+  Eigen::VectorXd ChassisToWheels(ChassisVelocity target, bool scale_limits = true);
+  ChassisVelocity WheelsToChassis(const Eigen::VectorXd& wheel_vels);
 };
 
 #endif

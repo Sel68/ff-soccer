@@ -1,6 +1,7 @@
 #include <vector>
-#include <gameobject.h>
-#include <resource_manager.h>
+
+#include "GameObject.h"
+#include "ResourceManager.h"
 
 class GameLevel {
  public:

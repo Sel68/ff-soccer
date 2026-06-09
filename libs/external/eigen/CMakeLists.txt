@@ -63,13 +63,13 @@ endif()
 #==============================================================================
 # Determine if we should build tests.
 include(CMakeDependentOption)
-cmake_dependent_option(BUILD_TESTING "Enable creation of tests." ON "PROJECT_IS_TOP_LEVEL" OFF)
-option(EIGEN_BUILD_TESTING "Enable creation of Eigen tests." ${BUILD_TESTING})
+cmake_dependent_option(BUILD_TESTING "Enable creation of tests." OFF "PROJECT_IS_TOP_LEVEL" OFF)
+option(EIGEN_BUILD_TESTING "Enable creation of Eigen tests." OFF)
 option(EIGEN_LEAVE_TEST_IN_ALL_TARGET "Leaves tests in the all target, needed by ctest for automatic building." OFF)
 
 # Determine if we should build BLAS/LAPACK implementations.
-option(EIGEN_BUILD_BLAS "Toggles the building of the Eigen Blas library" ${PROJECT_IS_TOP_LEVEL})
-option(EIGEN_BUILD_LAPACK "Toggles the building of the included Eigen LAPACK library" ${PROJECT_IS_TOP_LEVEL})
+option(EIGEN_BUILD_BLAS "Toggles the building of the Eigen Blas library" OFF)
+option(EIGEN_BUILD_LAPACK "Toggles the building of the included Eigen LAPACK library" OFF)
 if (EIGEN_BUILD_BLAS OR EIGEN_BUILD_LAPACK)
   # Determine if we should build shared libraries for BLAS/LAPACK on this platform.
   if (NOT EIGEN_BUILD_SHARED_LIBS)
@@ -81,17 +81,17 @@ endif()
 # Building documentation requires creating and running executables on the host
 # platform.  We shouldn't do this if cross-compiling.
 if (PROJECT_IS_TOP_LEVEL AND NOT CMAKE_CROSSCOMPILING)
-  set(EIGEN_BUILD_DOC_DEFAULT ON)
+  set(EIGEN_BUILD_DOC_DEFAULT OFF)
 endif()
-option(EIGEN_BUILD_DOC "Enable creation of Eigen documentation" ${EIGEN_BUILD_DOC_DEFAULT})
+option(EIGEN_BUILD_DOC "Enable creation of Eigen documentation" OFF)
 
-option(EIGEN_BUILD_DEMOS "Toggles the building of the Eigen demos" ${PROJECT_IS_TOP_LEVEL})
+option(EIGEN_BUILD_DEMOS "Toggles the building of the Eigen demos" OFF)
 
 # Disable pkgconfig only for native Windows builds
 if(NOT WIN32 OR NOT CMAKE_HOST_SYSTEM_NAME MATCHES Windows)
-  option(EIGEN_BUILD_PKGCONFIG "Build pkg-config .pc file for Eigen" ${PROJECT_IS_TOP_LEVEL})
+  option(EIGEN_BUILD_PKGCONFIG "Build pkg-config .pc file for Eigen" OFF)
 endif()
-option(EIGEN_BUILD_CMAKE_PACKAGE "Enables the creation of EigenConfig.cmake and related files" ${PROJECT_IS_TOP_LEVEL})
+option(EIGEN_BUILD_CMAKE_PACKAGE "Enables the creation of EigenConfig.cmake and related files" OFF)
 
 if (EIGEN_BUILD_TESTING OR EIGEN_BUILD_BLAS OR EIGEN_BUILD_LAPACK OR EIGEN_BUILD_DOC OR EIGEN_BUILD_DEMOS)
   set(EIGEN_IS_BUILDING_ ON)

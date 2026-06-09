@@ -1,33 +1,31 @@
-#include "resource_manager.h"
-
-std::map<std::string, Texture2D> ResourceManager::Textures;
-std::map<std::string, Shader> ResourceManager::Shaders;
+#include "ResourceManager.h"
 
 Shader ResourceManager::LoadShader(const char* vShaderFile, const char* fShaderFile,
                                    const char* gShaderFile, std::string name) {
-  Shaders[name] = loadShaderFromFile(vShaderFile, fShaderFile, gShaderFile);
-  return Shaders[name];
+  std::cout << "[ResourceManager::LoadShader]: " << vShaderFile << std::endl;
+  shaders[name] = LoadShaderFromFile(vShaderFile, fShaderFile, gShaderFile);
+  return shaders[name];
 }
 
-Shader ResourceManager::GetShader(std::string name) { return Shaders[name]; }
+Shader ResourceManager::GetShader(std::string name) { return shaders[name]; }
 
 Texture2D ResourceManager::LoadTexture(const char* file, bool alpha, std::string name) {
-  Textures[name] = loadTextureFromFile(file, alpha);
-  return Textures[name];
+  textures[name] = LoadTextureFromFile(file, alpha);
+  return textures[name];
 }
 
-Texture2D ResourceManager::GetTexture(std::string name) { return Textures[name]; }
+Texture2D ResourceManager::GetTexture(std::string name) { return textures[name]; }
 
 void ResourceManager::Clear() {
-  for (auto iter : Shaders) {
+  for (auto& iter : shaders) {
     glDeleteProgram(iter.second.ID);
   }
-  for (auto iter : Textures) {
+  for (auto& iter : textures) {
     glDeleteTextures(1, &iter.second.ID);
   }
 }
 
-Shader ResourceManager::loadShaderFromFile(const char* vShaderFile, const char* fShaderFile,
+Shader ResourceManager::LoadShaderFromFile(const char* vShaderFile, const char* fShaderFile,
                                            const char* gShaderFile) {
   std::string vertexCode;
   std::string fragmentCode;
@@ -66,7 +64,7 @@ Shader ResourceManager::loadShaderFromFile(const char* vShaderFile, const char* 
   return shader;
 }
 
-Texture2D ResourceManager::loadTextureFromFile(const char* file, bool alpha) {
+Texture2D ResourceManager::LoadTextureFromFile(const char* file, bool alpha) {
   Texture2D texture;
   if (alpha) {
     texture.Internal_Format = GL_RGBA;
