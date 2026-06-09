@@ -4,26 +4,27 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
   glViewport(0, 0, width, height);
 }
 
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode) {
+void key_callback(Game& game, GLFWwindow* window, int key, int scancode, int action, int mode) {
   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) glfwSetWindowShouldClose(window, true);
 
   if (key >= 0 && key < 1024) {
     if (action == GLFW_PRESS)
-      Breakout.Keys[key] = true;
+      game.Keys[key] = true;
     else if (action == GLFW_RELEASE) {
-      Breakout.Keys[key] = false;
-      Breakout.KeysProcessed[key] = false;
+      game.Keys[key] = false;
+      game.KeysProcessed[key] = false;
     }
   }
 }
 
-void window::windowinit() {
+void Window::windowinit() {
   glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_RESIZABLE, false);
-  GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Breakout", nullptr, nullptr);
+  GLFWwindow* window = glfwCreateWindow(GameConstants::SCREEN_WIDTH, GameConstants::SCREEN_HEIGHT,
+                                        "Breakout", nullptr, nullptr);
   glfwMakeContextCurrent(window);
 
   if (!gladLoadGL((GLADloadfunc)glfwGetProcAddress)) {

@@ -3,7 +3,8 @@
 
 #include "GameLevel.h"
 
-void GameLevel::Load(const char* file, unsigned int levelWidth, unsigned int levelHeight) {
+void GameLevel::Load(ResourceManager& resource_manager, const char* file, unsigned int levelWidth,
+                     unsigned int levelHeight) {
   Bricks.clear();
 
   unsigned int tileCode;
@@ -19,7 +20,7 @@ void GameLevel::Load(const char* file, unsigned int levelWidth, unsigned int lev
       tileData.push_back(row);
     }
 
-    if (tileData.size() > 0) init(tileData, levelWidth, levelHeight);
+    if (tileData.size() > 0) init(resource_manager, tileData, levelWidth, levelHeight);
   }
 }
 
@@ -34,7 +35,7 @@ bool GameLevel::IsCompleted() {
   return true;
 }
 
-void GameLevel::init(std::vector<std::vector<unsigned int>> tileData, unsigned int lvlWidth,
+void GameLevel::init(ResourceManager& resource_manager, std::vector<std::vector<unsigned int>> tileData, unsigned int lvlWidth,
                      unsigned int lvlHeight) {
   unsigned int height = tileData.size();
   unsigned int width = tileData[0].size();
@@ -48,7 +49,7 @@ void GameLevel::init(std::vector<std::vector<unsigned int>> tileData, unsigned i
       {
         glm::vec2 pos(unit_width * x, unit_height * y);
         glm::vec2 size(unit_width, unit_height);
-        GameObject obj(pos, size, ResourceManager::GetTexture("block_solid"), true,
+        GameObject obj(pos, size, resource_manager.GetTexture("block_solid"), true,
                        glm::vec3(0.8f, 0.8f, 0.7f));
         obj.IsSolid = true;
         Bricks.push_back(obj);
@@ -70,7 +71,7 @@ void GameLevel::init(std::vector<std::vector<unsigned int>> tileData, unsigned i
 
         glm::vec2 pos(unit_width * x, unit_height * y);
         glm::vec2 size(unit_width, unit_height);
-        Bricks.push_back(GameObject(pos, size, ResourceManager::GetTexture("block"), true, color));
+        Bricks.push_back(GameObject(pos, size, resource_manager.GetTexture("block"), true, color));
       }
     }
   }

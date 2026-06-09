@@ -14,14 +14,9 @@
 #define LEVEL_DIR ""
 #endif
 
-const unsigned int Team1 = 6;
-const unsigned int Team2 = 6;
-int SelectedPlayer = 0;
-
-float Stuckerror = 2.0f;
-
-Game::Game(unsigned int width, unsigned int height)
-    : State(GAME_ACTIVE), Keys(), Width(width), Height(height) {
+Game::Game() : State(GAME_ACTIVE), Keys() {
+  this->Width = GameConstants::SCREEN_WIDTH;
+  this->Height = GameConstants::SCREEN_HEIGHT;
   game_window.windowinit();
 }
 
@@ -56,7 +51,7 @@ void Game::Init() {
   renderer = new SpriteRenderer(shader);
 
   GameLevel one;
-  one.Load(LEVEL_DIR "sim.lvl", this->Width, this->Height / 2);
+  one.Load(resource_manager, LEVEL_DIR "sim.lvl", this->Width, this->Height / 2);
 
   this->Levels.push_back(one);
   this->Level = 0;
@@ -341,8 +336,9 @@ Collision CheckCollision(BallObject& one, BallObject& two)  // Circle - Circle c
   float radiiSum = one.Radius + two.Radius;
 
   if (distance <= radiiSum) {
-    if ((centerTwo.x + GameConstants::PLAYER_RADIUS - Stuckerror) <= ((ball->Position).x)) {
-      ball->Stuck = true;
+    if ((centerTwo.x + GameConstants::PLAYER_RADIUS - GameConstants::Stuckerror) <=
+        ((one.Position).x)) {
+      one.Stuck = true;
     }
     return std::make_tuple(true, VectorDirection(difference), difference);
   }
@@ -353,7 +349,7 @@ Collision CheckCollision(BallObject& one, BallObject& two)  // Circle - Circle c
 
 void Game::DoCollisions() {
   auto handleCollision = [&](BallObject* player) {
-    Collision result = CheckCollision(*Ball, *player);
+    Collision result = CheckCollision(*ball, *player);
     if (!ball->Stuck && std::get<0>(result)) {
       float centerBoard = player->Position.x + GameConstants::PLAYER_RADIUS;
       float distance = (ball->Position.x + ball->Radius) - centerBoard;
@@ -361,7 +357,7 @@ void Game::DoCollisions() {
       float strength = 2.0f;
 
       glm::vec2 oldVelocity = ball->Velocity;
-      ball->Velocity.x = INITIAL_BALL_VELOCITY.x * percentage * strength;
+      ball->Velocity.x = GameConstants::INITIAL_BALL_VELOCITY.x * percentage * strength;
       ball->Velocity = glm::normalize(ball->Velocity) * glm::length(oldVelocity);
       ball->Velocity.y = -1.0f * abs(ball->Velocity.y);
     }

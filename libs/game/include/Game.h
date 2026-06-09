@@ -12,7 +12,6 @@
 
 #include "Constants.h"
 #include "GameLevel.h"
-#include "ParticleGenerator.h"
 #include "PostProcessor.h"
 #include "ResourceManager.h"
 #include "Window.h"
@@ -29,12 +28,12 @@ class Game {
   bool Keys[1024];
   bool KeysProcessed[1024];
   unsigned int Width, Height;
-  window game_window;
+  Window game_window;
   std::vector<GameLevel> Levels;
   unsigned int Level;
   unsigned int Lives;
 
-  Game(unsigned int width, unsigned int height);
+  Game();
   ~Game();
   void Init();
   void Cleanup();

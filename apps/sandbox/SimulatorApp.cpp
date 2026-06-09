@@ -1,7 +1,7 @@
 #include "Window.h"
 
 int main() {
-  Game Breakout(SCREEN_WIDTH, SCREEN_HEIGHT);
+  Game Breakout();
 
   return 0;
 }
