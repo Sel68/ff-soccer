@@ -1,5 +1,4 @@
 #include "Game.h"
-
 #include "RRTX.h"
 
 #ifndef SHADER_DIR
@@ -14,13 +13,23 @@
 #define LEVEL_DIR ""
 #endif
 
-Game::Game() : State(GAME_ACTIVE), Keys() {
+Game::Game() : State(GAME_ACTIVE) {
   this->Width = GameConstants::SCREEN_WIDTH;
   this->Height = GameConstants::SCREEN_HEIGHT;
-  game_window.windowinit();
+  game_window.WindowInit();
+  Init();
 }
 
-Game::~Game() {}
+void Game::Exit() {
+  Cleanup();
+  resource_manager.Clear();
+
+  glfwTerminate();
+}
+
+Game::~Game() { Exit(); }
+
+bool Game::Running() { return !glfwWindowShouldClose(game_window.gl_window); }
 
 void Game::Cleanup() {
   delete renderer;
@@ -222,66 +231,76 @@ void Game::Update(float dt) {
   }
 
   this->DoCollisions();
+
+  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+  glClear(GL_COLOR_BUFFER_BIT);
+  Render();
+
+  glfwSwapBuffers(game_window.gl_window);
 }
 
+
+
 void Game::ProcessInput(float dt) {
+  glfwPollEvents();
+
   auto handleCollision = [&](BallObject* Player) {
     bool isStuckToThisPlayer =
         ball->Stuck && (glm::length(Player->Position - ball->Position) < Player->Radius * 4.0f);
     if (!Player->lock) {
       if (this->State == GAME_ACTIVE) {
         float velocity = GameConstants::PLAYER_VELOCITY * dt;
-        if (this->Keys[GLFW_KEY_A]) {
+        if (keys[GLFW_KEY_A]) {
           if (Player->Position.x >= 50.0f) {
             Player->Position.x -= velocity;
             if (isStuckToThisPlayer) ball->Position.x -= velocity;
           }
         }
-        if (this->Keys[GLFW_KEY_D]) {
+        if (keys[GLFW_KEY_D]) {
           if (Player->Position.x <= this->Width - Player->Size.x - 50.0f) {
             Player->Position.x += velocity;
             if (isStuckToThisPlayer) ball->Position.x += velocity;
           }
         }
 
-        if (this->Keys[GLFW_KEY_W]) {
+        if (keys[GLFW_KEY_W]) {
           if (Player->Position.y >= 30.0f) {
             Player->Position.y -= velocity;
             if (isStuckToThisPlayer) ball->Position.y -= velocity;
           }
         }
-        if (this->Keys[GLFW_KEY_S]) {
+        if (keys[GLFW_KEY_S]) {
           if (Player->Position.y <= this->Height - Player->Size.y - 30.0f) {
             Player->Position.y += velocity;
             if (isStuckToThisPlayer) ball->Position.y += velocity;
           }
         }
 
-        if (this->Keys[GLFW_KEY_K]) ball->Stuck = false;
+        if (keys[GLFW_KEY_K]) ball->Stuck = false;
       }
     } else if (Player == team2_players[0]) {
       if (this->State == GAME_ACTIVE) {
         float velocity = GameConstants::PLAYER_VELOCITY * dt;
-        if (this->Keys[GLFW_KEY_LEFT]) {
+        if (keys[GLFW_KEY_LEFT]) {
           if (Player->Position.x >= 50.0f) {
             Player->Position.x -= velocity;
             if (isStuckToThisPlayer) ball->Position.x -= velocity;
           }
         }
-        if (this->Keys[GLFW_KEY_RIGHT]) {
+        if (keys[GLFW_KEY_RIGHT]) {
           if (Player->Position.x <= this->Width - Player->Size.x - 50.0f) {
             Player->Position.x += velocity;
             if (isStuckToThisPlayer) ball->Position.x += velocity;
           }
         }
 
-        if (this->Keys[GLFW_KEY_UP]) {
+        if (keys[GLFW_KEY_UP]) {
           if (Player->Position.y >= 30.0f) {
             Player->Position.y -= velocity;
             if (isStuckToThisPlayer) ball->Position.y -= velocity;
           }
         }
-        if (this->Keys[GLFW_KEY_DOWN]) {
+        if (keys[GLFW_KEY_DOWN]) {
           if (Player->Position.y <= this->Height - Player->Size.y - 30.0f) {
             Player->Position.y += velocity;
             if (isStuckToThisPlayer) ball->Position.y += velocity;

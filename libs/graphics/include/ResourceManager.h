@@ -9,7 +9,6 @@
     Local stuff
 */
 
-#include <glad/glad.h>
 #include <stb_image.h>
 
 #include <fstream>

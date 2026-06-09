@@ -1,7 +1,9 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
+// IMPORTANT: glad should come first. Then GLFW
 #include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 class Texture2D {
  public:

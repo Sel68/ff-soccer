@@ -3,8 +3,6 @@
 #define GAMEOBJECT_H
 
 #include <SpriteRenderer.h>
-#include <glad/glad.h>
-
 #include <glm/glm.hpp>
 
 #include "Texture.h"

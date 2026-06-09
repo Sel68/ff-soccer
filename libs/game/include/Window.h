@@ -1,22 +1,23 @@
 #ifndef GAME_WINDOW_H
 #define GAME_WINDOW_H
 
-// IMPORTANT: glad should come first. Then GLFW
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
 #include <iostream>
 
-#include "Constants.h"
-#include "Game.h"
+#include "GameConstants.h"
 #include "ResourceManager.h"
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
+extern bool keys[1024];
+extern bool keys_processed[1024];
 
 class Window {
  public:
-  void windowinit();
+  void WindowInit();
+  static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
+  static void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
+
+  GLFWwindow* gl_window;
+
+ private:
 };
 
 #endif  // GAME_WINDOW_H
