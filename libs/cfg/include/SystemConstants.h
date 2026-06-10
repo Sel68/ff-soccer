@@ -13,6 +13,8 @@ struct SystemConstants {
 
   static constexpr unsigned int SCREEN_WIDTH = 950;
   static constexpr unsigned int SCREEN_HEIGHT = 580;
+
+  static constexpr float OBSTACLE_TOLERANCE = 30.0f;
 };
 
 #endif  // SYSTEM_CONSTANTS

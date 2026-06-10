@@ -221,7 +221,9 @@ void Game::Update(float dt) {
       auto add_obstacle = [&](BallObject* p) {
         if (p->lock) {
           Point2D pos = screenToRRTX(p->Position.x, p->Position.y);
-          double radius = (SystemConstants::PLAYER_RADIUS / SystemConstants::SCREEN_WIDTH) * 12.0;
+          double radius = ((SystemConstants::PLAYER_RADIUS + SystemConstants::OBSTACLE_TOLERANCE) /
+                           SystemConstants::SCREEN_WIDTH) *
+                          12.0;
           obstacles.push_back({id_counter++, pos, radius});
         }
       };
