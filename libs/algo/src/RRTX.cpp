@@ -7,7 +7,7 @@
 
 #include "SystemConstants.h"
 
-RRTX::RRTX() : m_recalculation_time_ms(10.0) {}
+RRTX::RRTX() : m_recalculation_time_ms(10.0), bias_to_goal(0.0) {}
 
 RRTX::~RRTX() {}
 

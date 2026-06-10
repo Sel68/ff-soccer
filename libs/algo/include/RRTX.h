@@ -41,6 +41,7 @@ class RRTX {
   Point2D m_goal;
   std::vector<Obstacle> m_obstacles;
   double m_recalculation_time_ms;
+  double bias_to_goal;  // balance between greedy and finding global optim
 
   kdt::KDTree<Point2D> m_kd_tree;
   std::vector<RRTXNode> m_nodes;
