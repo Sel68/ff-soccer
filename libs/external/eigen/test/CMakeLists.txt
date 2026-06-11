@@ -513,7 +513,7 @@ if (EIGEN_TEST_HIP)
     message(FATAL_ERROR "Eigen requires ROCm/HIP >= 5.6, found ${HIP_VERSION}")
   endif()
   if (HIP_FOUND)
-    execute_process(COMMAND ${HIP_PATH}/bin/hipconfig --platform OUTPUT_VARIABLE HIP_PLATFORM)
+    execute_process(COMMAND ${HIP_PATH}/bin/hNetworkConfig --platform OUTPUT_VARIABLE HIP_PLATFORM)
 
     if ((${HIP_PLATFORM} STREQUAL "hcc") OR (${HIP_PLATFORM} STREQUAL "amd"))
 
