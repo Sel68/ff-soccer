@@ -1,26 +1,13 @@
 #ifndef RRTX_H
 #define RRTX_H
 
-#include <vector>
-#include <memory>
 #include <cmath>
+#include <memory>
+#include <vector>
+
+#include "Point2D.h"
+#include "Obstacle.h"
 #include "kdTree.h"
-
-struct Point2D {
-  static const int DIM = 2;
-  double x;
-  double y;
-
-  // handy for dim access
-  double operator[](size_t idx) const { return idx == 0 ? x : y; }
-};
-
-// all other robots
-struct Obstacle {
-  int id;  // Unique identifier=
-  Point2D position;
-  double radius;
-};
 
 // RRTX tree  node
 struct RRTXNode {
@@ -38,19 +25,23 @@ class RRTX {
   RRTX();
   ~RRTX();
 
+  std::vector<Point2D> PlanningStep(std::pair<double, double> start,
+                                    std::pair<double, double> goal,
+                                    std::vector<Obstacle> obstacles);
+
+ private:
   void setGoal(const Point2D& goal);
   void setStart(const Point2D& start);
   void setObstacles(const std::vector<Obstacle>& obstacles);
   void updateObstacle(const Obstacle& obstacle);
   void setRecalculationTime(double time_ms);
-
   std::vector<Point2D> plan();
 
- private:
   Point2D m_start;
   Point2D m_goal;
   std::vector<Obstacle> m_obstacles;
   double m_recalculation_time_ms;
+  double bias_to_goal;  // balance between greedy and finding global optim
 
   kdt::KDTree<Point2D> m_kd_tree;
   std::vector<RRTXNode> m_nodes;

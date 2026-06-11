@@ -1,5 +1,6 @@
-#include <gtest/gtest.h>
 #include <OmniKinematics.h>
+#include <gtest/gtest.h>
+
 #include <cmath>
 #include <vector>
 
@@ -28,7 +29,7 @@ TEST_F(OmniKinematicsTest, ZeroVelocity) {
   OmniKinematics kin(wheel_configs, max_spin);
   ChassisVelocity target = {0.0, 0.0, 0.0};
 
-  Eigen::VectorXd vels = kin.chassisToWheels(target);
+  Eigen::VectorXd vels = kin.ChassisToWheels(target);
 
   ASSERT_EQ(vels.size(), 4);
   for (int i = 0; i < 4; ++i) {
@@ -40,7 +41,7 @@ TEST_F(OmniKinematicsTest, ForwardVelocityX) {
   OmniKinematics kin(wheel_configs, max_spin);
   ChassisVelocity target = {1.0, 0.0, 0.0};  // Move +1.0 m/s in X
 
-  Eigen::VectorXd vels = kin.chassisToWheels(target);
+  Eigen::VectorXd vels = kin.ChassisToWheels(target);
 
   // W1 (gamma=pi/2): cos(pi/2)*1 = 0
   // W2 (gamma=pi): cos(pi)*1 = -1 -> vel = -1/0.05 = -20 rad/s
@@ -57,7 +58,7 @@ TEST_F(OmniKinematicsTest, ForwardVelocityY) {
   OmniKinematics kin(wheel_configs, max_spin);
   ChassisVelocity target = {0.0, 1.0, 0.0};  // Move +1.0 m/s in Y
 
-  Eigen::VectorXd vels = kin.chassisToWheels(target);
+  Eigen::VectorXd vels = kin.ChassisToWheels(target);
 
   // W1 (gamma=pi/2): sin(pi/2)*1 = 1 -> 20 rad/s
   // W2 (gamma=pi): sin(pi)*1 = 0
@@ -74,7 +75,7 @@ TEST_F(OmniKinematicsTest, RotationPure) {
   OmniKinematics kin(wheel_configs, max_spin);
   ChassisVelocity target = {0.0, 0.0, 1.0};  // Rotate +1.0 rad/s
 
-  Eigen::VectorXd vels = kin.chassisToWheels(target);
+  Eigen::VectorXd vels = kin.ChassisToWheels(target);
 
   // For each wheel: v_w = R * sin(gamma - phi) * vtheta
   // gamma - phi = pi/2 for all wheels. sin(pi/2) = 1
@@ -91,7 +92,7 @@ TEST_F(OmniKinematicsTest, ScaleLimits) {
   ChassisVelocity target = {1.0, 0.0,
                             0.0};  // Move +1.0 m/s in X (would normally require 20 rad/s)
 
-  Eigen::VectorXd vels = kin.chassisToWheels(target, true);  // scale limits = true
+  Eigen::VectorXd vels = kin.ChassisToWheels(target, true);  // scale limits = true
 
   // W2 would be -20, W4 would be +20. Max observed is 20. Limit is 10.
   // Lambda = 10 / 20 = 0.5.

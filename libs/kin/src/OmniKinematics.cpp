@@ -1,14 +1,14 @@
+#include "OmniKinematics.h"
+
+#include <Eigen/Dense>
+#include <algorithm>
 #include <cmath>
 #include <vector>
-#include <algorithm>
-#include <Eigen/Dense>
-
-#include "OmniKinematics.h"
 
 OmniKinematics::OmniKinematics(const std::vector<WheelConfig>& wheel_configs, double max_wheelspin)
     : wheels(wheel_configs), max_wheel_vel(max_wheelspin) {}
 
-Eigen::VectorXd OmniKinematics::chassisToWheels(ChassisVelocity target, bool scale_limits) {
+Eigen::VectorXd OmniKinematics::ChassisToWheels(ChassisVelocity target, bool scale_limits) {
   Eigen::VectorXd wheel_vels(wheels.size());
   double max_observed = 0.0;
 
@@ -27,7 +27,7 @@ Eigen::VectorXd OmniKinematics::chassisToWheels(ChassisVelocity target, bool sca
   return wheel_vels;
 }
 
-ChassisVelocity OmniKinematics::wheelsToChassis(const Eigen::VectorXd& wheel_vels) {
+ChassisVelocity OmniKinematics::WheelsToChassis(const Eigen::VectorXd& wheel_vels) {
   int n = wheels.size();
   if (n == 0) return {0.0, 0.0, 0.0};
 

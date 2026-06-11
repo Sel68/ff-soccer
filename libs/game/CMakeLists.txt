@@ -19,11 +19,12 @@ target_link_libraries(game
     graphics
     glfw
     algo_lib
+    cfg_lib
 )
 
 target_compile_definitions(game
     PRIVATE
-    SHADER_DIR="${CMAKE_SOURCE_DIR}/libs/graphics/include/"
-    TEXTURE_DIR="${CMAKE_SOURCE_DIR}/libs/graphics/texture/"
+    SHADER_DIR="${CMAKE_SOURCE_DIR}/libs/graphics/resources/"
+    TEXTURE_DIR="${CMAKE_SOURCE_DIR}/libs/graphics/resources/texture/"
     LEVEL_DIR="${CMAKE_SOURCE_DIR}/libs/game/levels/"
 )

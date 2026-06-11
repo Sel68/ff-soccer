@@ -1,13 +1,35 @@
-#include <iostream>
-#include <random>
-#include <chrono>
-#include <algorithm>
-
 #include "RRTX.h"
 
-RRTX::RRTX() : m_recalculation_time_ms(10.0) {}
+#include <algorithm>
+#include <chrono>
+#include <iostream>
+#include <random>
+
+#include "SystemConstants.h"
+
+RRTX::RRTX() : m_recalculation_time_ms(10.0), bias_to_goal(0.0) {}
 
 RRTX::~RRTX() {}
+
+std::vector<Point2D> RRTX::PlanningStep(std::pair<double, double> start,
+                                        std::pair<double, double> goal,
+                                        std::vector<Obstacle> obstacles) {
+  // Algo
+  // 1. RRTX Init
+
+  // 2. Starts and Goals
+  setStart(start);
+  setGoal(goal);
+
+  // 3. Obstacles
+
+  setObstacles(obstacles);
+
+  // 4. Planning
+  std::vector<Point2D> path = plan();
+
+  return path;
+}
 
 void RRTX::setGoal(const Point2D& goal) { m_goal = goal; }
 
@@ -91,11 +113,16 @@ Point2D RRTX::sampleFree() const {
 std::vector<Point2D> RRTX::plan() {
   std::vector<Point2D> path;
 
-  if (m_nodes.empty()) {
-    m_nodes.emplace_back(m_start);
-    m_nodes[0].cost_from_start = 0;
-    m_kd_tree.insert(m_start);
+  if (isCollisionFree(m_start, m_goal)) {
+    return {m_start, m_goal};
   }
+
+  m_nodes.clear();
+  m_kd_tree.clear();
+
+  m_nodes.emplace_back(m_start);
+  m_nodes[0].cost_from_start = 0;
+  m_kd_tree.insert(m_start);
 
   auto start_time = std::chrono::steady_clock::now();
 

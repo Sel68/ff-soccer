@@ -2,11 +2,10 @@
 #ifndef GAMEOBJECT_H
 #define GAMEOBJECT_H
 
-#include <glad/glad.h>
+#include <SpriteRenderer.h>
 #include <glm/glm.hpp>
 
-#include <texture.h>
-#include <SpriteRenderer.h>
+#include "Texture.h"
 
 class GameObject {
  public:

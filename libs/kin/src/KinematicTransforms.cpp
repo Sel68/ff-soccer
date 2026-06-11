@@ -1,8 +1,8 @@
-#include <cmath>
-
 #include "KinematicTransforms.h"
 
-ChassisVelocity KinematicTransforms::worldToRobot(const ChassisVelocity& world_vel,
+#include <cmath>
+
+ChassisVelocity KinematicTransforms::WorldToRobot(const ChassisVelocity& world_vel,
                                                   double robot_theta) {
   ChassisVelocity robot_vel;
   robot_vel.vx = world_vel.vx * std::cos(robot_theta) + world_vel.vy * std::sin(robot_theta);
@@ -11,7 +11,7 @@ ChassisVelocity KinematicTransforms::worldToRobot(const ChassisVelocity& world_v
   return robot_vel;
 }
 
-ChassisVelocity KinematicTransforms::robotToWorld(const ChassisVelocity& robot_vel,
+ChassisVelocity KinematicTransforms::RobotToWorld(const ChassisVelocity& robot_vel,
                                                   double robot_theta) {
   ChassisVelocity world_vel;
   world_vel.vx = robot_vel.vx * std::cos(robot_theta) - robot_vel.vy * std::sin(robot_theta);

@@ -4,10 +4,13 @@
 
 #include <string>
 
-#include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+
+// IMPORTANT: glad should come first. Then GLFW
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 class Shader {
   void checkCompileErrors(unsigned int object, std::string type);

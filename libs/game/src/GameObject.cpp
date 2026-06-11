@@ -1,4 +1,4 @@
-#include "gameobject.h"
+#include "GameObject.h"
 
 GameObject::GameObject()
     : Position(0.0f, 0.0f),

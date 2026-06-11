@@ -1,10 +1,10 @@
 #ifndef BALLOBJECT_H
 #define BALLOBJECT_H
 
-#include <glad/glad.h>
 #include <glm/glm.hpp>
-#include <gameobject.h>
-#include <texture.h>
+
+#include "GameObject.h"
+#include "Texture.h"
 
 class BallObject : public GameObject {
  public:
