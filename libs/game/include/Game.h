@@ -1,18 +1,22 @@
 #ifndef GAME_H
 #define GAME_H
-#include <BallObject.h>
+
+#include <tuple>
+#include <vector>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <tuple>
-#include <vector>
+#include <asio.hpp>
 
+#include <BallObject.h>
 #include "Algos.h"
 #include "GameLevel.h"
 #include "PostProcessor.h"
 #include "ResourceManager.h"
 #include "Window.h"
+#include "Transmitter.h"
+#include "OmniKinematics.h"
 
 enum GameState { GAME_ACTIVE, GAME_MENU, GAME_WIN };
 
@@ -56,6 +60,10 @@ class Game {
   AlgoName current_algo;
 
   RRTX rrtx_planner;
+
+  asio::io_context ioc;
+  Transmitter* transmitter;
+  OmniKinematics* kinematics;
 };
 
 #endif

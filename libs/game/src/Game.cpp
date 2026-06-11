@@ -1,7 +1,5 @@
 #include "Game.h"
 
-#include "RRTX.h"
-
 #ifndef SHADER_DIR
 #define SHADER_DIR ""
 #endif
@@ -14,6 +12,7 @@
 #define LEVEL_DIR ""
 #endif
 
+#include "RRTX.h"
 #include "Obstacle.h"
 #include "SystemCoordinates.h"
 
@@ -38,6 +37,15 @@ bool Game::Running() { return !glfwWindowShouldClose(game_window.gl_window); }
 void Game::Cleanup() {
   delete renderer;
   renderer = nullptr;
+
+  if (transmitter) {
+    delete transmitter;
+    transmitter = nullptr;
+  }
+  if (kinematics) {
+    delete kinematics;
+    kinematics = nullptr;
+  }
 
   for (BallObject* p : team1_players) delete p;
   team1_players.clear();
@@ -68,6 +76,14 @@ void Game::Init() {
 
   this->Levels.push_back(one);
   this->Level = 0;
+
+  // initialize Transmitter and Kinematics
+  transmitter = new Transmitter(ioc, "127.0.0.1", 12345);
+  std::vector<WheelConfig> wheel_configs = {{0.2, M_PI / 4, 0.0, 0.05},
+                                            {0.2, 3 * M_PI / 4, 0.0, 0.05},
+                                            {0.2, 5 * M_PI / 4, 0.0, 0.05},
+                                            {0.2, 7 * M_PI / 4, 0.0, 0.05}};
+  kinematics = new OmniKinematics(wheel_configs, 10.0);
 
   // Team 1 players
   glm::vec2 playerPos1 =
@@ -256,6 +272,20 @@ void Game::Update(float dt) {
             movableBot->Position.y = this->Height - movableBot->Size.y - 30.0f;
         }
       }
+    }
+  }
+
+  if (transmitter && kinematics) {
+    int robot_id = 0;
+    for (BallObject* p : team1_players) {
+      ChassisVelocity c_vel{p->Velocity.x, p->Velocity.y, 0.0};
+      Eigen::VectorXd wheels = kinematics->ChassisToWheels(c_vel);
+      transmitter->transmit(robot_id++, p->Position.x, p->Position.y, 0.0, c_vel, wheels);
+    }
+    for (BallObject* p : team2_players) {
+      ChassisVelocity c_vel{p->Velocity.x, p->Velocity.y, 0.0};
+      Eigen::VectorXd wheels = kinematics->ChassisToWheels(c_vel);
+      transmitter->transmit(robot_id++, p->Position.x, p->Position.y, 0.0, c_vel, wheels);
     }
   }
 
