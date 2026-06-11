@@ -35,8 +35,8 @@ class Game {
 
   Game();
   ~Game();
-  void ProcessInput(float dt);
-  void Update(float dt);
+  void ProcessInput(double dt);
+  void Update(double dt);
   void Exit();
 
   void SetCurrentAlgo(AlgoName algo_name);
@@ -49,6 +49,7 @@ class Game {
   void Init();
   void DoCollisions();
   void Render();
+  void UpdateSimulation(double dt);
   void Cleanup();
 
   ResourceManager resource_manager;

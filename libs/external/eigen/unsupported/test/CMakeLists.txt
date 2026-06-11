@@ -309,7 +309,7 @@ if (EIGEN_TEST_HIP)
 
   find_package(HIP REQUIRED)
   if (HIP_FOUND)
-    execute_process(COMMAND ${HIP_PATH}/bin/hNetworkConfig --platform OUTPUT_VARIABLE HIP_PLATFORM)
+    execute_process(COMMAND ${HIP_PATH}/bin/hipconfig --platform OUTPUT_VARIABLE HIP_PLATFORM)
 
     if ((${HIP_PLATFORM} STREQUAL "hcc") OR (${HIP_PLATFORM} STREQUAL "amd"))
       include_directories(${CMAKE_CURRENT_BINARY_DIR})

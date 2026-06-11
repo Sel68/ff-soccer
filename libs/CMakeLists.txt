@@ -6,6 +6,7 @@ else()
     add_subdirectory(comms)
     add_subdirectory(game)
     add_subdirectory(graphics)
+    add_subdirectory(handler)
 endif()
 
 # Libraries used for all platforms
