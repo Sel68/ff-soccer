@@ -32,20 +32,7 @@ int main(int argc, char* argv[]) {
     udp_socket.open(host_endpoint.protocol());
     udp_socket.bind(host_endpoint);
   } catch (const std::exception& e) {
-    std::cerr << "Failed to bind to " << host_ip_address << ":" << host_recv_port
-              << "\n" file(GLOB_RECURSE HEADERS "include/*.h")
-                     file(GLOB_RECURSE SOURCES "src/*.cpp")
-
-                         add_library(handler_lib ${HEADERS} ${SOURCES})
-
-                             target_include_directories(handler_lib PUBLIC include)
-
-                                 target_link_libraries(handler_lib PUBLIC kin_lib comm_lib)
-
-                                     add_subdirectory(examples)
-
-#TODO:
-#add_subdirectory(test)
+    std::cerr << "Failed to bind to " << host_ip_address << ":" << host_recv_port << "\n"
               << "Error: " << e.what() << "\n";
     return 1;
   }
@@ -57,18 +44,22 @@ int main(int argc, char* argv[]) {
             << "\n";
   std::cout << "Waiting for packets...\n\n";
 
+  int cnt = 0;
   while (true) {
     std::size_t bytes_received = udp_socket.receive_from(asio::buffer(buffer), sender_endpoint);
 
-    if (bytes_received == sizeof(RobotTelemetryPacket)) {
+    if (1) {
       RobotTelemetryPacket* packet = reinterpret_cast<RobotTelemetryPacket*>(buffer.data());
-      std::cout << "[Robot " << packet->robot_id << "] "
-                << "Pos: (" << packet->pos_x << ", " << packet->pos_y << ", " << packet->pos_theta
-                << ") | "
-                << "Vel: (" << packet->vel_x << ", " << packet->vel_y << ", " << packet->vel_theta
-                << ") | "
-                << "Wheels: [" << packet->wheel_speeds[0] << ", " << packet->wheel_speeds[1]
-                << ", " << packet->wheel_speeds[2] << ", " << packet->wheel_speeds[3] << "]\n";
+      if (packet->robot_id == 0 && (cnt++ % 100) == 0) {
+        std::cout << "[Robot " << packet->robot_id << "] "
+                  << "Pos: (" << packet->pos_x << ", " << packet->pos_y << ", "
+                  << packet->pos_theta << ") | "
+                  << "Vel: (" << packet->vel_x << ", " << packet->vel_y << ", "
+                  << packet->vel_theta << ") | "
+                  << "Wheels: [" << packet->wheel_speeds[0] << ", " << packet->wheel_speeds[1]
+                  << ", " << packet->wheel_speeds[2] << ", " << packet->wheel_speeds[3] << "]\n";
+        std::cout << sizeof(bytes_received) << std::endl;
+      }
     } else {
       std::cerr << "Received packet of unexpected size: " << bytes_received << " bytes.\n";
     }
