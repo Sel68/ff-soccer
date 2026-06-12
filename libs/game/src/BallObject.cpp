@@ -1,19 +1,19 @@
 #include "BallObject.h"
 
 BallObject::BallObject()
-    : GameObject(), Radius(12.5f), Stuck(true), Sticky(false), PassThrough(false) {}
+    : GameObject(), Radius(12.5f), Owner(nullptr), Sticky(false), PassThrough(false) {}
 
 BallObject::BallObject(glm::vec2 pos, float radius, glm::vec2 velocity, Texture2D sprite,
                        bool isLock)
     : GameObject(pos, glm::vec2(radius * 2.0f, radius * 2.0f), sprite, isLock, glm::vec3(1.0f),
                  velocity),
       Radius(radius),
-      Stuck(true),
+      Owner(nullptr),
       Sticky(false),
       PassThrough(false) {}
 
 glm::vec2 BallObject::Move(float dt, unsigned int window_width, unsigned int window_length) {
-  if (!Stuck) {
+  if (Owner == nullptr) {
     Position += Velocity * dt;
     if (Position.x <= 45.0f) {
       Velocity.x = -Velocity.x;
@@ -36,7 +36,7 @@ glm::vec2 BallObject::Move(float dt, unsigned int window_width, unsigned int win
 void BallObject::Reset(glm::vec2 position, glm::vec2 velocity) {
   this->Position = position;
   this->Velocity = velocity;
-  this->Stuck = true;
+  this->Owner = nullptr;
   this->Sticky = false;
   this->PassThrough = false;
 }

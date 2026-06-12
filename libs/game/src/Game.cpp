@@ -211,8 +211,7 @@ void Game::UpdateSimulation(double dt) {
     if (!p->lock) movableBot = p;
 
   if (movableBot && this->State == GAME_ACTIVE) {
-    bool ballIsStuckToMe = ball->Stuck && (glm::length(movableBot->Position - ball->Position) <
-                                           movableBot->Radius * 4.0f);
+    bool ballIsStuckToMe = ball->Owner == movableBot;
     if (!ballIsStuckToMe) {
       // 1. Start, 2. Goal, 3. Obstacles
       std::vector<Obstacle> obstacles;
@@ -276,8 +275,7 @@ void Game::ProcessInput(double dt) {
   glfwPollEvents();
 
   auto handleCollision = [&](BallObject* Player) {
-    bool isStuckToThisPlayer =
-        ball->Stuck && (glm::length(Player->Position - ball->Position) < Player->Radius * 4.0f);
+    bool isStuckToThisPlayer = ball->Owner == Player;
     if (!Player->lock) {
       if (this->State == GAME_ACTIVE) {
         float velocity = SystemConstants::PLAYER_VELOCITY * dt;
@@ -307,7 +305,7 @@ void Game::ProcessInput(double dt) {
           }
         }
 
-        if (keys[GLFW_KEY_K]) ball->Stuck = false;
+        if (keys[GLFW_KEY_K]) ball->Owner = nullptr;
       }
     } else if (Player == team2_players[0]) {
       if (this->State == GAME_ACTIVE) {
@@ -389,7 +387,9 @@ Collision CheckCollision(BallObject& one,
   if (distance <= radiiSum) {
     if ((centerTwo.x + SystemConstants::PLAYER_RADIUS - SystemConstants::Stuckerror) <=
         ((one.Position).x)) {
-      one.Stuck = true;
+      if (one.Owner == nullptr) {
+        one.Owner = &two;
+      }
     }
     return std::make_tuple(true, VectorDirection(difference), difference);
   }
@@ -401,7 +401,7 @@ Collision CheckCollision(BallObject& one,
 void Game::DoCollisions() {
   auto handleCollision = [&](BallObject* player) {
     Collision result = CheckCollision(*ball, *player);
-    if (!ball->Stuck && std::get<0>(result)) {
+    if (ball->Owner == nullptr && std::get<0>(result)) {
       float centerBoard = player->Position.x + SystemConstants::PLAYER_RADIUS;
       float distance = (ball->Position.x + ball->Radius) - centerBoard;
       float percentage = distance / SystemConstants::PLAYER_RADIUS;
