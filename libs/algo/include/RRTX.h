@@ -20,9 +20,21 @@ struct RRTXNode {
   RRTXNode(const Point2D& pos) : position(pos), cost_from_start(1e9), lmc(1e9), parent_idx(-1) {}
 };
 
+// hyperparam + other
+class RRTXConfig {
+ public:
+  double recalculation_time_ms = 10.0;
+  double bias_to_goal = 0.1;
+  double step_size = 0.5;
+  double search_radius = 2.0;
+  double robot_radius = 0.09;
+  double field_length = 12.0;
+  double field_width = 9.0;
+};
+
 class RRTX {
  public:
-  RRTX();
+  RRTX(const RRTXConfig& config = RRTXConfig());
   ~RRTX();
 
   std::vector<Point2D> PlanningStep(std::pair<double, double> start,
@@ -40,18 +52,10 @@ class RRTX {
   Point2D m_start;
   Point2D m_goal;
   std::vector<Obstacle> m_obstacles;
-  double m_recalculation_time_ms;
-  double bias_to_goal;  // balance between greedy and finding global optim
+  RRTXConfig m_config;
 
   kdt::KDTree<Point2D> m_kd_tree;
   std::vector<RRTXNode> m_nodes;
-
-  // config
-  double step_size = 0.5;
-  double search_radius = 2.0;
-  double robot_radius = 0.09;
-  double field_length = 12.0;
-  double field_width = 9.0;
 
   // helper funcs
   bool isCollisionFree(const Point2D& p1, const Point2D& p2) const;

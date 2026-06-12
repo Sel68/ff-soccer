@@ -7,7 +7,7 @@
 
 #include "SystemConstants.h"
 
-RRTX::RRTX() : m_recalculation_time_ms(10.0), bias_to_goal(0.0) {}
+RRTX::RRTX(const RRTXConfig& config) : m_config(config) {}
 
 RRTX::~RRTX() {}
 
@@ -51,7 +51,7 @@ void RRTX::updateObstacle(const Obstacle& updated_obstacle) {
   }
 }
 
-void RRTX::setRecalculationTime(double time_ms) { m_recalculation_time_ms = time_ms; }
+void RRTX::setRecalculationTime(double time_ms) { m_config.recalculation_time_ms = time_ms; }
 
 // l2 norm
 double RRTX::distance(const Point2D& p1, const Point2D& p2) const {
@@ -60,12 +60,12 @@ double RRTX::distance(const Point2D& p1, const Point2D& p2) const {
 
 Point2D RRTX::steer(const Point2D& nearest, const Point2D& sample) const {
   double dist = distance(nearest, sample);
-  if (dist < step_size) {
+  if (dist < m_config.step_size) {
     return sample;
   }
   Point2D steered;
-  steered.x = nearest.x + step_size * (sample.x - nearest.x) / dist;
-  steered.y = nearest.y + step_size * (sample.y - nearest.y) / dist;
+  steered.x = nearest.x + m_config.step_size * (sample.x - nearest.x) / dist;
+  steered.y = nearest.y + m_config.step_size * (sample.y - nearest.y) / dist;
   return steered;
 }
 
@@ -84,7 +84,7 @@ bool RRTX::isCollisionFree(const Point2D& p1, const Point2D& p2) const {
     double closest_y = p1.y + t * dy;
 
     double dist_to_obs = std::hypot(closest_x - obs.position.x, closest_y - obs.position.y);
-    if (dist_to_obs < (obs.radius + robot_radius)) {
+    if (dist_to_obs < (obs.radius + m_config.robot_radius)) {
       return false;  // Collision
     }
   }
@@ -95,12 +95,14 @@ bool RRTX::isCollisionFree(const Point2D& p1, const Point2D& p2) const {
 Point2D RRTX::sampleFree() const {
   static std::random_device rd;
   static std::mt19937 gen(rd());
-  static std::uniform_real_distribution<> dis_x(-field_length / 2, field_length / 2);
-  static std::uniform_real_distribution<> dis_y(-field_width / 2, field_width / 2);
+  static std::uniform_real_distribution<> dis_x(-m_config.field_length / 2,
+                                                m_config.field_length / 2);
+  static std::uniform_real_distribution<> dis_y(-m_config.field_width / 2,
+                                                m_config.field_width / 2);
   static std::uniform_real_distribution<> dis_prob(0.0, 1.0);
 
   // 10pc chance to x_rand  = goal
-  if (dis_prob(gen) < 0.1) {
+  if (dis_prob(gen) < m_config.bias_to_goal) {
     return m_goal;
   }
 
@@ -131,7 +133,7 @@ std::vector<Point2D> RRTX::plan() {
     auto current_time = std::chrono::steady_clock::now();
     double elapsed_ms =
         std::chrono::duration<double, std::milli>(current_time - start_time).count();
-    if (elapsed_ms >= m_recalculation_time_ms) {
+    if (elapsed_ms >= m_config.recalculation_time_ms) {
       break;
     }
 
@@ -150,7 +152,7 @@ std::vector<Point2D> RRTX::plan() {
     int new_node_idx = (int)m_nodes.size();
     RRTXNode new_node(new_pos);
 
-    std::vector<int> near_indices = m_kd_tree.radiusSearch(new_pos, search_radius);
+    std::vector<int> near_indices = m_kd_tree.radiusSearch(new_pos, m_config.search_radius);
 
     // Find best parent
     int best_parent_idx = nearest_idx;
