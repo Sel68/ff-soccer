@@ -9,8 +9,12 @@ AsyncUdpServer::~AsyncUdpServer() = default;
 
 void AsyncUdpServer::start() {
   sock_->bind(local_);
-  sock_->start_receive([self = shared_from_this()](const auto& peer, const auto& data) {
-    self->on_receive(peer, data);
+  // weak shared ptr
+  sock_->start_receive([weak_self = std::weak_ptr<AsyncUdpServer>(shared_from_this())](
+                           const auto& peer, const auto& data) {
+    if (auto self = weak_self.lock()) {
+      self->on_receive(peer, data);
+    }
   });
 }
 

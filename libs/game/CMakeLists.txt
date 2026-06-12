@@ -20,6 +20,9 @@ target_link_libraries(game
     glfw
     algo_lib
     cfg_lib
+    handler_lib
+    kin_lib
+    asio
 )
 
 target_compile_definitions(game

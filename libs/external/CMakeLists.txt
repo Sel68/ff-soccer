@@ -1,7 +1,14 @@
-file(GLOB libs RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *)
+if (BUILD_ON_STM)
+# Libraries only used for stm
+else()
+    # Libraries only used for laptop
+    add_subdirectory(asio)
+    add_subdirectory(glad)
+    add_subdirectory(glfw)
+    add_subdirectory(glm)
+    add_subdirectory(gtest)
+    add_subdirectory(stb_image)
+endif()
 
-foreach(lib ${libs})
-    if(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${lib})
-        add_subdirectory(${lib})
-    endif()
-endforeach()
+# Libraries used for all platforms
+add_subdirectory(eigen)

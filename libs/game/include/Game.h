@@ -1,13 +1,15 @@
 #ifndef GAME_H
 #define GAME_H
-#include <BallObject.h>
+
+#include <tuple>
+#include <vector>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <tuple>
-#include <vector>
+#include <asio.hpp>
 
+#include <BallObject.h>
 #include "Algos.h"
 #include "GameLevel.h"
 #include "PostProcessor.h"
@@ -31,8 +33,8 @@ class Game {
 
   Game();
   ~Game();
-  void ProcessInput(float dt);
-  void Update(float dt);
+  void ProcessInput(double dt);
+  void Update(double dt);
   void Exit();
 
   void SetCurrentAlgo(AlgoName algo_name);
@@ -41,10 +43,13 @@ class Game {
 
   bool Running();
 
+  const std::vector<BallObject*>& GetTeam1Players() const;
+
  private:
   void Init();
   void DoCollisions();
   void Render();
+  void UpdateSimulation(double dt);
   void Cleanup();
 
   ResourceManager resource_manager;

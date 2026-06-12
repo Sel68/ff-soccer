@@ -1,7 +1,5 @@
 #include "Game.h"
 
-#include "RRTX.h"
-
 #ifndef SHADER_DIR
 #define SHADER_DIR ""
 #endif
@@ -14,6 +12,7 @@
 #define LEVEL_DIR ""
 #endif
 
+#include "RRTX.h"
 #include "Obstacle.h"
 #include "SystemCoordinates.h"
 
@@ -202,7 +201,7 @@ std::vector<Point2D> Game::Plan(std::pair<double, double> start, std::pair<doubl
   }
 }
 
-void Game::Update(float dt) {
+void Game::UpdateSimulation(double dt) {
   ball->Move(dt, this->Width, this->Height);
 
   BallObject* movableBot = nullptr;
@@ -263,12 +262,17 @@ void Game::Update(float dt) {
 
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
-  Render();
 
+  Render();
   glfwSwapBuffers(game_window.gl_window);
 }
 
-void Game::ProcessInput(float dt) {
+void Game::Update(double dt) {
+  // struct maintained for future
+  UpdateSimulation(dt);
+}
+
+void Game::ProcessInput(double dt) {
   glfwPollEvents();
 
   auto handleCollision = [&](BallObject* Player) {
@@ -415,3 +419,5 @@ void Game::DoCollisions() {
 }
 
 void Game::SetCurrentAlgo(AlgoName algo) { current_algo = algo; }
+
+const std::vector<BallObject*>& Game::GetTeam1Players() const { return team1_players; }

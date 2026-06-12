@@ -1,5 +1,7 @@
 #include "UdpSocket.hpp"
 
+#include <iostream>
+
 namespace comms {
 
 UdpSocket::UdpSocket(asio::io_context& ioc) : ioc_(ioc), socket_(ioc) {}
@@ -11,7 +13,6 @@ UdpSocket::~UdpSocket() {
 
 void UdpSocket::bind(const asio::ip::udp::endpoint& ep) {
   socket_.open(ep.protocol());
-  socket_.set_option(asio::ip::udp::socket::reuse_address(true));
   socket_.bind(ep);
 }
 
@@ -29,6 +30,13 @@ void UdpSocket::start_receive(UdpHandler handler) {
 void UdpSocket::async_send_to(const asio::ip::udp::endpoint& peer,
                               const std::vector<uint8_t>& data,
                               std::function<void(const asio::error_code&, std::size_t)> on_sent) {
+  // static int seq = 0;
+  // seq += 1;
+  // std::string new_data = "hefyyy" + std::to_string(seq);
+  // socket_.send_to(asio::buffer(new_data), peer);
+  // std::cout << "sent data: " << new_data << std::endl;
+  // left for debug^
+
   socket_.async_send_to(asio::buffer(data), peer,
                         [on_sent](const asio::error_code& ec, std::size_t len) {
                           if (on_sent) on_sent(ec, len);
