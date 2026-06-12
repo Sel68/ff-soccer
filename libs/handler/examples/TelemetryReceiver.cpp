@@ -5,13 +5,13 @@
 #pragma pack(push, 1)
 struct RobotTelemetryPacket {
   int robot_id;
-  double pos_x;
-  double pos_y;
-  double pos_theta;
-  double vel_x;
-  double vel_y;
-  double vel_theta;
-  double wheel_speeds[4];
+  float pos_x;
+  float pos_y;
+  float pos_theta;
+  float vel_x;
+  float vel_y;
+  float vel_theta;
+  float wheel_speeds[4];
 };
 #pragma pack(pop)
 
@@ -20,7 +20,7 @@ int main(int argc, char* argv[]) {
   asio::ip::udp::socket udp_socket(io_context);
 
   std::string host_ip_address = "127.0.0.1";
-  int host_recv_port = 12345;
+  int host_recv_port = 8080;
 
   if (argc > 1) host_ip_address = argv[1];
   if (argc > 2) host_recv_port = std::stoi(argv[2]);
@@ -48,7 +48,7 @@ int main(int argc, char* argv[]) {
   while (true) {
     std::size_t bytes_received = udp_socket.receive_from(asio::buffer(buffer), sender_endpoint);
 
-    if (1) {
+    if (bytes_received == sizeof(RobotTelemetryPacket)) {
       RobotTelemetryPacket* packet = reinterpret_cast<RobotTelemetryPacket*>(buffer.data());
       if (packet->robot_id == 0 && (cnt++ % 100) == 0) {
         std::cout << "[Robot " << packet->robot_id << "] "
@@ -58,7 +58,6 @@ int main(int argc, char* argv[]) {
                   << packet->vel_theta << ") | "
                   << "Wheels: [" << packet->wheel_speeds[0] << ", " << packet->wheel_speeds[1]
                   << ", " << packet->wheel_speeds[2] << ", " << packet->wheel_speeds[3] << "]\n";
-        std::cout << sizeof(bytes_received) << std::endl;
       }
     } else {
       std::cerr << "Received packet of unexpected size: " << bytes_received << " bytes.\n";

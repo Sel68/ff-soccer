@@ -38,15 +38,6 @@ void Game::Cleanup() {
   delete renderer;
   renderer = nullptr;
 
-  if (transmitter) {
-    delete transmitter;
-    transmitter = nullptr;
-  }
-  if (kinematics) {
-    delete kinematics;
-    kinematics = nullptr;
-  }
-
   for (BallObject* p : team1_players) delete p;
   team1_players.clear();
 
@@ -76,14 +67,6 @@ void Game::Init() {
 
   this->Levels.push_back(one);
   this->Level = 0;
-
-  // initialize Transmitter and Kinematics
-  transmitter = new Transmitter(ioc, "192.168.1.101", 8080);
-  std::vector<WheelConfig> wheel_configs = {{0.2, M_PI / 4, 0.0, 0.05},
-                                            {0.2, 3 * M_PI / 4, 0.0, 0.05},
-                                            {0.2, 5 * M_PI / 4, 0.0, 0.05},
-                                            {0.2, 7 * M_PI / 4, 0.0, 0.05}};
-  kinematics = new OmniKinematics(wheel_configs, 10.0);
 
   // Team 1 players
   glm::vec2 playerPos1 =
@@ -284,18 +267,7 @@ void Game::UpdateSimulation(double dt) {
   glfwSwapBuffers(game_window.gl_window);
 }
 
-void Game::Update(double dt) {
-  UpdateSimulation(dt);
-  
-  if (transmitter && kinematics) {
-    int robot_id = 0;
-    for (BallObject* p : team1_players) {
-      ChassisVelocity c_vel{p->Velocity.x, p->Velocity.y, 0.0};
-      Eigen::VectorXd wheels = kinematics->ChassisToWheels(c_vel);
-      transmitter->transmit(robot_id++, p->Position.x, p->Position.y, 0.0, c_vel, wheels);
-    }
-  }
-}
+void Game::Update(double dt) { UpdateSimulation(dt); }
 
 void Game::ProcessInput(double dt) {
   glfwPollEvents();
@@ -444,3 +416,5 @@ void Game::DoCollisions() {
 }
 
 void Game::SetCurrentAlgo(AlgoName algo) { current_algo = algo; }
+
+const std::vector<BallObject*>& Game::GetTeam1Players() const { return team1_players; }

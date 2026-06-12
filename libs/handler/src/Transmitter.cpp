@@ -2,7 +2,7 @@
 
 Transmitter::Transmitter(asio::io_context& ioc, const std::string& ip, unsigned short port)
     : socket_(ioc), peer_endpoint_(asio::ip::make_address(ip), port) {
-  socket_.bind(asio::ip::udp::endpoint(asio::ip::address::from_string(ip), port));
+  socket_.bind(asio::ip::udp::endpoint(asio::ip::udp::v4(), 0));
 }
 
 void Transmitter::transmit(int robot_id, double px, double py, double ptheta,
@@ -25,23 +25,8 @@ void Transmitter::transmit(int robot_id, double px, double py, double ptheta,
     }
   }
 
-  std::vector<uint8_t> data(10);
-  data[0] = 0x11;
-  data[1] = 0x11;
-  data[2] = 0x11;
-  data[3] = 0x11;
-  data[4] = 0x11;
-  // std::memcpy(data.data(), &packet, sizeof(RobotTelemetryPacket));
+  std::vector<uint8_t> data(sizeof(RobotTelemetryPacket));
+  std::memcpy(data.data(), &packet, sizeof(RobotTelemetryPacket));
 
-  // host: 192.168.1.101:8080
-  // 192.168.1.100:8081
-  int device_udp_port = 8081;
-  std::string device_ip = "192.168.1.100";
-  asio::ip::address ip_addr = asio::ip::address::from_string(device_ip);
-  asio::ip::udp::endpoint remote_endpoint =
-      asio::ip::udp::endpoint(ip_addr, device_udp_port);
-
-  // socket_.
-
-  socket_.async_send_to(remote_endpoint, data);
+  socket_.async_send_to(peer_endpoint_, data);
 }

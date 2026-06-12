@@ -15,8 +15,6 @@
 #include "PostProcessor.h"
 #include "ResourceManager.h"
 #include "Window.h"
-#include "Transmitter.h"
-#include "OmniKinematics.h"
 
 enum GameState { GAME_ACTIVE, GAME_MENU, GAME_WIN };
 
@@ -45,6 +43,8 @@ class Game {
 
   bool Running();
 
+  const std::vector<BallObject*>& GetTeam1Players() const;
+
  private:
   void Init();
   void DoCollisions();
@@ -61,10 +61,6 @@ class Game {
   AlgoName current_algo;
 
   RRTX rrtx_planner;
-
-  asio::io_context ioc;
-  Transmitter* transmitter;
-  OmniKinematics* kinematics;
 };
 
 #endif
