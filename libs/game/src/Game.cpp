@@ -267,7 +267,10 @@ void Game::UpdateSimulation(double dt) {
   glfwSwapBuffers(game_window.gl_window);
 }
 
-void Game::Update(double dt) { UpdateSimulation(dt); }
+void Game::Update(double dt) {
+  // struct maintained for future
+  UpdateSimulation(dt);
+}
 
 void Game::ProcessInput(double dt) {
   glfwPollEvents();
