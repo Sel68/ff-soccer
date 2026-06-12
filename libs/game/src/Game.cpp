@@ -179,8 +179,8 @@ void Game::Init() {
   team2_players.push_back(Tp6);
 
   // Ball
-  glm::vec2 ballPos = playerPos1 + glm::vec2(SystemConstants::BALL_RADIUS * 2.0f,
-                                             SystemConstants::SystemConstants::PLAYER_RADIUS -
+  glm::vec2 ballPos = playerPos1 + glm::vec2(SystemConstants::PLAYER_RADIUS * 2.0f + 5.0f,
+                                             SystemConstants::PLAYER_RADIUS -
                                                  SystemConstants::BALL_RADIUS);
   ball = new BallObject(ballPos, SystemConstants::BALL_RADIUS,
                         glm::vec2(SystemConstants::INITIAL_BALL_VELOCITY.first,
@@ -401,16 +401,27 @@ Collision CheckCollision(BallObject& one,
 void Game::DoCollisions() {
   auto handleCollision = [&](BallObject* player) {
     Collision result = CheckCollision(*ball, *player);
-    if (ball->Owner == nullptr && std::get<0>(result)) {
-      float centerBoard = player->Position.x + SystemConstants::PLAYER_RADIUS;
-      float distance = (ball->Position.x + ball->Radius) - centerBoard;
-      float percentage = distance / SystemConstants::PLAYER_RADIUS;
-      float strength = 2.0f;
+    if (std::get<0>(result)) {
+      // Resolve overlap so ball cannot enter bot's outline
+      glm::vec2 diff = std::get<2>(result);
+      float dist = glm::length(diff);
+      float penetration = (ball->Radius + player->Radius) - dist;
+      if (dist > 0.0f && penetration > 0.0f) {
+        ball->Position += glm::normalize(diff) * penetration;
+      }
 
-      glm::vec2 oldVelocity = ball->Velocity;
-      ball->Velocity.x = SystemConstants::INITIAL_BALL_VELOCITY.first * percentage * strength;
-      ball->Velocity = glm::normalize(ball->Velocity) * glm::length(oldVelocity);
-      ball->Velocity.y = -1.0f * abs(ball->Velocity.y);
+      // Bounce logic if not owned
+      if (ball->Owner == nullptr) {
+        float centerBoard = player->Position.x + SystemConstants::PLAYER_RADIUS;
+        float distance = (ball->Position.x + ball->Radius) - centerBoard;
+        float percentage = distance / SystemConstants::PLAYER_RADIUS;
+        float strength = 2.0f;
+
+        glm::vec2 oldVelocity = ball->Velocity;
+        ball->Velocity.x = SystemConstants::INITIAL_BALL_VELOCITY.first * percentage * strength;
+        ball->Velocity = glm::normalize(ball->Velocity) * glm::length(oldVelocity);
+        ball->Velocity.y = -1.0f * abs(ball->Velocity.y);
+      }
     }
   };
 
