@@ -410,11 +410,11 @@ void Game::DoCollisions() {
         ball->Position += glm::normalize(diff) * penetration;
       }
 
-      // Bounce logic if not owned
+      // Bounce logic if not caught
       if (ball->Owner == nullptr) {
         float centerBoard = player->Position.x + SystemConstants::PLAYER_RADIUS;
-        float distance = (ball->Position.x + ball->Radius) - centerBoard;
-        float percentage = distance / SystemConstants::PLAYER_RADIUS;
+        float distance_x = (ball->Position.x + ball->Radius) - centerBoard;
+        float percentage = distance_x / SystemConstants::PLAYER_RADIUS;
         float strength = 2.0f;
 
         glm::vec2 oldVelocity = ball->Velocity;
