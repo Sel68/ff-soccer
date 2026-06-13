@@ -242,9 +242,26 @@ void Game::UpdateSimulation(double dt) {
         glm::vec2 target(target_.first, target_.second);
         glm::vec2 diff = target - movableBot->Position;
         if (glm::length(diff) > 1.0f) {
-          glm::vec2 dir = glm::normalize(diff);
-          float velocity = SystemConstants::PLAYER_VELOCITY * dt;
-          movableBot->Position += dir * velocity;
+          // Determine if target changed significantly to regenerate profile
+          if (glm::length(target - movableBot->current_target) > 5.0f) {
+            movableBot->current_target = target;
+            Motion::Point m_start{movableBot->Position.x, movableBot->Position.y};
+            Motion::Point m_end{target.x, target.y};
+            
+            movableBot->currentProfile = movableBot->motionLibrary.generateProfile(
+                m_start, m_end, glm::radians(movableBot->Rotation),
+                movableBot->current_velocities
+            );
+            movableBot->current_segment_time = 0.0;
+          }
+
+          movableBot->current_segment_time += dt;
+          movableBot->current_velocities = movableBot->motionLibrary.getVelocityState(
+              movableBot->currentProfile, movableBot->current_segment_time);
+
+          movableBot->Position.x += movableBot->current_velocities.vx * dt;
+          movableBot->Position.y += movableBot->current_velocities.vy * dt;
+          movableBot->Rotation += glm::degrees(movableBot->current_velocities.vtheta * dt);
 
           if (movableBot->Position.x < 50.0f) movableBot->Position.x = 50.0f;
           if (movableBot->Position.x > this->Width - movableBot->Size.x - 50.0f)
@@ -305,7 +322,42 @@ void Game::ProcessInput(double dt) {
           }
         }
 
-        if (keys[GLFW_KEY_K]) ball->Owner = nullptr;
+        float rotation_velocity = SystemConstants::PLAYER_ROTATION_VELOCITY * dt;
+        float rot_change = 0.0f;
+        if (keys[GLFW_KEY_Q]) {
+          rot_change -= rotation_velocity;
+        }
+        if (keys[GLFW_KEY_E]) {
+          rot_change += rotation_velocity;
+        }
+
+        if (rot_change != 0.0f) {
+          Player->Rotation += rot_change;
+          if (isStuckToThisPlayer) {
+            glm::vec2 player_center = Player->Position + Player->Radius;
+            glm::vec2 ball_center = ball->Position + ball->Radius;
+            glm::vec2 diff = ball_center - player_center;
+            
+            float angle = glm::radians(rot_change);
+            float cos_a = cos(angle);
+            float sin_a = sin(angle);
+            
+            glm::vec2 new_diff(
+              diff.x * cos_a - diff.y * sin_a,
+              diff.x * sin_a + diff.y * cos_a
+            );
+            
+            ball->Position = player_center + new_diff - ball->Radius;
+          }
+        }
+
+        if (keys[GLFW_KEY_K]) {
+          if (ball->Owner == Player) {
+            glm::vec2 face_dir(cos(glm::radians(Player->Rotation)), sin(glm::radians(Player->Rotation)));
+            ball->Velocity = face_dir * 500.0f;
+            ball->Owner = nullptr;
+          }
+        }
       }
     } else if (Player == team2_players[0]) {
       if (this->State == GAME_ACTIVE) {
@@ -385,8 +437,9 @@ Collision CheckCollision(BallObject& one,
   float radiiSum = one.Radius + two.Radius;
 
   if (distance <= radiiSum) {
-    if ((centerTwo.x + SystemConstants::PLAYER_RADIUS - SystemConstants::Stuckerror) <=
-        ((one.Position).x)) {
+    glm::vec2 face_dir(cos(glm::radians(two.Rotation)), sin(glm::radians(two.Rotation)));
+    float projected_dist = glm::dot(difference, face_dir);
+    if (projected_dist >= radiiSum - SystemConstants::Stuckerror) {
       if (one.Owner == nullptr) {
         one.Owner = &two;
       }
@@ -412,18 +465,50 @@ void Game::DoCollisions() {
 
       // Bounce logic if not caught
       if (ball->Owner == nullptr) {
-        float centerBoard = player->Position.x + SystemConstants::PLAYER_RADIUS;
-        float distance_x = (ball->Position.x + ball->Radius) - centerBoard;
-        float percentage = distance_x / SystemConstants::PLAYER_RADIUS;
-        float strength = 2.0f;
-
-        glm::vec2 oldVelocity = ball->Velocity;
-        ball->Velocity.x = SystemConstants::INITIAL_BALL_VELOCITY.first * percentage * strength;
-        ball->Velocity = glm::normalize(ball->Velocity) * glm::length(oldVelocity);
-        ball->Velocity.y = -1.0f * abs(ball->Velocity.y);
+        if (glm::length(ball->Velocity) > 0.0f && dist > 0.0f) {
+          glm::vec2 normal = glm::normalize(diff);
+          float velocityDotNormal = glm::dot(ball->Velocity, normal);
+          
+          // Only bounce if the ball is actually moving towards the bot
+          if (velocityDotNormal < 0.0f) {
+            ball->Velocity = ball->Velocity - 2.0f * velocityDotNormal * normal;
+            ball->Velocity *= SystemConstants::BALL_RESTITUTION;
+          }
+        }
       }
     }
   };
+
+  auto checkBotBotCollision = [&](BallObject* p1, BallObject* p2) {
+    if (p1 == p2) return;
+    glm::vec2 c1 = p1->Position + p1->Radius;
+    glm::vec2 c2 = p2->Position + p2->Radius;
+    glm::vec2 diff = c1 - c2;
+    float dist = glm::length(diff);
+    float radiiSum = p1->Radius + p2->Radius;
+    if (dist < radiiSum && dist > 0.0f) {
+        float penetration = radiiSum - dist;
+        glm::vec2 normal = glm::normalize(diff);
+        if (!p1->lock && p2->lock) {
+            p1->Position += normal * penetration;
+        } else if (p1->lock && !p2->lock) {
+            p2->Position -= normal * penetration;
+        } else if (!p1->lock && !p2->lock) {
+            p1->Position += normal * (penetration / 2.0f);
+            p2->Position -= normal * (penetration / 2.0f);
+        }
+    }
+  };
+
+  std::vector<BallObject*> all_players;
+  all_players.insert(all_players.end(), team1_players.begin(), team1_players.end());
+  all_players.insert(all_players.end(), team2_players.begin(), team2_players.end());
+
+  for (size_t i = 0; i < all_players.size(); i++) {
+    for (size_t j = i + 1; j < all_players.size(); j++) {
+      checkBotBotCollision(all_players[i], all_players[j]);
+    }
+  }
 
   for (BallObject* p : team1_players) handleCollision(p);
   for (BallObject* p : team2_players) handleCollision(p);

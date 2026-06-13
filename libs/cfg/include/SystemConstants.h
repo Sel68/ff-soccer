@@ -14,10 +14,27 @@ struct SystemConstants {
   static constexpr float BALL_RADIUS = 12.5f;
   static constexpr float Stuckerror = 2.0f;
 
+  // SSL Ball Physics
+  static constexpr float BALL_FRICTION = 250.0f;     // Linear deceleration (px/s^2)
+  static constexpr float BALL_RESTITUTION = 0.8f;    // 20% energy loss on bounce
+
   static constexpr unsigned int SCREEN_WIDTH = 950;
   static constexpr unsigned int SCREEN_HEIGHT = 580;
 
   static constexpr float OBSTACLE_TOLERANCE = 30.0f;
+
+  // Motion Constraints
+  static constexpr double MOTION_MAX_SPEED_X = 300.0;
+  static constexpr double MOTION_MAX_ACCEL_X = 400.0;
+  static constexpr double MOTION_MAX_DECEL_X = 400.0;
+
+  static constexpr double MOTION_MAX_SPEED_Y = 300.0;
+  static constexpr double MOTION_MAX_ACCEL_Y = 400.0;
+  static constexpr double MOTION_MAX_DECEL_Y = 400.0;
+
+  static constexpr double MOTION_MAX_SPEED_THETA = 6.28;
+  static constexpr double MOTION_MAX_ACCEL_THETA = 3.14;
+  static constexpr double MOTION_MAX_DECEL_THETA = 3.14;
 };
 
 struct NetworkConfig {

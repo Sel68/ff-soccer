@@ -12,5 +12,5 @@ endif()
 # Libraries used for all platforms
 add_subdirectory(external)
 add_subdirectory(kin)
-# add_subdirectory(Motion)
+add_subdirectory(motion)
 add_subdirectory(cfg)
