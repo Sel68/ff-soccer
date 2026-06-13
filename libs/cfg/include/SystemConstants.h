@@ -1,11 +1,13 @@
 #ifndef SYSTEM_CONSTANTS
 #define SYSTEM_CONSTANTS
 
-#include <utility>
-#include <cstdint>
 #include <array>
+#include <cstdint>
+#include <utility>
 
 struct SystemConstants {
+  static constexpr uint8_t num_robots = 1;
+
   static constexpr float PLAYER_RADIUS = 18.5f;
   static constexpr float PLAYER_VELOCITY = 300.0f;
   static constexpr std::pair<float, float> INITIAL_BALL_VELOCITY =
@@ -17,18 +19,8 @@ struct SystemConstants {
   static constexpr unsigned int SCREEN_HEIGHT = 580;
 
   static constexpr float OBSTACLE_TOLERANCE = 30.0f;
-};
 
-struct NetworkConfig {
-  // IPs (192.168.1.XYZ)
-  static constexpr uint8_t base_station_ip = 100;
-  static constexpr uint8_t host_ip = 101;
-
-  // Ports
-  static constexpr uint16_t host_listen_port = 8080;
-
-  // Message sizes
-  static constexpr int udp_buffer_max_size = 1024;
+  // Embedded
 };
 
 #endif  // SYSTEM_CONSTANTS
