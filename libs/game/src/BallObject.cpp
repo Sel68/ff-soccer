@@ -23,7 +23,7 @@ glm::vec2 BallObject::Move(float dt, unsigned int window_width, unsigned int win
     }
 
     Position += Velocity * dt;
-    
+
     // Wall bounces with restitution
     if (Position.x <= 45.0f) {
       Velocity.x = -Velocity.x * SystemConstants::BALL_RESTITUTION;

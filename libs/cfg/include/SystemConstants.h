@@ -15,8 +15,8 @@ struct SystemConstants {
   static constexpr float Stuckerror = 2.0f;
 
   // SSL Ball Physics
-  static constexpr float BALL_FRICTION = 250.0f;     // Linear deceleration (px/s^2)
-  static constexpr float BALL_RESTITUTION = 0.8f;    // 20% energy loss on bounce
+  static constexpr float BALL_FRICTION = 250.0f;   // Linear deceleration (px/s^2)
+  static constexpr float BALL_RESTITUTION = 0.8f;  // 20% energy loss on bounce
 
   static constexpr unsigned int SCREEN_WIDTH = 950;
   static constexpr unsigned int SCREEN_HEIGHT = 580;

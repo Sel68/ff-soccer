@@ -179,9 +179,9 @@ void Game::Init() {
   team2_players.push_back(Tp6);
 
   // Ball
-  glm::vec2 ballPos = playerPos1 + glm::vec2(SystemConstants::PLAYER_RADIUS * 2.0f + 5.0f,
-                                             SystemConstants::PLAYER_RADIUS -
-                                                 SystemConstants::BALL_RADIUS);
+  glm::vec2 ballPos =
+      playerPos1 + glm::vec2(SystemConstants::PLAYER_RADIUS * 2.0f + 5.0f,
+                             SystemConstants::PLAYER_RADIUS - SystemConstants::BALL_RADIUS);
   ball = new BallObject(ballPos, SystemConstants::BALL_RADIUS,
                         glm::vec2(SystemConstants::INITIAL_BALL_VELOCITY.first,
                                   SystemConstants::INITIAL_BALL_VELOCITY.second),
@@ -247,11 +247,10 @@ void Game::UpdateSimulation(double dt) {
             movableBot->current_target = target;
             Motion::Point m_start{movableBot->Position.x, movableBot->Position.y};
             Motion::Point m_end{target.x, target.y};
-            
+
             movableBot->currentProfile = movableBot->motionLibrary.generateProfile(
                 m_start, m_end, glm::radians(movableBot->Rotation),
-                movableBot->current_velocities
-            );
+                movableBot->current_velocities);
             movableBot->current_segment_time = 0.0;
           }
 
@@ -337,23 +336,21 @@ void Game::ProcessInput(double dt) {
             glm::vec2 player_center = Player->Position + Player->Radius;
             glm::vec2 ball_center = ball->Position + ball->Radius;
             glm::vec2 diff = ball_center - player_center;
-            
+
             float angle = glm::radians(rot_change);
             float cos_a = cos(angle);
             float sin_a = sin(angle);
-            
-            glm::vec2 new_diff(
-              diff.x * cos_a - diff.y * sin_a,
-              diff.x * sin_a + diff.y * cos_a
-            );
-            
+
+            glm::vec2 new_diff(diff.x * cos_a - diff.y * sin_a, diff.x * sin_a + diff.y * cos_a);
+
             ball->Position = player_center + new_diff - ball->Radius;
           }
         }
 
         if (keys[GLFW_KEY_K]) {
           if (ball->Owner == Player) {
-            glm::vec2 face_dir(cos(glm::radians(Player->Rotation)), sin(glm::radians(Player->Rotation)));
+            glm::vec2 face_dir(cos(glm::radians(Player->Rotation)),
+                               sin(glm::radians(Player->Rotation)));
             ball->Velocity = face_dir * 500.0f;
             ball->Owner = nullptr;
           }
@@ -468,7 +465,7 @@ void Game::DoCollisions() {
         if (glm::length(ball->Velocity) > 0.0f && dist > 0.0f) {
           glm::vec2 normal = glm::normalize(diff);
           float velocityDotNormal = glm::dot(ball->Velocity, normal);
-          
+
           // Only bounce if the ball is actually moving towards the bot
           if (velocityDotNormal < 0.0f) {
             ball->Velocity = ball->Velocity - 2.0f * velocityDotNormal * normal;
@@ -487,16 +484,16 @@ void Game::DoCollisions() {
     float dist = glm::length(diff);
     float radiiSum = p1->Radius + p2->Radius;
     if (dist < radiiSum && dist > 0.0f) {
-        float penetration = radiiSum - dist;
-        glm::vec2 normal = glm::normalize(diff);
-        if (!p1->lock && p2->lock) {
-            p1->Position += normal * penetration;
-        } else if (p1->lock && !p2->lock) {
-            p2->Position -= normal * penetration;
-        } else if (!p1->lock && !p2->lock) {
-            p1->Position += normal * (penetration / 2.0f);
-            p2->Position -= normal * (penetration / 2.0f);
-        }
+      float penetration = radiiSum - dist;
+      glm::vec2 normal = glm::normalize(diff);
+      if (!p1->lock && p2->lock) {
+        p1->Position += normal * penetration;
+      } else if (p1->lock && !p2->lock) {
+        p2->Position -= normal * penetration;
+      } else if (!p1->lock && !p2->lock) {
+        p1->Position += normal * (penetration / 2.0f);
+        p2->Position -= normal * (penetration / 2.0f);
+      }
     }
   };
 
