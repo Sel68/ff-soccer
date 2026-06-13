@@ -8,6 +8,7 @@
 struct SystemConstants {
   static constexpr float PLAYER_RADIUS = 18.5f;
   static constexpr float PLAYER_VELOCITY = 300.0f;
+  static constexpr float PLAYER_ROTATION_VELOCITY = 360.0f;
   static constexpr std::pair<float, float> INITIAL_BALL_VELOCITY =
       std::pair<float, float>(150.0f, 150.0f);
   static constexpr float BALL_RADIUS = 12.5f;
