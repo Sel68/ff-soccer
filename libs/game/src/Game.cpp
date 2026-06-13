@@ -202,6 +202,13 @@ std::vector<Point2D> Game::Plan(std::pair<double, double> start, std::pair<doubl
 }
 
 void Game::UpdateSimulation(double dt) {
+  if (keys[GLFW_KEY_K] && ball->Owner != nullptr) {
+    glm::vec2 face_dir(cos(glm::radians(ball->Owner->Rotation)),
+                       sin(glm::radians(ball->Owner->Rotation)));
+    ball->Velocity = face_dir * 500.0f;
+    ball->Owner = nullptr;
+  }
+
   ball->Move(dt, this->Width, this->Height);
 
   BallObject* movableBot = nullptr;
@@ -347,14 +354,7 @@ void Game::ProcessInput(double dt) {
           }
         }
 
-        if (keys[GLFW_KEY_K]) {
-          if (ball->Owner == Player) {
-            glm::vec2 face_dir(cos(glm::radians(Player->Rotation)),
-                               sin(glm::radians(Player->Rotation)));
-            ball->Velocity = face_dir * 500.0f;
-            ball->Owner = nullptr;
-          }
-        }
+
       }
     } else if (Player == team2_players[0]) {
       if (this->State == GAME_ACTIVE) {
