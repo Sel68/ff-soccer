@@ -1,9 +1,9 @@
 #ifndef SYSTEM_CONSTANTS
 #define SYSTEM_CONSTANTS
 
-#include <utility>
-#include <cstdint>
 #include <array>
+#include <cstdint>
+#include <utility>
 
 struct SystemConstants {
   static constexpr unsigned int SCREEN_WIDTH = 950;
