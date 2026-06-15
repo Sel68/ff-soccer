@@ -5,12 +5,21 @@
 
 #include "GameObject.h"
 #include "Texture.h"
+#include "motion.h"
 
 class BallObject : public GameObject {
  public:
   float Radius;
-  bool Stuck;
+  BallObject* Owner;
   bool Sticky, PassThrough;
+
+  // Motion tracking
+  Motion motionLibrary;
+  Motion::GeneratedProfile currentProfile;
+  double current_segment_time = 0.0;
+  glm::vec2 current_target = glm::vec2(0.0f, 0.0f);
+  Motion::VelocityState current_velocities{0.0, 0.0, 0.0};
+
   BallObject();
   BallObject(glm::vec2 pos, float radius, glm::vec2 velocity, Texture2D sprite, bool isLock);
   glm::vec2 Move(float dt, unsigned int window_width, unsigned int window_length);

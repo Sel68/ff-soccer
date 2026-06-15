@@ -3,12 +3,6 @@
 
 #include "RRTX.h"
 
-enum class AlgoName {
-  RRTX,
-  DUMMY
-};
+enum class AlgoName { RRTX, DUMMY };
 
-
-
-
-#endif // SOCCER_ALGOS_H
+#endif  // SOCCER_ALGOS_H

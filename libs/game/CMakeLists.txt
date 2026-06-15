@@ -22,6 +22,7 @@ target_link_libraries(game
     cfg_lib
     handler_lib
     kin_lib
+    motion_lib
     asio
 )
 

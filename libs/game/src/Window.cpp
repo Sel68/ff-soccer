@@ -40,7 +40,9 @@ void Window::WindowInit() {
   glfwSetKeyCallback(gl_window, KeyCallback);
   glfwSetFramebufferSizeCallback(gl_window, FramebufferSizeCallback);
 
-  glViewport(0, 0, SystemConstants::SCREEN_WIDTH, SystemConstants::SCREEN_HEIGHT);
+  int fb_width, fb_height;
+  glfwGetFramebufferSize(gl_window, &fb_width, &fb_height);
+  glViewport(0, 0, fb_width, fb_height);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   return;
