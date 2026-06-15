@@ -4,7 +4,7 @@ file(GLOB_RECURSE SOURCES "src/*.cpp")
 add_library(cfg_lib ${HEADERS} ${SOURCES})
 target_include_directories(cfg_lib PUBLIC include)
 
-if (BUILD_ON_STM)
+if(BUILD_ON_STM)
   target_compile_options(cfg_lib PRIVATE -Os)
   target_compile_options(cfg_lib PRIVATE -ffunction-sections)
   target_compile_options(cfg_lib PRIVATE -fdata-sections)

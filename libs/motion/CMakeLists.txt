@@ -6,7 +6,7 @@ add_library(motion_lib ${HEADERS} ${SOURCES})
 target_include_directories(motion_lib PUBLIC include)
 target_link_libraries(motion_lib PUBLIC cfg_lib)
 
-if (BUILD_ON_STM)
+if(BUILD_ON_STM)
   target_compile_options(motion_lib PRIVATE -Os)
   target_compile_options(motion_lib PRIVATE -ffunction-sections)
   target_compile_options(motion_lib PRIVATE -fdata-sections)

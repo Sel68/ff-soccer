@@ -1,7 +1,5 @@
 #ifndef GAME_H
 #define GAME_H
-
-#include <tuple>
 #include <vector>
 
 #include <glm/glm.hpp>
@@ -49,6 +47,7 @@ class Game {
   void Init();
   void DoCollisions();
   void Render();
+  void ObjectPosInit();
   void UpdateSimulation(double dt);
   void Cleanup();
 

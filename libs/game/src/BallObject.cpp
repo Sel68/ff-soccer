@@ -1,4 +1,5 @@
 #include "BallObject.h"
+#include "MotionConfig.h"
 
 BallObject::BallObject()
     : GameObject(), Radius(12.5f), Owner(nullptr), Sticky(false), PassThrough(false) {}
@@ -17,7 +18,7 @@ glm::vec2 BallObject::Move(float dt, unsigned int window_width, unsigned int win
     // Apply friction (linear deceleration)
     float speed = glm::length(Velocity);
     if (speed > 0.0f) {
-      float drop = SystemConstants::BALL_FRICTION * dt;
+      float drop = MotionConfig::BALL_FRICTION * dt;
       float newSpeed = std::max(speed - drop, 0.0f);
       Velocity = Velocity * (newSpeed / speed);
     }
@@ -26,17 +27,17 @@ glm::vec2 BallObject::Move(float dt, unsigned int window_width, unsigned int win
 
     // Wall bounces with restitution
     if (Position.x <= 45.0f) {
-      Velocity.x = -Velocity.x * SystemConstants::BALL_RESTITUTION;
+      Velocity.x = -Velocity.x * MotionConfig::BALL_RESTITUTION;
       Position.x = 45.0f;
     } else if (Position.x + Size.x >= window_width - 45.0f) {
-      Velocity.x = -Velocity.x * SystemConstants::BALL_RESTITUTION;
+      Velocity.x = -Velocity.x * MotionConfig::BALL_RESTITUTION;
       Position.x = window_width - 45.0f - Size.x;
     }
     if (Position.y <= 30.0f) {
-      Velocity.y = -Velocity.y * SystemConstants::BALL_RESTITUTION;
+      Velocity.y = -Velocity.y * MotionConfig::BALL_RESTITUTION;
       Position.y = 30.0f;
     } else if (Position.y + Size.y >= window_length - 30.0f) {
-      Velocity.y = -Velocity.y * SystemConstants::BALL_RESTITUTION;
+      Velocity.y = -Velocity.y * MotionConfig::BALL_RESTITUTION;
       Position.y = window_length - 30.0f - Size.y;
     }
   }
