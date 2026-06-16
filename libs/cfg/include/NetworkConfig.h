@@ -53,6 +53,7 @@ struct NetworkConfig {
     // 1: B + H + R1 ... R6
     // 2: 1 + R1
     // 3: ...
+    // 6:   N +  B    U  +   C * 6   +   R * 5
     return GetRobotCommandStartTime(cycle_start_time, SystemConstants::num_robots + 1) +
            robot_response_time * (robot_idx - 1);
   }
