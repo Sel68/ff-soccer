@@ -1,5 +1,8 @@
-#include "RRTX.h"
+#include <algorithm>
+#include <chrono>
+#include <random>
 
+#include "RRTX.h"
 #include "SystemConstants.h"
 
 RRTX::RRTX(const RRTXConfig& config) : m_config(config) {}
@@ -9,14 +12,8 @@ RRTX::~RRTX() {}
 std::vector<Point2D> RRTX::PlanningStep(std::pair<double, double> start,
                                         std::pair<double, double> goal,
                                         std::vector<Obstacle> obstacles) {
-  Point2D s;
-  s.x = start.first;
-  s.y = start.second;
-  Point2D g;
-  g.x = goal.first;
-  g.y = goal.second;
-  setStart(s);
-  setGoal(g);
+  setStart({start.first, start.second});
+  setGoal({goal.first, goal.second});
   setObstacles(obstacles);
   return plan();
 }

@@ -20,9 +20,11 @@ void ResourceManager::Clear() {
   for (auto& iter : shaders) {
     glDeleteProgram(iter.second.ID);
   }
+  shaders.clear();
   for (auto& iter : textures) {
     glDeleteTextures(1, &iter.second.ID);
   }
+  textures.clear();
 }
 
 Shader ResourceManager::LoadShaderFromFile(const char* vShaderFile, const char* fShaderFile,

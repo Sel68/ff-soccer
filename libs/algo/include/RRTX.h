@@ -1,13 +1,8 @@
 #ifndef RRTX_H
 #define RRTX_H
 
-#include <cmath>
-#include <memory>
 #include <vector>
-#include <algorithm>
-#include <chrono>
-#include <iostream>
-#include <random>
+#include <cmath>
 
 #include "Point2D.h"
 #include "Obstacle.h"

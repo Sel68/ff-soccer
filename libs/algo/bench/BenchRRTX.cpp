@@ -1,7 +1,8 @@
-#include "RRTX.h"
 #include <chrono>
 #include <iostream>
 #include <vector>
+
+#include "RRTX.h"
 
 int main() {
   std::cout << "Starting RRTX Benchmark..." << std::endl;
