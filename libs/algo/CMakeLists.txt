@@ -6,3 +6,4 @@ target_include_directories(algo_lib PUBLIC include)
 target_link_libraries(algo_lib PRIVATE cfg_lib)
 
 add_subdirectory(test)
+add_subdirectory(bench)

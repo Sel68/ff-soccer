@@ -20,6 +20,7 @@ target_link_libraries(game
     glfw
     algo_lib
     cfg_lib
+    strat
     handler_lib
     kin_lib
     motion_lib

@@ -1,23 +1,19 @@
 #ifndef RRTX_H
 #define RRTX_H
 
-#include <cmath>
-#include <memory>
 #include <vector>
+#include <cmath>
 
 #include "Point2D.h"
 #include "Obstacle.h"
-#include "kdTree.h"
 
-// RRTX tree  node
+// RRT node
 struct RRTXNode {
   Point2D position;
   double cost_from_start;
-  double lmc;  // Local Marginal Cost
   int parent_idx;
-  std::vector<int> children_indices;
 
-  RRTXNode(const Point2D& pos) : position(pos), cost_from_start(1e9), lmc(1e9), parent_idx(-1) {}
+  RRTXNode(const Point2D& pos) : position(pos), cost_from_start(0.0), parent_idx(-1) {}
 };
 
 // hyperparam + other
@@ -25,7 +21,7 @@ class RRTXConfig {
  public:
   double recalculation_time_ms = 10.0;
   double bias_to_goal = 0.1;
-  double step_size = 0.5;
+  double step_size = 0.2;
   double search_radius = 2.0;
   double robot_radius = 0.09;
   double field_length = 12.0;
@@ -54,7 +50,6 @@ class RRTX {
   std::vector<Obstacle> m_obstacles;
   RRTXConfig m_config;
 
-  kdt::KDTree<Point2D> m_kd_tree;
   std::vector<RRTXNode> m_nodes;
 
   // helper funcs

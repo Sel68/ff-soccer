@@ -13,6 +13,7 @@
 #include "PostProcessor.h"
 #include "ResourceManager.h"
 #include "Window.h"
+#include "MainStrategy.h"
 
 enum GameState { GAME_ACTIVE, GAME_MENU, GAME_WIN };
 
@@ -60,6 +61,9 @@ class Game {
   AlgoName current_algo;
 
   RRTX rrtx_planner;
+  MainStrategy m_strategy;
+
+  bool is_auto_mode = true;
 };
 
 #endif
