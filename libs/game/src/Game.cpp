@@ -313,6 +313,8 @@ void Game::UpdateSimulation(double dt) {
           movableBot->Position.x += dx;
           movableBot->Position.y += dy;
           movableBot->Rotation += dtheta;
+          movableBot->Rotation = std::fmod(movableBot->Rotation, 360.0f);
+          if (movableBot->Rotation < 0.0f) movableBot->Rotation += 360.0f;
 
           if (ball->Owner == movableBot) {
             ball->Position.x += dx;
@@ -365,6 +367,14 @@ void Game::ProcessInput(double dt) {
     keys_processed[GLFW_KEY_L] = true;
     std::cout << "[Game] Switched to " << (is_auto_mode ? "AUTO" : "MANUAL") << " mode."
               << std::endl;
+    if (is_auto_mode) {
+      for (BallObject* p : team1_players) {
+        p->current_target = glm::vec2(-10000.0f, -10000.0f);
+      }
+      for (BallObject* p : team2_players) {
+        p->current_target = glm::vec2(-10000.0f, -10000.0f);
+      }
+    }
   }
 
   auto handleCollision = [&](BallObject* Player) {
@@ -409,6 +419,8 @@ void Game::ProcessInput(double dt) {
 
         if (rot_change != 0.0f) {
           Player->Rotation += rot_change;
+          Player->Rotation = std::fmod(Player->Rotation, 360.0f);
+          if (Player->Rotation < 0.0f) Player->Rotation += 360.0f;
           if (isStuckToThisPlayer) {
             glm::vec2 player_center = Player->Position + Player->Radius;
             glm::vec2 ball_center = ball->Position + ball->Radius;

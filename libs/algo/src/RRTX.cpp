@@ -1,10 +1,5 @@
 #include "RRTX.h"
 
-#include <algorithm>
-#include <chrono>
-#include <iostream>
-#include <random>
-
 #include "SystemConstants.h"
 
 RRTX::RRTX(const RRTXConfig& config) : m_config(config) {}
@@ -14,21 +9,16 @@ RRTX::~RRTX() {}
 std::vector<Point2D> RRTX::PlanningStep(std::pair<double, double> start,
                                         std::pair<double, double> goal,
                                         std::vector<Obstacle> obstacles) {
-  // Algo
-  // 1. RRTX Init
-
-  // 2. Starts and Goals
-  setStart(start);
-  setGoal(goal);
-
-  // 3. Obstacles
-
+  Point2D s;
+  s.x = start.first;
+  s.y = start.second;
+  Point2D g;
+  g.x = goal.first;
+  g.y = goal.second;
+  setStart(s);
+  setGoal(g);
   setObstacles(obstacles);
-
-  // 4. Planning
-  std::vector<Point2D> path = plan();
-
-  return path;
+  return plan();
 }
 
 void RRTX::setGoal(const Point2D& goal) { m_goal = goal; }
@@ -53,7 +43,6 @@ void RRTX::updateObstacle(const Obstacle& updated_obstacle) {
 
 void RRTX::setRecalculationTime(double time_ms) { m_config.recalculation_time_ms = time_ms; }
 
-// l2 norm
 double RRTX::distance(const Point2D& p1, const Point2D& p2) const {
   return std::hypot(p1.x - p2.x, p1.y - p2.y);
 }
@@ -91,17 +80,13 @@ bool RRTX::isCollisionFree(const Point2D& p1, const Point2D& p2) const {
   return true;
 }
 
-// rand functs for distributions
 Point2D RRTX::sampleFree() const {
   static std::random_device rd;
   static std::mt19937 gen(rd());
-  static std::uniform_real_distribution<> dis_x(-m_config.field_length / 2,
-                                                m_config.field_length / 2);
-  static std::uniform_real_distribution<> dis_y(-m_config.field_width / 2,
-                                                m_config.field_width / 2);
-  static std::uniform_real_distribution<> dis_prob(0.0, 1.0);
+  std::uniform_real_distribution<> dis_x(-m_config.field_length / 2, m_config.field_length / 2);
+  std::uniform_real_distribution<> dis_y(-m_config.field_width / 2, m_config.field_width / 2);
+  std::uniform_real_distribution<> dis_prob(0.0, 1.0);
 
-  // 10pc chance to x_rand  = goal
   if (dis_prob(gen) < m_config.bias_to_goal) {
     return m_goal;
   }
@@ -113,22 +98,16 @@ Point2D RRTX::sampleFree() const {
 }
 
 std::vector<Point2D> RRTX::plan() {
-  std::vector<Point2D> path;
-
   if (isCollisionFree(m_start, m_goal)) {
     return {m_start, m_goal};
   }
 
   m_nodes.clear();
-  m_kd_tree.clear();
-
   m_nodes.emplace_back(m_start);
-  m_nodes[0].cost_from_start = 0;
-  m_kd_tree.insert(m_start);
 
   auto start_time = std::chrono::steady_clock::now();
+  int best_goal_node = -1;
 
-  // RRT* loop to simulate RRTX growth within time limits
   while (true) {
     auto current_time = std::chrono::steady_clock::now();
     double elapsed_ms =
@@ -139,8 +118,16 @@ std::vector<Point2D> RRTX::plan() {
 
     Point2D rand_pos = sampleFree();
 
-    int nearest_idx = m_kd_tree.nnSearch(rand_pos);
-    if (nearest_idx < 0 || nearest_idx >= (int)m_nodes.size()) continue;
+    // Linear nearest neighbor search
+    int nearest_idx = 0;
+    double min_dist = 1e9;
+    for (size_t i = 0; i < m_nodes.size(); ++i) {
+      double dist = distance(m_nodes[i].position, rand_pos);
+      if (dist < min_dist) {
+        min_dist = dist;
+        nearest_idx = (int)i;
+      }
+    }
 
     Point2D nearest_pos = m_nodes[nearest_idx].position;
     Point2D new_pos = steer(nearest_pos, rand_pos);
@@ -149,104 +136,44 @@ std::vector<Point2D> RRTX::plan() {
       continue;
     }
 
-    int new_node_idx = (int)m_nodes.size();
     RRTXNode new_node(new_pos);
+    new_node.parent_idx = nearest_idx;
+    new_node.cost_from_start =
+        m_nodes[nearest_idx].cost_from_start + distance(nearest_pos, new_pos);
 
-    std::vector<int> near_indices = m_kd_tree.radiusSearch(new_pos, m_config.search_radius);
-
-    // Find best parent
-    int best_parent_idx = nearest_idx;
-    double min_cost = m_nodes[nearest_idx].cost_from_start + distance(nearest_pos, new_pos);
-
-    for (int near_idx : near_indices) {
-      if (near_idx >= new_node_idx) continue;
-      Point2D near_pos = m_nodes[near_idx].position;
-      if (isCollisionFree(near_pos, new_pos)) {
-        double cost = m_nodes[near_idx].cost_from_start + distance(near_pos, new_pos);
-        if (cost < min_cost) {
-          min_cost = cost;
-          best_parent_idx = near_idx;
-        }
-      }
-    }
-
-    new_node.parent_idx = best_parent_idx;
-    new_node.cost_from_start = min_cost;
     m_nodes.push_back(new_node);
-    m_kd_tree.insert(new_pos);
-    m_nodes[best_parent_idx].children_indices.push_back(new_node_idx);
 
-    // Rewire near nodes
-    for (int near_idx : near_indices) {
-      if (near_idx >= new_node_idx) continue;
-      Point2D near_pos = m_nodes[near_idx].position;
-      double new_cost = min_cost + distance(new_pos, near_pos);
-      if (new_cost < m_nodes[near_idx].cost_from_start && isCollisionFree(new_pos, near_pos)) {
-        int old_parent = m_nodes[near_idx].parent_idx;
-        if (old_parent != -1) {
-          auto& children = m_nodes[old_parent].children_indices;
-          children.erase(std::remove(children.begin(), children.end(), near_idx), children.end());
-        }
-
-        m_nodes[near_idx].parent_idx = new_node_idx;
-        m_nodes[new_node_idx].children_indices.push_back(near_idx);
-
-        double cost_diff = m_nodes[near_idx].cost_from_start - new_cost;
-        m_nodes[near_idx].cost_from_start = new_cost;
-
-        std::vector<int> stack = m_nodes[near_idx].children_indices;
-        while (!stack.empty()) {
-          int curr = stack.back();
-          stack.pop_back();
-          m_nodes[curr].cost_from_start -= cost_diff;
-          for (int child : m_nodes[curr].children_indices) {
-            stack.push_back(child);
-          }
-        }
-      }
+    // Check if we can connect to the goal
+    if (distance(new_pos, m_goal) < m_config.step_size && isCollisionFree(new_pos, m_goal)) {
+      best_goal_node = (int)m_nodes.size() - 1;
+      break;
     }
   }
 
-  int best_goal_node = -1;
-  double min_cost_to_goal = 1e9;
-
-  // First try to find the best node that can connect to the goal
-  for (size_t i = 0; i < m_nodes.size(); ++i) {
-    if (isCollisionFree(m_nodes[i].position, m_goal)) {
-      double cost = m_nodes[i].cost_from_start + distance(m_nodes[i].position, m_goal);
-      if (cost < min_cost_to_goal) {
-        min_cost_to_goal = cost;
-        best_goal_node = (int)i;
-      }
-    }
-  }
-
-  int closest_to_goal = -1;
-  if (best_goal_node != -1) {
-    closest_to_goal = best_goal_node;
-  } else {
-    // Fallback if we couldn't connect to the goal
-    double min_dist_to_goal = 1e9;
+  int curr = best_goal_node;
+  if (curr == -1) {
+    double min_d = 1e9;
     for (size_t i = 0; i < m_nodes.size(); ++i) {
-      double dist = distance(m_nodes[i].position, m_goal);
-      if (dist < min_dist_to_goal) {
-        min_dist_to_goal = dist;
-        closest_to_goal = (int)i;
+      double d = distance(m_nodes[i].position, m_goal);
+      if (d < min_d) {
+        min_d = d;
+        curr = (int)i;
       }
     }
   }
 
-  if (closest_to_goal != -1) {
-    int curr = closest_to_goal;
-    while (curr != -1) {
-      path.push_back(m_nodes[curr].position);
-      curr = m_nodes[curr].parent_idx;
-    }
-    std::reverse(path.begin(), path.end());
-    // Only append goal if we actually have a clear path to it and aren't already there
-    if (isCollisionFree(path.back(), m_goal) && distance(path.back(), m_goal) > 0.01) {
-      path.push_back(m_goal);
-    }
+  std::vector<Point2D> path;
+  while (curr != -1) {
+    path.push_back(m_nodes[curr].position);
+    curr = m_nodes[curr].parent_idx;
+  }
+  std::reverse(path.begin(), path.end());
+
+  if (best_goal_node != -1) {
+    path.push_back(m_goal);
+  } else if (!path.empty() && isCollisionFree(path.back(), m_goal) &&
+             distance(path.back(), m_goal) > 0.01) {
+    path.push_back(m_goal);
   }
 
   return path;
