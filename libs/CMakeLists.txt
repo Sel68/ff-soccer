@@ -1,9 +1,10 @@
-if (BUILD_ON_STM)
+if(BUILD_ON_STM)
 # Libraries only used for stm
 else()
     # Libraries only used for laptop
     add_subdirectory(algo)
     add_subdirectory(comms)
+    add_subdirectory(strat)
     add_subdirectory(game)
     add_subdirectory(graphics)
     add_subdirectory(handler)

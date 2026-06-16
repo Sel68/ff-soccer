@@ -182,19 +182,57 @@ std::vector<Point2D> RRTX::plan() {
       Point2D near_pos = m_nodes[near_idx].position;
       double new_cost = min_cost + distance(new_pos, near_pos);
       if (new_cost < m_nodes[near_idx].cost_from_start && isCollisionFree(new_pos, near_pos)) {
+        int old_parent = m_nodes[near_idx].parent_idx;
+        if (old_parent != -1) {
+          auto& children = m_nodes[old_parent].children_indices;
+          children.erase(std::remove(children.begin(), children.end(), near_idx), children.end());
+        }
+
         m_nodes[near_idx].parent_idx = new_node_idx;
+        m_nodes[new_node_idx].children_indices.push_back(near_idx);
+
+        double cost_diff = m_nodes[near_idx].cost_from_start - new_cost;
         m_nodes[near_idx].cost_from_start = new_cost;
+
+        std::vector<int> stack = m_nodes[near_idx].children_indices;
+        while (!stack.empty()) {
+          int curr = stack.back();
+          stack.pop_back();
+          m_nodes[curr].cost_from_start -= cost_diff;
+          for (int child : m_nodes[curr].children_indices) {
+            stack.push_back(child);
+          }
+        }
+      }
+    }
+  }
+
+  int best_goal_node = -1;
+  double min_cost_to_goal = 1e9;
+
+  // First try to find the best node that can connect to the goal
+  for (size_t i = 0; i < m_nodes.size(); ++i) {
+    if (isCollisionFree(m_nodes[i].position, m_goal)) {
+      double cost = m_nodes[i].cost_from_start + distance(m_nodes[i].position, m_goal);
+      if (cost < min_cost_to_goal) {
+        min_cost_to_goal = cost;
+        best_goal_node = (int)i;
       }
     }
   }
 
   int closest_to_goal = -1;
-  double min_dist_to_goal = 1e9;
-  for (size_t i = 0; i < m_nodes.size(); ++i) {
-    double dist = distance(m_nodes[i].position, m_goal);
-    if (dist < min_dist_to_goal) {
-      min_dist_to_goal = dist;
-      closest_to_goal = (int)i;
+  if (best_goal_node != -1) {
+    closest_to_goal = best_goal_node;
+  } else {
+    // Fallback if we couldn't connect to the goal
+    double min_dist_to_goal = 1e9;
+    for (size_t i = 0; i < m_nodes.size(); ++i) {
+      double dist = distance(m_nodes[i].position, m_goal);
+      if (dist < min_dist_to_goal) {
+        min_dist_to_goal = dist;
+        closest_to_goal = (int)i;
+      }
     }
   }
 
@@ -205,7 +243,8 @@ std::vector<Point2D> RRTX::plan() {
       curr = m_nodes[curr].parent_idx;
     }
     std::reverse(path.begin(), path.end());
-    if (min_dist_to_goal > 0.01 && isCollisionFree(path.back(), m_goal)) {
+    // Only append goal if we actually have a clear path to it and aren't already there
+    if (isCollisionFree(path.back(), m_goal) && distance(path.back(), m_goal) > 0.01) {
       path.push_back(m_goal);
     }
   }
