@@ -29,7 +29,7 @@ void Window::WindowInit() {
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_RESIZABLE, false);
   gl_window = glfwCreateWindow(SystemConstants::SCREEN_WIDTH, SystemConstants::SCREEN_HEIGHT,
-                               "Breakout", nullptr, nullptr);
+                               "Soccer Simulator", nullptr, nullptr);
   glfwMakeContextCurrent(gl_window);
 
   if (!gladLoadGL((GLADloadfunc)glfwGetProcAddress)) {
