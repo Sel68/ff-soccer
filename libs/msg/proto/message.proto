@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+message RobotCommandMsg {
+  uint32 id = 1;
+  float vx = 2;
+  float vy = 3;
+  float w = 4;
+}
+
+message RobotResponseMsg {
+  uint32 id = 1;
+  float x = 2;
+  float y = 3;
+  float theta = 4;
+  uint32 state = 5;
+  uint32 errors = 6;
+}
