@@ -45,11 +45,15 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y libwayland-dev wayland-protocols libxinerama-dev libegl1-mesa-dev libxkbcommon-dev libxrandr-dev libglu1-mesa-dev freeglut3-dev mesa-common-dev libxcursor-dev libxi-dev libx11-dev protobuf-compiler libprotobuf-dev
+        sudo apt-get install -y python3-pip
+        sudo pip3 install --ignore-installed protobuf grpcio-tools
+        sudo apt-get install -y protobuf-compiler
     - name: Setup dependencies on macOS
       if: matrix.os == 'macos-latest'
       run: |
         brew update
         brew install cmake protobuf
+        pip3 install grpcio-tools --break-system-packages
     # Configure CMake
     - name: Configure CMake for Ubuntu and macOS
       run: |
