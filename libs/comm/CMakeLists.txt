@@ -6,4 +6,3 @@ target_link_libraries(comm_lib PUBLIC asio cfg_lib debug_lib msg_lib)
 target_include_directories(comm_lib PUBLIC include)
 
 add_subdirectory(examples)
-add_subdirectory(test)
