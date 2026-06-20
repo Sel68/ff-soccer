@@ -8,7 +8,7 @@ AsyncUdpServer::AsyncUdpServer(asio::io_context& ioc, const asio::ip::udp::endpo
 AsyncUdpServer::~AsyncUdpServer() = default;
 
 void AsyncUdpServer::start() {
-  sock_->bind(local_);
+  sock_->Bind(local_);
   // weak shared ptr
   sock_->start_receive([weak_self = std::weak_ptr<AsyncUdpServer>(shared_from_this())](
                            const auto& peer, const auto& data) {

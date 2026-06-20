@@ -1,8 +1,9 @@
 #include <asio.hpp>
+#include <chrono>
 #include <iostream>
 #include <memory>
-#include <chrono>
-#include "UdpSocket.hpp"
+
+#include "UdpSocket.h"
 
 // BroadcastSender: periodically broadcasts a short message on the local network
 int main() {
@@ -11,7 +12,7 @@ int main() {
     comms::UdpSocket sock(ioc);
 
     // bind to any address on an ephemeral port so OS picks interface
-    sock.bind(asio::ip::udp::endpoint(asio::ip::udp::v4(), 0));
+    sock.Bind(asio::ip::udp::endpoint(asio::ip::udp::v4(), 0));
     sock.set_broadcast(true);
 
     asio::ip::udp::endpoint broadcast_ep(asio::ip::address_v4::broadcast(), 9005);

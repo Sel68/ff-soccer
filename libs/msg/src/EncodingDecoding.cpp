@@ -21,24 +21,15 @@ std::string SerializeRobotResponseMsg(const RobotResponseMsg& robot_response_msg
   return std::string(reinterpret_cast<const char*>(inner_buffer), stream.bytes_written);
 }
 
-bool DeserializeHostMsg(const std::string_view& payload, HostMsg& host_msg) {
-  host_msg = HostMsg_init_zero;
-  pb_istream_t stream =
-      pb_istream_from_buffer(reinterpret_cast<const uint8_t*>(payload.data()), payload.size());
-  if (!pb_decode(&stream, HostMsg_fields, &host_msg)) {
-    debug::Log() << "[DeserializeHostMsg]: pb_decode failed\r\n";
-    return false;
-  }
-  return true;
-}
-
 bool DeserializeRobotCommandMsg(const std::string_view& payload,
                                 RobotCommandMsg& robot_command_msg) {
   robot_command_msg = RobotCommandMsg_init_zero;
   pb_istream_t stream =
       pb_istream_from_buffer(reinterpret_cast<const uint8_t*>(payload.data()), payload.size());
-  if (!pb_decode(&stream, RobotCommandMsg_fields, &robot_msg)) {
-    debug::Log() << "[DeserializeRobotCommandMsg]: pb_decode failed\r\n";
+  if (!pb_decode(&stream, RobotCommandMsg_fields, &robot_command_msg)) {
+    debug::Log() << "[DeserializeRobotCommandMsg]: pb_decode failed\r\n"
+                     << PB_GET_ERROR(&stream)
+                 << "\r\n";
     return false;
   }
   return true;

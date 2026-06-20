@@ -1,14 +1,13 @@
 #ifndef TRANSMITTER_H
 #define TRANSMITTER_H
 
-#include <vector>
-#include <cstring>
 #include <algorithm>
-
 #include <asio.hpp>
+#include <cstring>
+#include <vector>
 
 #include "OmniKinematics.h"
-#include "UdpSocket.hpp"
+#include "UdpSocket.h"
 
 // optmised byte layout
 #pragma pack(push, 1)

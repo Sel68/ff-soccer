@@ -2,7 +2,7 @@
 
 Transmitter::Transmitter(asio::io_context& ioc, const std::string& ip, unsigned short port)
     : socket_(ioc), peer_endpoint_(asio::ip::make_address(ip), port) {
-  socket_.bind(asio::ip::udp::endpoint(asio::ip::udp::v4(), 0));
+  socket_.Bind(asio::ip::udp::endpoint(asio::ip::udp::v4(), 0));
 }
 
 void Transmitter::transmit(int robot_id, double px, double py, double ptheta,

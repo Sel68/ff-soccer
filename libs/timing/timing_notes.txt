@@ -1,0 +1,42 @@
+
+// ***************************************************
+//                    Timing
+// ***************************************************
+
+/*
+ * Clock synchronization logic:
+ *
+ * T1 = master original timestamp
+ * T2 = slave reception time
+ * T3 = slave transmission time
+ * T4 = master reception time
+
+Host sends a time t (assume host is true)
+MCU receives it at t + dt.
+dt includes all transmission delays (software/hardware/wave propagation)
+MCU clock is at T
+t = T + o, o is offset
+So MCU receives it at t + dt = T + o + dt
+I want to estimate the true time at MCU
+True time est is T + o_est
+
+Suppose I send T1 from host
+I receive it at T2 at MCU. T2 is dt after T2_s, the time in MCU message was actually sent.
+T2 = T2_s + dt
+T1 = T2_s + o
+T1 + dt = T2_s + o + dt = T2_s + dt + o = T2 + o
+so
+T1 + dt = T2 + o
+T2 - T1 = dt - o
+
+Now suppose I send T3 from MCU
+I receive it at T4 at host. T4 is dt after T4_s, the time in host message was actually sent.
+Assume dt is the same for this case
+T4 = T4_s + dt
+T3 + o = T4_s (the other way!)
+T3 + o + dt = T4_s + dt = T4
+T4 - T3 = o + dt
+
+Then,
+(T4 - T3) - (T2 - T1) = 2 * o
+o = ((T4 - T3) - (T2 - T1))/2

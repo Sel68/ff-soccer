@@ -57,6 +57,7 @@ Motion::GeneratedProfile Motion::generateProfile(Point start, Point end, double 
   profile.totalDistanceX = totalDistanceX;
   profile.totalDistanceY = totalDistanceY;
 
+  // TODO: Why?
   double targetThetaRaw = std::atan2(displacementY, displacementX);
   double displacementTheta = targetThetaRaw - current_theta;
 

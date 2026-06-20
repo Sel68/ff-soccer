@@ -78,7 +78,7 @@ add_library(msg_lib ${HEADERS} ${SOURCES}
 
 # Specify the include directory for the ctrl_lib target
 target_include_directories(msg_lib PUBLIC include)
-target_link_libraries(msg_lib PUBLIC debug_lib cfg_lib)
+target_link_libraries(msg_lib PRIVATE debug_lib cfg_lib)
 # find the pb.h files
 target_include_directories(msg_lib PUBLIC 
   ${NANOPB_GEN_DIR} # the pb.h file

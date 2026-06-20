@@ -1,7 +1,5 @@
-file(GLOB children RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *)
+add_executable(game_engine SimulatorApp.cpp)
+target_link_libraries(game_engine PRIVATE game glfw)
 
-foreach(child ${children})
-    if(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${child})
-        add_subdirectory(${child})
-    endif()
-endforeach()
+add_executable(physical_engine PhysicalApp.cpp)
+target_link_libraries(physical_engine PRIVATE game glfw comm_lib timing_lib)

@@ -2,6 +2,9 @@
 #define ENCODING_DECODING_H
 
 #include "MessageInterface.h"
+#include "SystemConstants.h"
+
+using RobotCommands = std::array<RobotCommandMsg, SystemConstants::num_robots + 1>;
 
 /*
   Host: Serializes host msg, Serializes soccer msg
@@ -12,6 +15,8 @@
 
 /******** FOR MCUs ********/
 #ifdef BUILD_ON_STM
+
+#include <string_view>
 
 // Robot
 std::string SerializeRobotResponseMsg(
@@ -29,6 +34,7 @@ std::string SerializeRobotCommandMsg(const RobotCommandMsg& robot_command_msg);
 bool DeserializeRobotResponseMsg(const std::string& payload, RobotResponseMsg& robot_response_msg);
 bool DeserializeRobotCommandMsg(const std::string& payload, RobotCommandMsg& robot_command_msg);
 
-#endif  // NOT BUILD_ON_STM
+
+#endif
 
 #endif  // ENCODING_DECODING_H
