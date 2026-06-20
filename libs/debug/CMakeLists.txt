@@ -1,3 +1,6 @@
+# Make the uart lib first
+add_subdirectory(uart)
+
 file(GLOB_RECURSE HEADERS "include/*.h")
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 

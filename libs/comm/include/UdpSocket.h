@@ -16,7 +16,7 @@ class UdpSocket {
   ~UdpSocket();
 
   // bind to local endpoint (address and port)
-  void bind(const asio::ip::udp::endpoint& ep);
+  void Bind(const asio::ip::udp::endpoint& ep);
 
   // start receiving (will call handler for each datagram)
   void start_receive(UdpHandler handler);

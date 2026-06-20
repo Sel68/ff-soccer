@@ -7,22 +7,22 @@
 
 struct NetworkConfig {
   // IPs (192.168.1.XYZ)
-  static constexpr uint8_t base_station_ip = 100;
-  static constexpr uint8_t host_ip = 101;
+  static constexpr uint8_t base_station_ip[4] = {192, 168, 1, 100};
+  static constexpr uint8_t host_ip[4] = {192, 168, 1, 101};
 
   // Ports
-  static constexpr uint32_t host_listen_port = 8080;
-  static constexpr uint32_t base_station_listen_port = 8081;
+  static constexpr uint32_t host_port = 8080;
+  static constexpr uint32_t base_station_port = 8081;
 
   // Message sizes (WIRED)
-  static constexpr int udp_buffer_max_size = 1024;
+  static constexpr int udp_buffer_max_size = 1600;
 
   // Message sizees (WIRELESS)
   static constexpr uint8_t radio_msg_size = 255;
   static constexpr uint8_t radio_msg_header_size = 2;
   static constexpr uint8_t radio_msg_crc_size = 2;
   static constexpr uint8_t radio_msg_payload_size =
-      radio_msg_size - (radio_msg_header_size + radio_msg_crc_size);  // 128 - (2 + 2) = 124
+      radio_msg_size - (radio_msg_header_size + radio_msg_crc_size);  // 255 - (2 + 2) = 251
 };
 
 struct NetworkTime {
@@ -44,14 +44,14 @@ struct NetworkTime {
     return GetBeaconStartTime(cycle_start_time) + beacon_time;
   }
 
-  static uint32_t GetRobotCommandStartTime(uint32_t cycle_start_time, uint8_t robot_idx=1) {
+  static uint32_t GetRobotCommandStartTime(uint32_t cycle_start_time, uint8_t robot_idx = 1) {
     // 1: B + H
     // 2: B + H + R1
     // 6: B + H + R1 ... + R5
     return GetUdpStartTime(cycle_start_time) + udp_time + robot_command_time * (robot_idx - 1);
   }
 
-  static uint32_t GetRobotResponseStartTime(uint32_t cycle_start_time, uint8_t robot_idx= 1) {
+  static uint32_t GetRobotResponseStartTime(uint32_t cycle_start_time, uint8_t robot_idx = 1) {
     // 1: B + H + R1 ... R6
     // 2: 1 + R1
     // 3: ...

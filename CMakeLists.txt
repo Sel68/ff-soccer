@@ -7,7 +7,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 message(STATUS "Build on stm? ${BUILD_ON_STM}")
 
 if(BUILD_ON_STM)
-  add_definitions(-DBUILD_ON_STM)  
   add_subdirectory(libs)
 else()
   enable_testing()

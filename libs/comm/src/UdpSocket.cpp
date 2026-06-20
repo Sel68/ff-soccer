@@ -1,4 +1,4 @@
-#include "UdpSocket.hpp"
+#include "UdpSocket.h"
 
 #include <iostream>
 
@@ -11,9 +11,8 @@ UdpSocket::~UdpSocket() {
   socket_.close(ec);
 }
 
-void UdpSocket::bind(const asio::ip::udp::endpoint& ep) {
-  socket_.open(ep.protocol());
-  socket_.bind(ep);
+void UdpSocket::Bind(const asio::ip::udp::endpoint& ep) {
+  
 }
 
 void UdpSocket::start_receive(UdpHandler handler) {

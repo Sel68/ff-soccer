@@ -1,7 +1,8 @@
 #include <asio.hpp>
 #include <iostream>
 #include <memory>
-#include "UdpSocket.hpp"
+
+#include "UdpSocket.h"
 
 // BroadcastReceiver: listens on port 9005 for broadcast messages
 int main() {
@@ -9,7 +10,7 @@ int main() {
     asio::io_context ioc;
     comms::UdpSocket sock(ioc);
     // bind to all interfaces on port 9005
-    sock.bind(asio::ip::udp::endpoint(asio::ip::udp::v4(), 9005));
+    sock.Bind(asio::ip::udp::endpoint(asio::ip::udp::v4(), 9005));
 
     int recv_count = 0;
     const int max_recv = 10;  // stop after this many packets

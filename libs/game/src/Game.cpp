@@ -355,7 +355,6 @@ void Game::UpdateSimulation(double dt) {
 }
 
 void Game::Update(double dt) {
-  // struct maintained for future
   UpdateSimulation(dt);
 }
 
@@ -378,6 +377,9 @@ void Game::ProcessInput(double dt) {
   }
 
   auto handleCollision = [&](BallObject* Player) {
+    
+    glm::vec2 oldPosition = Player->Position;
+
     bool isStuckToThisPlayer = ball->Owner == Player;
     if (!Player->lock) {
       if (this->State == GAME_ACTIVE) {
@@ -465,6 +467,12 @@ void Game::ProcessInput(double dt) {
           }
         }
       }
+    }
+
+    if (dt > 0.0001) {
+      Player->Velocity = (Player->Position - oldPosition) / static_cast<float>(dt);
+    } else {
+      Player->Velocity = glm::vec2(0.0f, 0.0f);
     }
   };
 

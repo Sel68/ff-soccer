@@ -1,2 +1,0 @@
-add_executable(TelemetryReceiver TelemetryReceiver.cpp)
-target_link_libraries(TelemetryReceiver PRIVATE asio)
