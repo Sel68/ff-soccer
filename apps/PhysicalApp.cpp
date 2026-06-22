@@ -1,7 +1,7 @@
 #include <asio.hpp>
 
-#include "CommManager.h"
 #include "Game.h"
+#include "HostComm.h"
 #include "OmniKinematics.h"
 #include "Timing.h"
 #include "Transmitter.h"
@@ -39,7 +39,7 @@ class Host {
 
     RobotCommands robot_cmds = PrepareRobotCommands(soccer);
 
-    comm_manager.SetRobotCommands(robot_cmds);
+    host_comm.SetRobotCommands(robot_cmds);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(10));  // 100 Hz
   }
@@ -47,16 +47,14 @@ class Host {
   bool Running() { return soccer.Running() && running; }
 
   void Exit() {
-    comm_manager.Exit();
+    host_comm.Exit();
     soccer.Exit();
   }
 
-  ~Host() {
-    Exit();
-  }
+  ~Host() { Exit(); }
 
  private:
-  CommManager comm_manager;
+  HostComm host_comm;
   Game soccer;
 
   // Timing

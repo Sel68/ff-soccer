@@ -1,5 +1,5 @@
-#ifndef COMM_MANAGER_H
-#define COMM_MANAGER_H
+#ifndef HOST_COMM_H
+#define HOST_COMM_H
 
 #include <asio.hpp>
 #include <chrono>
@@ -13,10 +13,10 @@
 #include "NetworkConfig.h"
 #include "SystemConstants.h"
 
-class CommManager {
+class HostComm {
  public:
-  CommManager();
-  ~CommManager();
+  HostComm();
+  ~HostComm();
   void Exit();
 
   void SetRobotCommands(
@@ -50,4 +50,4 @@ class CommManager {
   std::string stored_commands;
 };
 
-#endif  // COMM_MANAGER_H
+#endif  // HOST_COMM_H
