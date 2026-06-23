@@ -10,6 +10,7 @@ struct SystemConstants {
   static constexpr uint8_t num_wheels = 4;
 
   static_assert(num_robots >= 1 && num_robots <= 6 && "Check [SystemConstants]: num_robots\r\n");
+  static_assert(num_wheels == 4 && "Check [SystemConstants]: num_wheels\r\n");
 
   static constexpr unsigned int SCREEN_WIDTH = 950;
   static constexpr unsigned int SCREEN_HEIGHT = 580;
