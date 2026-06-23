@@ -4,7 +4,7 @@
 #include "MessageInterface.h"
 #include "SystemConstants.h"
 
-using RobotCommands = std::array<RobotCommandMsg, SystemConstants::num_robots + 1>;
+using RobotCommands = std::array<RobotCommandMsg, SystemConstants::NUM_ROBOTS + 1>;
 
 /*
   Host: Serializes host msg, Serializes soccer msg
@@ -33,7 +33,6 @@ std::string SerializeRobotCommandMsg(const RobotCommandMsg& robot_command_msg);
 // Robot
 bool DeserializeRobotResponseMsg(const std::string& payload, RobotResponseMsg& robot_response_msg);
 bool DeserializeRobotCommandMsg(const std::string& payload, RobotCommandMsg& robot_command_msg);
-
 
 #endif
 

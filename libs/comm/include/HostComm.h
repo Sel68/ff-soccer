@@ -20,7 +20,7 @@ class HostComm {
   void Exit();
 
   void SetRobotCommands(
-      const std::array<RobotCommandMsg, SystemConstants::num_robots + 1>& robot_command_msg);
+      const std::array<RobotCommandMsg, SystemConstants::NUM_ROBOTS + 1>& robot_command_msg);
 
  private:
   void TransmissionThread();

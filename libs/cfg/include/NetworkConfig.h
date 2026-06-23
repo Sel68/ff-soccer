@@ -35,7 +35,7 @@ struct NetworkTime {
   static constexpr uint32_t receive_offset = 10;
 
   static_assert(beacon_time + udp_time +
-                        (robot_command_time + robot_response_time) * SystemConstants::num_robots <=
+                        (robot_command_time + robot_response_time) * SystemConstants::NUM_ROBOTS <=
                     network_cycle_time &&
                 "Total network cycle time issue");
 
@@ -57,7 +57,7 @@ struct NetworkTime {
     // 2: 1 + R1
     // 3: ...
     // 6:   N +  B    U  +   C * 6   +   R * 5
-    return GetRobotCommandStartTime(cycle_start_time, SystemConstants::num_robots + 1) +
+    return GetRobotCommandStartTime(cycle_start_time, SystemConstants::NUM_ROBOTS + 1) +
            robot_response_time * (robot_idx - 1);
   }
 };

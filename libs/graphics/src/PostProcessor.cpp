@@ -1,5 +1,8 @@
 #include "PostProcessor.h"
+
 #include <iostream>
+
+#include "../../cfg/include/SystemConstants.h"
 
 PostProcessor::PostProcessor(Shader shader, unsigned int width, unsigned int height)
     : PostProcessingShader(shader),
@@ -64,7 +67,8 @@ void PostProcessor::EndRender() {
   // now resolve multisampled color-buffer into intermediate FBO to store to texture
   glBindFramebuffer(GL_READ_FRAMEBUFFER, this->MSFBO);
   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->FBO);
-  glBlitFramebuffer(0, 0, this->Width, this->Height, 0, 0, this->Width, this->Height,
+  glBlitFramebuffer(0, 0, SystemConstants::SCREEN_WIDTH, SystemConstants::SCREEN_HEIGHT, 0, 0,
+                    SystemConstants::SCREEN_WIDTH, SystemConstants::SCREEN_HEIGHT,
                     GL_COLOR_BUFFER_BIT, GL_NEAREST);
   glBindFramebuffer(GL_FRAMEBUFFER,
                     0);  // binds both READ and WRITE framebuffer to default framebuffer

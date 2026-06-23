@@ -11,7 +11,7 @@ using Clock = std::chrono::steady_clock;
 RobotCommands PrepareRobotCommands(Game& soccer) {
   RobotCommands robot_cmds;
   int robot_id = 0;
-  for (BallObject* p : soccer.GetTeam1Players()) {
+  for (GameObject* p : soccer.GetTeam1Players()) {
     robot_id++;
     robot_cmds[robot_id].id = robot_id;
     robot_cmds[robot_id].vx = p->Velocity.x;

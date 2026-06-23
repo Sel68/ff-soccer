@@ -110,10 +110,10 @@ void HostComm::Exit() {
 HostComm::~HostComm() { Exit(); }
 
 void HostComm::SetRobotCommands(
-    const std::array<RobotCommandMsg, SystemConstants::num_robots + 1>& robot_cmd_msg) {
+    const std::array<RobotCommandMsg, SystemConstants::NUM_ROBOTS + 1>& robot_cmd_msg) {
   std::cout << "[HostComm::SetRobotCommands]: Setting robot commands\r\n";
   stored_commands.clear();
-  for (int i = 1; i <= SystemConstants::num_robots; ++i) {
+  for (int i = 1; i <= SystemConstants::NUM_ROBOTS; ++i) {
     std::string cmd_i = SerializeRobotCommandMsg(robot_cmd_msg[i]);
     uint16_t len = static_cast<uint16_t>(cmd_i.size());
     std::cout << "[HostComm::SetRobotCommands]: Robot " << i << " command size: " << len

@@ -3,6 +3,13 @@
 
 #include <iostream>
 
+/* TODO:  GameConfig
+          Variables naming
+          Logs while starting things up in Game (Resource Load...) Error handling
+          Use solid OOP: Private variables (libs: graphics, game)
+          Namespaces:
+            every lib, namespace itself same 
+*/
 struct MotionConfig {
   static constexpr float PLAYER_RADIUS = 18.5f;
   static constexpr float PLAYER_VELOCITY = 300.0f;
