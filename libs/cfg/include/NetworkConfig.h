@@ -32,6 +32,7 @@ struct NetworkTime {
   static constexpr uint32_t udp_time = 30;
   static constexpr uint32_t robot_command_time = 30;
   static constexpr uint32_t robot_response_time = 30;
+  static constexpr uint32_t receive_offset = 10;
 
   static_assert(beacon_time + udp_time +
                         (robot_command_time + robot_response_time) * SystemConstants::num_robots <=

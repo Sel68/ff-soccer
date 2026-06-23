@@ -205,12 +205,6 @@ void Game::Init() {
 
   static Shader shader = resource_manager.GetShader("sprite");
   renderer = new SpriteRenderer(shader);
-
-  GameLevel one;
-  one.Load(resource_manager, LEVEL_DIR "sim.lvl", this->Width, this->Height / 2);
-
-  this->Levels.push_back(one);
-  this->Level = 0;
 }
 
 std::vector<Point2D> Game::Plan(std::pair<double, double> start, std::pair<double, double> goal,
@@ -485,7 +479,7 @@ void Game::Render() {
     static Texture2D texture = resource_manager.GetTexture("background");
     renderer->DrawSprite(texture, glm::vec2(0.0f, 0.0f), glm::vec2(this->Width, this->Height),
                          0.0f);
-    this->Levels[this->Level].Draw(*renderer);
+    // this->Levels[this->Level].Draw(*renderer);
 
     for (BallObject* p : team1_players) p->Draw(*renderer);
     for (BallObject* p : team2_players) p->Draw(*renderer);

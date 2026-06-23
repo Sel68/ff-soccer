@@ -9,7 +9,6 @@
 
 #include <BallObject.h>
 #include "Algos.h"
-#include "GameLevel.h"
 #include "PostProcessor.h"
 #include "ResourceManager.h"
 #include "Window.h"
@@ -26,7 +25,6 @@ class Game {
   GameState State;
   unsigned int Width, Height;
   Window game_window;
-  std::vector<GameLevel> Levels;
   unsigned int Level;
   unsigned int Lives;
 
