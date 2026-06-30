@@ -19,6 +19,7 @@ struct RRTXNode {
 // hyperparam + other
 class RRTXConfig {
  public:
+  bool debug_mode = false;
   double recalculation_time_ms = 10.0;
   double bias_to_goal = 0.1;
   double step_size = 0.2;
@@ -36,6 +37,7 @@ class RRTX {
   std::vector<Point2D> PlanningStep(std::pair<double, double> start,
                                     std::pair<double, double> goal,
                                     std::vector<Obstacle> obstacles);
+  void setDebugMode(bool mode) { m_config.debug_mode = mode; }
 
  private:
   void setGoal(const Point2D& goal);

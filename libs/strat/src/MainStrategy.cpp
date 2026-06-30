@@ -1,10 +1,15 @@
 #include <cmath>
+#include <iostream>
 
 #include "MainStrategy.h"
+
+bool MainStrategy::m_debug_mode = false;
 
 StrategyResult MainStrategy::update(const StrategyContext& ctx) {
   StrategyResult result;
   result.kick = false;
+
+  ActionState current_state = ActionState::NONE;
 
   if (ctx.has_ball) {
     double dist_to_goal = std::hypot(ctx.robot_pos.first - ctx.goal_pos.first,
@@ -25,6 +30,9 @@ StrategyResult MainStrategy::update(const StrategyContext& ctx) {
     // ~10 degree threshold, 0.2 in radians
     if (dist_to_goal < 250.0 && std::abs(angle_diff) < 0.2) {  // kick threshold
       result.kick = true;
+      current_state = ActionState::KICKING;
+    } else {
+      current_state = ActionState::AIMING_AT_GOAL;
     }
   } else {
     // Find ball, target little behind the ball relative to the goal
@@ -45,8 +53,28 @@ StrategyResult MainStrategy::update(const StrategyContext& ctx) {
         // We aren't close to the setup point yet, move to the setup point instead of diving
         result.target_pos.first = back_x;
         result.target_pos.second = back_y;
+        current_state = ActionState::SEEKING_SETUP;
+      } else {
+        current_state = ActionState::SEEKING_BALL;
+      }
+    } else {
+      current_state = ActionState::SEEKING_BALL;
+    }
+  }
+
+  if (current_state != last_state) {
+    if (m_debug_mode) {
+      if (current_state == ActionState::KICKING) {
+        std::cout << "[INFO] [Strategy]: Decided to kick ball at target (" << ctx.goal_pos.first << ", " << ctx.goal_pos.second << ")" << std::endl;
+      } else if (current_state == ActionState::AIMING_AT_GOAL) {
+        std::cout << "[INFO] [Strategy]: Aiming at goal..." << std::endl;
+      } else if (current_state == ActionState::SEEKING_SETUP) {
+        std::cout << "[INFO] [Strategy]: Moving to ball setup point..." << std::endl;
+      } else if (current_state == ActionState::SEEKING_BALL) {
+        std::cout << "[INFO] [Strategy]: Diving to capture ball..." << std::endl;
       }
     }
+    last_state = current_state;
   }
 
   return result;

@@ -6,7 +6,8 @@
 
 int main() {
   // // 1. Host prepares all the commands
-  // std::array<RobotCommandMsg, SystemConstants::num_robots + 1> robot_command_msg;
+  // std::array<RobotCommandMsg, SystemConstants::num_robots + 1>
+  // robot_command_msg;
 
   // for (int i = 1; i <= SystemConstants::num_robots; ++i) {
   //   robot_command_msg[i].id = i;
@@ -63,7 +64,9 @@ int main() {
   // }
 
   // // 8. Robot uses this command
-  // std::cout << "Robot Command: " << rob_cmd.id << ", " << rob_cmd.vx << ", " << rob_cmd.vy << ", "
+  // std::cout << "Robot Command: " << rob_cmd.id << ", " << rob_cmd.vx << ", "
+  // << rob_cmd.vy << ",
+  // "
   //           << rob_cmd.w << std::endl;
   return 0;
 }

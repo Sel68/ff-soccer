@@ -1,19 +1,18 @@
 #ifndef GAME_H
 #define GAME_H
-#include <vector>
 
+#include <asio.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <asio.hpp>
+#include <vector>
 
-#include <BallObject.h>
 #include "Algos.h"
-#include "GameLevel.h"
+#include "GameObject.h"
+#include "MainStrategy.h"
 #include "PostProcessor.h"
 #include "ResourceManager.h"
 #include "Window.h"
-#include "MainStrategy.h"
 
 enum GameState { GAME_ACTIVE, GAME_MENU, GAME_WIN };
 
@@ -23,13 +22,6 @@ typedef std::tuple<bool, Direction, glm::vec2> Collision;
 
 class Game {
  public:
-  GameState State;
-  unsigned int Width, Height;
-  Window game_window;
-  std::vector<GameLevel> Levels;
-  unsigned int Level;
-  unsigned int Lives;
-
   Game();
   ~Game();
   void ProcessInput(double dt);
@@ -42,7 +34,7 @@ class Game {
 
   bool Running();
 
-  const std::vector<BallObject*>& GetTeam1Players() const;
+  const std::vector<GameObject*>& GetTeam1Players() const;
 
  private:
   void Init();
@@ -52,14 +44,19 @@ class Game {
   void UpdateSimulation(double dt);
   void Cleanup();
 
+  GameObject* ball;
+  std::vector<GameObject*> team1_players;
+  std::vector<GameObject*> team2_players;
+  GameState state;
+
+  // Graphics
+  Window game_window;
+  unsigned int level;
   ResourceManager resource_manager;
   SpriteRenderer* renderer;
-  BallObject* ball;
-  std::vector<BallObject*> team1_players;
-  std::vector<BallObject*> team2_players;
 
+  // Algo
   AlgoName current_algo;
-
   RRTX rrtx_planner;
   MainStrategy m_strategy;
 

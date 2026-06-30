@@ -1,30 +1,28 @@
-
 #ifndef POST_PROCESSOR_H
 #define POST_PROCESSOR_H
-
-#include <SpriteRenderer.h>
 
 #include <glm/glm.hpp>
 
 #include "Shaders.h"
+#include "SpriteRenderer.h"
 #include "Texture.h"
 
 class PostProcessor {
- public:
-  Shader PostProcessingShader;
-  Texture2D Texture;
-  unsigned int Width, Height;
-  bool Confuse, Chaos, Shake;
+public:
   PostProcessor(Shader shader, unsigned int width, unsigned int height);
   void BeginRender();
   void EndRender();
   void Render(float time);
 
- private:
+private:
   unsigned int MSFBO, FBO;
   unsigned int RBO;
   unsigned int VAO;
   void initRenderData();
+  Shader PostProcessingShader;
+  Texture2D Texture;
+  unsigned int Width, Height;
+  bool Confuse, Chaos, Shake;
 };
 
 #endif

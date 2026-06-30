@@ -1,5 +1,5 @@
-#ifndef COMM_MANAGER_H
-#define COMM_MANAGER_H
+#ifndef HOST_COMM_H
+#define HOST_COMM_H
 
 #include <asio.hpp>
 #include <chrono>
@@ -13,22 +13,23 @@
 #include "NetworkConfig.h"
 #include "SystemConstants.h"
 
-class CommManager {
- public:
-  CommManager();
-  ~CommManager();
+class HostComm {
+public:
+  HostComm();
+  ~HostComm();
   void Exit();
 
   void SetRobotCommands(
-      const std::array<RobotCommandMsg, SystemConstants::num_robots + 1>& robot_command_msg);
+      const std::array<RobotCommandMsg, SystemConstants::num_robots + 1>
+          &robot_command_msg);
 
- private:
+private:
   void TransmissionThread();
   void ReceptionThread();
   void SetupBaseStation();
   asio::ip::udp::endpoint MakeEndpoint(const uint8_t ip[4], uint16_t port);
   void SetupHost();
-  void ProcessBaseStationMessage(const std::string& msg);
+  void ProcessBaseStationMessage(const std::string &msg);
 
   asio::io_context io_context;
   asio::ip::udp::socket socket;
@@ -50,4 +51,4 @@ class CommManager {
   std::string stored_commands;
 };
 
-#endif  // COMM_MANAGER_H
+#endif // HOST_COMM_H
