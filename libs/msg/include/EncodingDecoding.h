@@ -4,7 +4,8 @@
 #include "MessageInterface.h"
 #include "SystemConstants.h"
 
-using RobotCommands = std::array<RobotCommandMsg, SystemConstants::NUM_ROBOTS + 1>;
+using RobotCommands =
+    std::array<RobotCommandMsg, SystemConstants::num_robots + 1>;
 
 /*
   Host: Serializes host msg, Serializes soccer msg
@@ -20,20 +21,22 @@ using RobotCommands = std::array<RobotCommandMsg, SystemConstants::NUM_ROBOTS + 
 
 // Robot
 std::string SerializeRobotResponseMsg(
-    const RobotResponseMsg& robot_response_msg = RobotResponseMsg_init_zero);
-bool DeserializeRobotCommandMsg(const std::string_view& payload,
-                                RobotCommandMsg& robot_command_msg);
+    const RobotResponseMsg &robot_response_msg = RobotResponseMsg_init_zero);
+bool DeserializeRobotCommandMsg(const std::string_view &payload,
+                                RobotCommandMsg &robot_command_msg);
 
 #else
 /******** FOR LAPTOP ******/
 
 // Host
-std::string SerializeRobotCommandMsg(const RobotCommandMsg& robot_command_msg);
+std::string SerializeRobotCommandMsg(const RobotCommandMsg &robot_command_msg);
 
 // Robot
-bool DeserializeRobotResponseMsg(const std::string& payload, RobotResponseMsg& robot_response_msg);
-bool DeserializeRobotCommandMsg(const std::string& payload, RobotCommandMsg& robot_command_msg);
+bool DeserializeRobotResponseMsg(const std::string &payload,
+                                 RobotResponseMsg &robot_response_msg);
+bool DeserializeRobotCommandMsg(const std::string &payload,
+                                RobotCommandMsg &robot_command_msg);
 
 #endif
 
-#endif  // ENCODING_DECODING_H
+#endif // ENCODING_DECODING_H

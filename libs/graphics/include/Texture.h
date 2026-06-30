@@ -6,7 +6,15 @@
 #include <GLFW/glfw3.h>
 
 class Texture2D {
- public:
+  friend class ResourceManager;
+  friend class PostProcessor;
+
+public:
+  Texture2D();
+  void Generate(unsigned int width, unsigned int height, unsigned char *data);
+  void Bind() const;
+
+private:
   unsigned int ID;
   unsigned int Width, Height;
   unsigned int Internal_Format;
@@ -16,9 +24,6 @@ class Texture2D {
   unsigned int Filter_Min;
   unsigned int Filter_Max;
 
-  Texture2D();
-  void Generate(unsigned int width, unsigned int height, unsigned char* data);
-  void Bind() const;
 };
 
 #endif

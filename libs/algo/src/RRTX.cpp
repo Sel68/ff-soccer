@@ -1,11 +1,16 @@
 #include <algorithm>
 #include <chrono>
+#include <iostream>
 #include <random>
 
 #include "RRTX.h"
 #include "SystemConstants.h"
 
-RRTX::RRTX(const RRTXConfig& config) : m_config(config) {}
+RRTX::RRTX(const RRTXConfig &config) : m_config(config) {
+  std::cout << "[INFO] [Algo]: RRTX Path Planner Initialized (Recalc Time: " 
+            << m_config.recalculation_time_ms << "ms, Step Size: " 
+            << m_config.step_size << ")" << std::endl;
+}
 
 RRTX::~RRTX() {}
 
@@ -18,15 +23,17 @@ std::vector<Point2D> RRTX::PlanningStep(std::pair<double, double> start,
   return plan();
 }
 
-void RRTX::setGoal(const Point2D& goal) { m_goal = goal; }
+void RRTX::setGoal(const Point2D &goal) { m_goal = goal; }
 
-void RRTX::setStart(const Point2D& start) { m_start = start; }
+void RRTX::setStart(const Point2D &start) { m_start = start; }
 
-void RRTX::setObstacles(const std::vector<Obstacle>& obstacles) { m_obstacles = obstacles; }
+void RRTX::setObstacles(const std::vector<Obstacle> &obstacles) {
+  m_obstacles = obstacles;
+}
 
-void RRTX::updateObstacle(const Obstacle& updated_obstacle) {
+void RRTX::updateObstacle(const Obstacle &updated_obstacle) {
   bool found = false;
-  for (auto& obs : m_obstacles) {
+  for (auto &obs : m_obstacles) {
     if (obs.id == updated_obstacle.id) {
       obs = updated_obstacle;
       found = true;
@@ -38,13 +45,15 @@ void RRTX::updateObstacle(const Obstacle& updated_obstacle) {
   }
 }
 
-void RRTX::setRecalculationTime(double time_ms) { m_config.recalculation_time_ms = time_ms; }
+void RRTX::setRecalculationTime(double time_ms) {
+  m_config.recalculation_time_ms = time_ms;
+}
 
-double RRTX::distance(const Point2D& p1, const Point2D& p2) const {
+double RRTX::distance(const Point2D &p1, const Point2D &p2) const {
   return std::hypot(p1.x - p2.x, p1.y - p2.y);
 }
 
-Point2D RRTX::steer(const Point2D& nearest, const Point2D& sample) const {
+Point2D RRTX::steer(const Point2D &nearest, const Point2D &sample) const {
   double dist = distance(nearest, sample);
   if (dist < m_config.step_size) {
     return sample;
@@ -55,23 +64,25 @@ Point2D RRTX::steer(const Point2D& nearest, const Point2D& sample) const {
   return steered;
 }
 
-bool RRTX::isCollisionFree(const Point2D& p1, const Point2D& p2) const {
+bool RRTX::isCollisionFree(const Point2D &p1, const Point2D &p2) const {
   double len = distance(p1, p2);
-  if (len == 0) return true;
+  if (len == 0)
+    return true;
 
   double dx = (p2.x - p1.x) / len;
   double dy = (p2.y - p1.y) / len;
 
-  for (const auto& obs : m_obstacles) {
+  for (const auto &obs : m_obstacles) {
     double t = (obs.position.x - p1.x) * dx + (obs.position.y - p1.y) * dy;
     t = std::max(0.0, std::min(len, t));
 
     double closest_x = p1.x + t * dx;
     double closest_y = p1.y + t * dy;
 
-    double dist_to_obs = std::hypot(closest_x - obs.position.x, closest_y - obs.position.y);
+    double dist_to_obs =
+        std::hypot(closest_x - obs.position.x, closest_y - obs.position.y);
     if (dist_to_obs < (obs.radius + m_config.robot_radius)) {
-      return false;  // Collision
+      return false; // Collision
     }
   }
   return true;
@@ -80,8 +91,10 @@ bool RRTX::isCollisionFree(const Point2D& p1, const Point2D& p2) const {
 Point2D RRTX::sampleFree() const {
   static std::random_device rd;
   static std::mt19937 gen(rd());
-  std::uniform_real_distribution<> dis_x(-m_config.field_length / 2, m_config.field_length / 2);
-  std::uniform_real_distribution<> dis_y(-m_config.field_width / 2, m_config.field_width / 2);
+  std::uniform_real_distribution<> dis_x(-m_config.field_length / 2,
+                                         m_config.field_length / 2);
+  std::uniform_real_distribution<> dis_y(-m_config.field_width / 2,
+                                         m_config.field_width / 2);
   std::uniform_real_distribution<> dis_prob(0.0, 1.0);
 
   if (dis_prob(gen) < m_config.bias_to_goal) {
@@ -96,6 +109,9 @@ Point2D RRTX::sampleFree() const {
 
 std::vector<Point2D> RRTX::plan() {
   if (isCollisionFree(m_start, m_goal)) {
+    if (m_config.debug_mode) {
+      std::cout << "[DEBUG] [Algo]: Direct path to goal is clear. Bypassing RRTX tree generation." << std::endl;
+    }
     return {m_start, m_goal};
   }
 
@@ -108,7 +124,8 @@ std::vector<Point2D> RRTX::plan() {
   while (true) {
     auto current_time = std::chrono::steady_clock::now();
     double elapsed_ms =
-        std::chrono::duration<double, std::milli>(current_time - start_time).count();
+        std::chrono::duration<double, std::milli>(current_time - start_time)
+            .count();
     if (elapsed_ms >= m_config.recalculation_time_ms) {
       break;
     }
@@ -141,8 +158,12 @@ std::vector<Point2D> RRTX::plan() {
     m_nodes.push_back(new_node);
 
     // Check if we can connect to the goal
-    if (distance(new_pos, m_goal) < m_config.step_size && isCollisionFree(new_pos, m_goal)) {
+    if (distance(new_pos, m_goal) < m_config.step_size &&
+        isCollisionFree(new_pos, m_goal)) {
       best_goal_node = (int)m_nodes.size() - 1;
+      if (m_config.debug_mode) {
+        std::cout << "[DEBUG] [Algo]: RRTX successfully connected to goal using " << m_nodes.size() << " nodes." << std::endl;
+      }
       break;
     }
   }
@@ -157,6 +178,9 @@ std::vector<Point2D> RRTX::plan() {
         curr = (int)i;
       }
     }
+    std::cout << "[WARN] [Algo]: RRTX hit time limit. Routing to nearest "
+                 "discovered node (Distance to goal: "
+              << min_d << ")." << std::endl;
   }
 
   std::vector<Point2D> path;

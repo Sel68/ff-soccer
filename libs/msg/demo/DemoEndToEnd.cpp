@@ -6,9 +6,10 @@
 
 int main() {
   // // 1. Host prepares all the commands
-  // std::array<RobotCommandMsg, SystemConstants::NUM_ROBOTS + 1> robot_command_msg;
+  // std::array<RobotCommandMsg, SystemConstants::num_robots + 1>
+  // robot_command_msg;
 
-  // for (int i = 1; i <= SystemConstants::NUM_ROBOTS; ++i) {
+  // for (int i = 1; i <= SystemConstants::num_robots; ++i) {
   //   robot_command_msg[i].id = i;
   //   robot_command_msg[i].vx = 1;
   //   robot_command_msg[i].vy = 1.222;
@@ -20,7 +21,7 @@ int main() {
   // // string: [len, .........., len, ......, len, ....]
 
   // std::string host_msg;
-  // for (int i = 1; i <= SystemConstants::NUM_ROBOTS; ++i) {
+  // for (int i = 1; i <= SystemConstants::num_robots; ++i) {
   //   std::string cmd_i = SerializeRobotCommandMsg(robot_command_msg[i]);
   //   uint16_t len = static_cast<uint16_t>(cmd_i.size());
 
@@ -38,9 +39,9 @@ int main() {
   // std::cout << std::dec << "\n";
 
   // // 5. Base station receives the host msg and deserialzies it
-  // std::array<std::string, SystemConstants::NUM_ROBOTS + 1> rob_cmd_ser;
+  // std::array<std::string, SystemConstants::num_robots + 1> rob_cmd_ser;
   // size_t offset = 0;
-  // for (int i = 1; i <= SystemConstants::NUM_ROBOTS; ++i) {
+  // for (int i = 1; i <= SystemConstants::num_robots; ++i) {
   //   uint16_t len = 0;
   //   memcpy(&len, out_msg.data() + offset, sizeof(len));
   //   offset += sizeof(len);
@@ -63,7 +64,8 @@ int main() {
   // }
 
   // // 8. Robot uses this command
-  // std::cout << "Robot Command: " << rob_cmd.id << ", " << rob_cmd.vx << ", " << rob_cmd.vy << ",
+  // std::cout << "Robot Command: " << rob_cmd.id << ", " << rob_cmd.vx << ", "
+  // << rob_cmd.vy << ",
   // "
   //           << rob_cmd.w << std::endl;
   return 0;

@@ -2,7 +2,10 @@
 
 Shader ResourceManager::LoadShader(const char* vShaderFile, const char* fShaderFile,
                                    const char* gShaderFile, std::string name) {
-  std::cout << "[ResourceManager::LoadShader]: " << vShaderFile << std::endl;
+  std::string vFile(vShaderFile);
+  size_t pos = vFile.find_last_of("/\\");
+  std::string vBaseName = (pos == std::string::npos) ? vFile : vFile.substr(pos + 1);
+  std::cout << "[INFO] [ResourceManager]: Loading Shader '" << name << "' from " << vBaseName << std::endl;
   shaders[name] = LoadShaderFromFile(vShaderFile, fShaderFile, gShaderFile);
   return shaders[name];
 }
@@ -55,7 +58,7 @@ Shader ResourceManager::LoadShaderFromFile(const char* vShaderFile, const char* 
       geometryCode = gShaderStream.str();
     }
   } catch (std::exception e) {
-    std::cout << "ERROR::SHADER: Failed to read shader files" << std::endl;
+    std::cout << "[ERROR] [ResourceManager]: Failed to read shader files (" << vShaderFile << ", " << fShaderFile << ")" << std::endl;
   }
   const char* vShaderCode = vertexCode.c_str();
   const char* fShaderCode = fragmentCode.c_str();
@@ -75,8 +78,17 @@ Texture2D ResourceManager::LoadTextureFromFile(const char* file, bool alpha) {
 
   int width, height, nrChannels;
   unsigned char* data = stbi_load(file, &width, &height, &nrChannels, 0);
-  texture.Generate(width, height, data);
-  stbi_image_free(data);
+  std::string fileStr(file);
+  size_t pos = fileStr.find_last_of("/\\");
+  std::string baseName = (pos == std::string::npos) ? fileStr : fileStr.substr(pos + 1);
+
+  if (data) {
+    texture.Generate(width, height, data);
+    stbi_image_free(data);
+    std::cout << "[INFO] [ResourceManager]: Loaded texture '" << baseName << "' (" << width << "x" << height << ", " << nrChannels << " channels)" << std::endl;
+  } else {
+    std::cout << "[ERROR] [ResourceManager]: Failed to load texture '" << baseName << "'" << std::endl;
+  }
 
   return texture;
 }

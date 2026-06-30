@@ -47,11 +47,11 @@ class Game {
   GameObject* ball;
   std::vector<GameObject*> team1_players;
   std::vector<GameObject*> team2_players;
-  GameState State;
+  GameState state;
 
   // Graphics
   Window game_window;
-  unsigned int Level;
+  unsigned int level;
   ResourceManager resource_manager;
   SpriteRenderer* renderer;
 

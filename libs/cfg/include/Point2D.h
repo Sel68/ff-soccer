@@ -4,7 +4,7 @@
 #include <utility>
 
 struct Point2D {
-  static const int DIM = 2;
+  static const int dim = 2;
   double x;
   double y;
 
@@ -21,4 +21,4 @@ struct Point2D {
   double operator[](int idx) const { return idx == 0 ? x : y; }
 };
 
-#endif  // SYS_POINT_2D_H
+#endif // SYS_POINT_2D_H

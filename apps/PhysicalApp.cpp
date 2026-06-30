@@ -14,8 +14,8 @@ RobotCommands PrepareRobotCommands(Game& soccer) {
   for (GameObject* p : soccer.GetTeam1Players()) {
     robot_id++;
     robot_cmds[robot_id].id = robot_id;
-    robot_cmds[robot_id].vx = p->Velocity.x;
-    robot_cmds[robot_id].vy = p->Velocity.y;
+    robot_cmds[robot_id].vx = p->velocity.x;
+    robot_cmds[robot_id].vy = p->velocity.y;
     robot_cmds[robot_id].w = 243.1223;
   }
   return robot_cmds;

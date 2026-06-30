@@ -16,7 +16,8 @@ HostComm::HostComm() : socket(io_context) {
   reception_thread = std::thread(&HostComm::ReceptionThread, this);
 }
 
-asio::ip::udp::endpoint HostComm::MakeEndpoint(const uint8_t ip[4], uint16_t port) {
+asio::ip::udp::endpoint HostComm::MakeEndpoint(const uint8_t ip[4],
+                                               uint16_t port) {
   asio::ip::address_v4::bytes_type bytes = {ip[0], ip[1], ip[2], ip[3]};
 
   return asio::ip::udp::endpoint(asio::ip::address_v4(bytes), port);
@@ -31,10 +32,11 @@ void HostComm::SetupHost() {
   try {
     socket.bind(*host_endpoint);
 
-  } catch (const std::exception& e) {
+  } catch (const std::exception &e) {
     std::cout << "[HostComm::HostComm]: Exception: " << e.what() << std::endl;
     std::cout << COLOR_RED
-              << "[HostComm::HostComm]: Please connect the ethernet (base station) AND "
+              << "[HostComm::HostComm]: Please connect the ethernet (base "
+                 "station) AND "
                  "power the device"
               << COLOR_RESET << std::endl;
     exit(0);
@@ -42,8 +44,9 @@ void HostComm::SetupHost() {
 }
 
 void HostComm::SetupBaseStation() {
-  base_station_endpoint = std::make_unique<asio::ip::udp::endpoint>(
-      MakeEndpoint(NetworkConfig::base_station_ip, NetworkConfig::base_station_port));
+  base_station_endpoint =
+      std::make_unique<asio::ip::udp::endpoint>(MakeEndpoint(
+          NetworkConfig::base_station_ip, NetworkConfig::base_station_port));
 }
 
 void HostComm::TransmissionThread() {
@@ -53,7 +56,8 @@ void HostComm::TransmissionThread() {
     // 1. Wait until you see ready
     {
       std::unique_lock<std::mutex> lock(transmission_mtx);
-      transmission_cv.wait(lock, [&] { return received_ready && new_stored_commands; });
+      transmission_cv.wait(
+          lock, [&] { return received_ready && new_stored_commands; });
       received_ready = false;
       new_stored_commands = false;
       // if predicate is true -> It gets out and moves forward
@@ -64,7 +68,8 @@ void HostComm::TransmissionThread() {
     // std::cout << "[HostComm::TransmissionThread]: Running\r\n";
 
     socket.send_to(asio::buffer(stored_commands), *base_station_endpoint);
-    std::cout << "[HostComm::TransmissionThread]: Sent " << stored_commands << std::endl;
+    std::cout << "[HostComm::TransmissionThread]: Sent " << stored_commands
+              << std::endl;
   }
 }
 
@@ -73,12 +78,13 @@ void HostComm::ReceptionThread() {
   std::array<char, NetworkConfig::udp_buffer_max_size> received_data;
 
   while (running) {
-    size_t bytes_received = socket.receive_from(asio::buffer(received_data), sender_endpoint);
+    size_t bytes_received =
+        socket.receive_from(asio::buffer(received_data), sender_endpoint);
     std::string msg(received_data.data(), bytes_received);
 
     std::cout << "[HostComm::ReceptionThread]: Received from "
-              << sender_endpoint.address().to_string() << ":" << sender_endpoint.port() << " -> "
-              << msg << std::endl;
+              << sender_endpoint.address().to_string() << ":"
+              << sender_endpoint.port() << " -> " << msg << std::endl;
 
     ProcessBaseStationMessage(msg);
 
@@ -86,14 +92,15 @@ void HostComm::ReceptionThread() {
   }
 }
 
-void HostComm::ProcessBaseStationMessage(const std::string& msg) {
+void HostComm::ProcessBaseStationMessage(const std::string &msg) {
   if (msg == "ready") {
     {
       std::unique_lock<std::mutex> lock(transmission_mtx);
       received_ready = true;
 
       if (!new_stored_commands)
-        std::cout << "[HostComm::ProcessBaseStationMessage]: WARNING!!! Received ready but NO "
+        std::cout << "[HostComm::ProcessBaseStationMessage]: WARNING!!! "
+                     "Received ready but NO "
                      "stored commands\r\n";
     }
     transmission_cv.notify_one();
@@ -103,22 +110,25 @@ void HostComm::ProcessBaseStationMessage(const std::string& msg) {
 void HostComm::Exit() {
   running = false;
   std::this_thread::sleep_for(std::chrono::milliseconds(1));
-  if (transmission_thread.joinable()) transmission_thread.join();
-  if (reception_thread.joinable()) reception_thread.join();
+  if (transmission_thread.joinable())
+    transmission_thread.join();
+  if (reception_thread.joinable())
+    reception_thread.join();
 }
 
 HostComm::~HostComm() { Exit(); }
 
 void HostComm::SetRobotCommands(
-    const std::array<RobotCommandMsg, SystemConstants::NUM_ROBOTS + 1>& robot_cmd_msg) {
+    const std::array<RobotCommandMsg, SystemConstants::num_robots + 1>
+        &robot_cmd_msg) {
   std::cout << "[HostComm::SetRobotCommands]: Setting robot commands\r\n";
   stored_commands.clear();
-  for (int i = 1; i <= SystemConstants::NUM_ROBOTS; ++i) {
+  for (int i = 1; i <= SystemConstants::num_robots; ++i) {
     std::string cmd_i = SerializeRobotCommandMsg(robot_cmd_msg[i]);
     uint16_t len = static_cast<uint16_t>(cmd_i.size());
-    std::cout << "[HostComm::SetRobotCommands]: Robot " << i << " command size: " << len
-              << std::endl;
-    stored_commands.append(reinterpret_cast<const char*>(&len), sizeof(len));
+    std::cout << "[HostComm::SetRobotCommands]: Robot " << i
+              << " command size: " << len << std::endl;
+    stored_commands.append(reinterpret_cast<const char *>(&len), sizeof(len));
     stored_commands.append(cmd_i);
   }
   {
