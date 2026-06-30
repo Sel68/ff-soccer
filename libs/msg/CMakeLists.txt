@@ -10,6 +10,13 @@ file(MAKE_DIRECTORY ${PY_PROTO_GEN_DIR})
 # Find .proto files
 file(GLOB PROTO_FILES ${PROTO_DIR}/*.proto)
 
+# Determine the correct plugin extension depending on the OS
+if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+  set(NANOPB_PLUGIN_EXT ".bat")
+else()
+  set(NANOPB_PLUGIN_EXT "")
+endif()
+
 # NanoPB (generates pb.c, pb.h)
 foreach(PROTO_FILE ${PROTO_FILES})
   # Get the .proto file without extension
@@ -22,7 +29,7 @@ foreach(PROTO_FILE ${PROTO_FILES})
       ${NANOPB_GEN_DIR}/${PROTO_NAME}.pb.h
     COMMAND protoc
       --proto_path=${PROTO_DIR}
-      --plugin=protoc-gen-nanopb=${CMAKE_CURRENT_SOURCE_DIR}/nanopb/generator/protoc-gen-nanopb
+      --plugin=protoc-gen-nanopb=${CMAKE_CURRENT_SOURCE_DIR}/nanopb/generator/protoc-gen-nanopb${NANOPB_PLUGIN_EXT}
       --nanopb_out=${NANOPB_GEN_DIR}
       ${PROTO_FILE}
     DEPENDS ${PROTO_FILE}
