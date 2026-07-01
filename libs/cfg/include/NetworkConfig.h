@@ -22,8 +22,12 @@ struct NetworkConfig {
   static constexpr uint8_t radio_msg_header_size = 2;
   static constexpr uint8_t radio_msg_crc_size = 2;
   static constexpr uint8_t radio_msg_payload_size =
-      radio_msg_size -
-      (radio_msg_header_size + radio_msg_crc_size); // 255 - (2 + 2) = 251
+      radio_msg_size - (radio_msg_header_size + radio_msg_crc_size);  // 255 - (2 + 2) = 251
+
+  // Event flags
+  static constexpr uint32_t radio_rx_irq = 1u << 0;
+  static constexpr uint32_t radio_tx_irq = 1u << 1;
+  static constexpr uint32_t radio_timeout_irq = 1u << 2;
 };
 
 struct NetworkTime {
@@ -34,6 +38,10 @@ struct NetworkTime {
   static constexpr uint32_t robot_command_time = 30;
   static constexpr uint32_t robot_response_time = 30;
   static constexpr uint32_t receive_offset = 10;
+
+  static constexpr uint32_t spi_timeout = 5;
+
+  static constexpr uint32_t predicted_beacon_travel_time = 10;
 
   static_assert(beacon_time + udp_time +
                         (robot_command_time + robot_response_time) *
