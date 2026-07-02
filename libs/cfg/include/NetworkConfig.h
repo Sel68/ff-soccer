@@ -32,50 +32,45 @@ struct NetworkConfig {
 
 struct NetworkTime {
   // Timing
-  static constexpr uint32_t network_cycle_time = 1000;
-  static constexpr uint32_t beacon_time = 30;
-  static constexpr uint32_t udp_time = 30;
-  static constexpr uint32_t robot_command_time = 30;
-  static constexpr uint32_t robot_response_time = 30;
-  static constexpr uint32_t receive_offset = 10;
+  static constexpr uint32_t ticks_rate = 4;
+  static constexpr uint32_t to_us = 1000;
+  static constexpr uint32_t network_cycle_time = 1000 * to_us;
+  static constexpr uint32_t beacon_time = 30 * to_us;
+  static constexpr uint32_t udp_time = 30 * to_us;
+  static constexpr uint32_t robot_command_time = 30 * to_us;
+  static constexpr uint32_t robot_response_time = 30 * to_us;
+  static constexpr uint32_t receive_offset = 10 * to_us;
 
-  static constexpr uint32_t spi_timeout = 5;
+  static constexpr uint32_t spi_timeout = 5 * to_us;
 
-  static constexpr uint32_t predicted_beacon_travel_time = 10;
+  static constexpr uint32_t predicted_beacon_travel_time = 10 * to_us;
 
   static_assert(beacon_time + udp_time +
-                        (robot_command_time + robot_response_time) *
-                            SystemConstants::num_robots <=
+                        (robot_command_time + robot_response_time) * SystemConstants::num_robots <=
                     network_cycle_time &&
                 "Total network cycle time issue");
 
-  static uint32_t GetBeaconStartTime(uint32_t cycle_start_time) {
-    return cycle_start_time;
-  }
+  static uint32_t GetBeaconStartTime(uint32_t cycle_start_time) { return cycle_start_time; }
 
   static uint32_t GetUdpStartTime(uint32_t cycle_start_time) {
     return GetBeaconStartTime(cycle_start_time) + beacon_time;
   }
 
-  static uint32_t GetRobotCommandStartTime(uint32_t cycle_start_time,
-                                           uint8_t robot_idx = 1) {
+  static uint32_t GetRobotCommandStartTime(uint32_t cycle_start_time, uint8_t robot_idx = 1) {
     // 1: B + H
     // 2: B + H + R1
     // 6: B + H + R1 ... + R5
-    return GetUdpStartTime(cycle_start_time) + udp_time +
-           robot_command_time * (robot_idx - 1);
+    return GetUdpStartTime(cycle_start_time) + udp_time + robot_command_time * (robot_idx - 1);
   }
 
-  static uint32_t GetRobotResponseStartTime(uint32_t cycle_start_time,
-                                            uint8_t robot_idx = 1) {
+  static uint32_t GetRobotResponseStartTime(uint32_t cycle_start_time, uint8_t robot_idx = 1) {
     // 1: B + H + R1 ... R6
     // 2: 1 + R1
     // 3: ...
     // 6:   N +  B    U  +   C * 6   +   R * 5
-    return GetRobotCommandStartTime(cycle_start_time,
-                                    SystemConstants::num_robots + 1) +
+    return GetRobotCommandStartTime(cycle_start_time, SystemConstants::num_robots + 1) +
            robot_response_time * (robot_idx - 1);
   }
 };
 
-#endif // NETWORK_CONFIG_H
+#endif  // NETWORK_CONFIG_H

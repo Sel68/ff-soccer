@@ -14,11 +14,12 @@ void RegisterClock(OsTicksFunctionPtr funtion_name);
  */
 
 // Gets current time in own clock
+uint32_t GetCurrentTimeUs();
 
 uint32_t GetCurrentTimeMs();
 
 // Subtracts offset from current time (in master clock)
-uint32_t GetCurrentCalibratedTimeSTM();
+uint32_t GetCurrentCalibratedTimeUs();
 
 // Next calibrated cycle time (heartbeat in ms)
 uint32_t GetNextCalibratedCycleTime();

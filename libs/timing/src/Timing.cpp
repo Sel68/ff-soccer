@@ -6,12 +6,16 @@ static OsTicksFunctionPtr OsTicksFunction = 0;
 // Time offset to master. slave_clock - time_offset = master_clock
 static int32_t time_offset = 0;
 
+static uint32_t tick_unit = 250;  // microseconds
+
 void RegisterClock(OsTicksFunctionPtr function_name) { OsTicksFunction = function_name; }
 
-uint32_t GetCurrentTimeMs() { return OsTicksFunction ? OsTicksFunction() : 0; }
+uint32_t GetCurrentTimeUs() { return OsTicksFunction ? OsTicksFunction() : 0; }
 
-uint32_t GetCurrentCalibratedTimeSTM() {
-  return OsTicksFunction ? OsTicksFunction() + time_offset : 0;
+uint32_t GetCurrentTimeMs() { return GetCurrentTimeUs() / 1000; }
+
+uint32_t GetCurrentCalibratedTimeUs() {
+  return OsTicksFunction ? (GetCurrentTimeUs() + time_offset) : 0;
 }
 
 // Direct setting
