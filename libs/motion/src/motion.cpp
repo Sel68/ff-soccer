@@ -11,7 +11,9 @@
   Simple Path: Two waypoints (start, goal) -> GenerateMotion(start, goal)
 
   Trajectory's mathematical implementation.
-
+    Start with a simple curve
+    Then trapezoidal, triangular
+    FINAL: S Curves
 
   GetVelocity(t):
     current_trajectory(...)
@@ -21,7 +23,6 @@
     /               \
 
   speed will be given to the game robot
-
 
   In Simulator App:
     Start, Goal => Robot moves from start to goal
