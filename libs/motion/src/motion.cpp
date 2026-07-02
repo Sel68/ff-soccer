@@ -1,8 +1,31 @@
-#include <cmath>
+#include "../include/motion.h"
+
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 
-#include "../include/motion.h"
+/*
+  MotionManager: (0, 0, 0) -> (1, 1, 1) -> ...
+    current_trajectory
+
+  Simple Path: Two waypoints (start, goal) -> GenerateMotion(start, goal)
+
+  Trajectory's mathematical implementation.
+
+
+  GetVelocity(t):
+    current_trajectory(...)
+
+      /-----------\
+     /             \
+    /               \
+
+  speed will be given to the game robot
+
+
+  In Simulator App:
+    Start, Goal => Robot moves from start to goal
+*/
 
 bool Motion::m_debug_mode = false;
 
@@ -22,8 +45,9 @@ Motion::Profile1D Motion::planProfile(double distance, MotionConstraints constra
     p.timeToMax = (p.maxSpeed - p.v0) / p.maxAccel;
     p.timeToStop = p.maxSpeed / p.maxDecel;
     if (m_debug_mode) {
-      std::cout << "[DEBUG] [Motion]: Trapezoidal Profile -> Accel: " << p.timeToMax 
-                << "s | Cruise: " << p.cruiseTime << "s | Decel: " << p.timeToStop << "s" << std::endl;
+      std::cout << "[DEBUG] [Motion]: Trapezoidal Profile -> Accel: " << p.timeToMax
+                << "s | Cruise: " << p.cruiseTime << "s | Decel: " << p.timeToStop << "s"
+                << std::endl;
     }
   } else {
     // Triangular motion calculation
@@ -41,8 +65,9 @@ Motion::Profile1D Motion::planProfile(double distance, MotionConstraints constra
     p.distToStop = (p.maxSpeed * p.maxSpeed) / (2.0 * p.maxDecel);
     p.cruiseTime = 0.0;
     if (m_debug_mode) {
-      std::cout << "[DEBUG] [Motion]: Triangular Profile -> Accel: " << p.timeToMax 
-                << "s | Cruise: " << p.cruiseTime << "s | Decel: " << p.timeToStop << "s" << std::endl;
+      std::cout << "[DEBUG] [Motion]: Triangular Profile -> Accel: " << p.timeToMax
+                << "s | Cruise: " << p.cruiseTime << "s | Decel: " << p.timeToStop << "s"
+                << std::endl;
     }
   }
 
@@ -89,7 +114,9 @@ Motion::GeneratedProfile Motion::generateProfile(Point start, Point end, double 
   // Time-synchronization scaling
   if (profile.xProfile.totalTime > 0.0 && profile.yProfile.totalTime > 0.0) {
     if (profile.xProfile.totalTime < profile.yProfile.totalTime) {
-      if (m_debug_mode) std::cout << "[DEBUG] [Motion]: Time-syncing axes. Throttling X-axis constraints." << std::endl;
+      if (m_debug_mode)
+        std::cout << "[DEBUG] [Motion]: Time-syncing axes. Throttling X-axis constraints."
+                  << std::endl;
       double ratio = profile.xProfile.totalTime / profile.yProfile.totalTime;
       MotionConstraints scaledConstraints = {
           xDirectionConstraints.maxSpeed * ratio,
@@ -97,7 +124,9 @@ Motion::GeneratedProfile Motion::generateProfile(Point start, Point end, double 
           xDirectionConstraints.maxDeceleration * ratio * ratio};
       profile.xProfile = planProfile(totalDistanceX, scaledConstraints, initial_velocity.vx);
     } else if (profile.yProfile.totalTime < profile.xProfile.totalTime) {
-      if (m_debug_mode) std::cout << "[DEBUG] [Motion]: Time-syncing axes. Throttling Y-axis constraints." << std::endl;
+      if (m_debug_mode)
+        std::cout << "[DEBUG] [Motion]: Time-syncing axes. Throttling Y-axis constraints."
+                  << std::endl;
       double ratio = profile.yProfile.totalTime / profile.xProfile.totalTime;
       MotionConstraints scaledConstraints = {
           yDirectionConstraints.maxSpeed * ratio,
@@ -111,7 +140,8 @@ Motion::GeneratedProfile Motion::generateProfile(Point start, Point end, double 
       {profile.xProfile.totalTime, profile.yProfile.totalTime, profile.thetaProfile.totalTime});
 
   if (m_debug_mode) {
-    std::cout << "[DEBUG] [Motion]: Generated new trajectory. Total Time: " << profile.totalTime << "s" << std::endl;
+    std::cout << "[DEBUG] [Motion]: Generated new trajectory. Total Time: " << profile.totalTime
+              << "s" << std::endl;
   }
 
   return profile;
