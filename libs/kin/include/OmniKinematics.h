@@ -8,6 +8,8 @@ TODO: Need to cut down a few things in eigen to build on the microcontroller
 #include <Eigen/Dense>
 #include <vector>
 
+#include "SystemConstants.h"
+
 class ChassisVelocity {
  public:
   double vx;
@@ -39,13 +41,15 @@ class OmniKinematics {
     will be a constant (constexpr). This code will go inside the microcontroller
     and the unusual growth of std::vector's heap memory is unsuitable.
   */
-  std::vector<WheelConfig> wheels;
+  std::array<WheelConfig, SystemConstants::num_wheels> wheels;
   double max_wheel_vel;
 
  public:
-  OmniKinematics(const std::vector<WheelConfig>& wheel_configs, double max_wheelspin);
+  OmniKinematics(const std::array<WheelConfig, SystemConstants::num_wheels>& wheel_configs,
+                 double max_wheelspin);
 
-  Eigen::VectorXd ChassisToWheels(ChassisVelocity target, bool scale_limits = true);
+  std::array<double, SystemConstants::num_wheels> ChassisToWheels(ChassisVelocity target,
+                                                                  bool scale_limits = true);
   ChassisVelocity WheelsToChassis(const Eigen::VectorXd& wheel_vels);
 };
 

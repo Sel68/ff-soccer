@@ -5,11 +5,14 @@
 #include <cmath>
 #include <vector>
 
-OmniKinematics::OmniKinematics(const std::vector<WheelConfig>& wheel_configs, double max_wheelspin)
+OmniKinematics::OmniKinematics(
+    const std::array<WheelConfig, SystemConstants::num_wheels>& wheel_configs,
+    double max_wheelspin)
     : wheels(wheel_configs), max_wheel_vel(max_wheelspin) {}
 
-Eigen::VectorXd OmniKinematics::ChassisToWheels(ChassisVelocity target, bool scale_limits) {
-  Eigen::VectorXd wheel_vels(wheels.size());
+std::array<double, SystemConstants::num_wheels> OmniKinematics::ChassisToWheels(
+    ChassisVelocity target, bool scale_limits) {
+  std::array<double, SystemConstants::num_wheels> wheel_vels;
   double max_observed = 0.0;
 
   for (size_t i = 0; i < wheels.size(); ++i) {
@@ -20,10 +23,10 @@ Eigen::VectorXd OmniKinematics::ChassisToWheels(ChassisVelocity target, bool sca
     max_observed = std::max(max_observed, std::abs(wheel_vels[i]));
   }
 
-  if (scale_limits && max_observed > max_wheel_vel) {
-    double lambda = max_wheel_vel / max_observed;
-    wheel_vels *= lambda;
-  }
+  // if (scale_limits && max_observed > max_wheel_vel) {
+  //   double lambda = max_wheel_vel / max_observed;
+  //   wheel_vels[i] *= lambda;
+  // }
   return wheel_vels;
 }
 
