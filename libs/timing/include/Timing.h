@@ -3,8 +3,11 @@
 
 #include <stdint.h>
 
-// Function pointer type for getting system tick count
 typedef uint32_t (*OsTicksFunctionPtr)(void);
+
+extern OsTicksFunctionPtr OsTicksFunction;
+
+// Function pointer type for getting system tick count
 
 // Setter for the tick function (e.g., osKernelGetTickCount or a mock)
 void RegisterClock(OsTicksFunctionPtr funtion_name);
@@ -13,8 +16,7 @@ void RegisterClock(OsTicksFunctionPtr funtion_name);
  * Utilities for time conversion.
  */
 
-// Gets current time in own clock
-uint32_t GetCurrentTimeUs();
+inline uint32_t GetCurrentTimeUs() { return OsTicksFunction(); }
 
 uint32_t GetCurrentTimeMs();
 

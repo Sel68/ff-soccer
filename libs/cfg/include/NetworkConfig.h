@@ -34,17 +34,19 @@ struct NetworkTime {
   // Timing
   static constexpr uint32_t ticks_rate = 4;
   static constexpr uint32_t to_us = 1000;
-  static constexpr uint32_t network_cycle_time = 100 * to_us;
-  static constexpr uint32_t beacon_time = 2 * to_us;
-  static constexpr uint32_t udp_time = 30 * to_us;
-  static constexpr uint32_t robot_command_time = 2 * to_us;
-  static constexpr uint32_t robot_response_time = 2 * to_us;
+  static constexpr uint32_t network_cycle_time = 40 * to_us;  // 40 is fine
+  static constexpr uint32_t beacon_time = (2 * to_us);
+  static constexpr uint32_t udp_time = 5 * to_us;
+  static constexpr uint32_t robot_command_time = (2 * to_us);
+  static constexpr uint32_t robot_response_time = (2 * to_us);
   static constexpr uint32_t receive_offset = 0 * to_us;
 
   static constexpr uint32_t spi_timeout = 5 * to_us;
 
   static constexpr uint32_t predicted_beacon_travel_time = 10 * to_us;
   static constexpr uint32_t time_offset_diff_thresh = 5 * to_us;
+
+  static constexpr uint32_t sx1280_timeout_delay = 320;  // Microseconds
 
   static_assert(beacon_time + udp_time +
                         (robot_command_time + robot_response_time) * SystemConstants::num_robots <=
