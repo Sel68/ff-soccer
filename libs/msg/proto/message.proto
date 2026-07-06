@@ -5,6 +5,9 @@ message RobotCommandMsg {
   float vx = 2;
   float vy = 3;
   float w = 4;
+  float camX = 1;
+  float camY = 1;
+  float camTheta = 1;
 }
 
 message RobotResponseMsg {
