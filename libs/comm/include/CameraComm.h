@@ -1,23 +1,27 @@
-#pragma once
+#ifndef CAMERA_COMM_H
+#define CAMERA_COMM_H
+
 #include <vector>
 #include <string>
 
-struct CameraValues{
-    int id;
-    float x;
-    float y;
-    float orientation;
+struct CameraValues {
+  int id;
+  float x;
+  float y;
+  float orientation;
 };
 
 class CameraComm {
-private:
-    int sock_fd;
-    const int LISTEN_PORT = 5000;
-    const int BUFFER_SIZE = 65536;
+ private:
+  int sock_fd;
+  const int LISTEN_PORT = 5000;
+  const int BUFFER_SIZE = 65536;
 
-public:
+ public:
   CameraComm();
   ~CameraComm();
 
   std::vector<CameraValues> GetCameraValues();
 };
+
+#endif  // CAMERA_COMM_H
