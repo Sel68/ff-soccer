@@ -1,22 +1,35 @@
 #include <asio.hpp>
+#include <iostream>
 
 #include "Game.h"
 #include "HostComm.h"
+#include "CameraComm.h"
 #include "OmniKinematics.h"
 #include "Timing.h"
 #include "Transmitter.h"
 
 using Clock = std::chrono::steady_clock;
 
-RobotCommands PrepareRobotCommands(Game& soccer) {
+RobotCommands PrepareRobotCommands(Game& soccer, const std::vector<CameraValues>& cam_vals) {
   RobotCommands robot_cmds;
   int robot_id = 0;
   for (GameObject* p : soccer.GetTeam1Players()) {
     robot_id++;
-    robot_cmds[robot_id].id = robot_id;
+    if (robot_id > cam_vals.size()) break;
+ 
+    int cam_idx = robot_id - 1;
+    robot_cmds[robot_id].id = cam_vals[cam_idx].id;
     robot_cmds[robot_id].vx = p->velocity.x;
     robot_cmds[robot_id].vy = p->velocity.y;
     robot_cmds[robot_id].w = 243.1223;
+    robot_cmds[robot_id].camX = cam_vals[cam_idx].x;
+    robot_cmds[robot_id].camY = cam_vals[cam_idx].y;
+    robot_cmds[robot_id].camTheta = cam_vals[cam_idx].orientation;
+
+    std::cout << robot_cmds[robot_id].id << " " << robot_cmds[robot_id].vx << " " << robot_cmds[robot_id].vy << " "
+      << robot_cmds[robot_id].w << " " << robot_cmds[robot_id].camX << " " << robot_cmds[robot_id].camY << " "
+      << robot_cmds[robot_id].camTheta << std::endl;
+
   }
   return robot_cmds;
 }
@@ -34,10 +47,12 @@ class Host {
     double dt = std::chrono::duration<double>(t_current - t_last).count();
     t_last = t_current;
 
-    // soccer.ProcessInput(dt);
-    // soccer.Update(dt);
+    std::vector<CameraValues> myVect = camera_comm.GetCameraValues();
 
-    RobotCommands robot_cmds = PrepareRobotCommands(soccer);
+    soccer.ProcessInput(dt, myVect[0].x, myVect[0].y, myVect[0].orientation);
+    soccer.Update(dt);
+
+    RobotCommands robot_cmds = PrepareRobotCommands(soccer, myVect);
 
     host_comm.SetRobotCommands(robot_cmds);
 
@@ -56,6 +71,7 @@ class Host {
  private:
   HostComm host_comm;
   Game soccer;
+  CameraComm camera_comm;
 
   // Timing
   Clock::time_point t_current, t_last;
