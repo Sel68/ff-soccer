@@ -1,7 +1,7 @@
 #include <asio.hpp>
 
-#include "CommManager.h"
 #include "Game.h"
+#include "HostComm.h"
 #include "OmniKinematics.h"
 #include "Timing.h"
 #include "Transmitter.h"
@@ -11,11 +11,11 @@ using Clock = std::chrono::steady_clock;
 RobotCommands PrepareRobotCommands(Game& soccer) {
   RobotCommands robot_cmds;
   int robot_id = 0;
-  for (BallObject* p : soccer.GetTeam1Players()) {
+  for (GameObject* p : soccer.GetTeam1Players()) {
     robot_id++;
     robot_cmds[robot_id].id = robot_id;
-    robot_cmds[robot_id].vx = p->Velocity.x;
-    robot_cmds[robot_id].vy = p->Velocity.y;
+    robot_cmds[robot_id].vx = p->velocity.x;
+    robot_cmds[robot_id].vy = p->velocity.y;
     robot_cmds[robot_id].w = 243.1223;
   }
   return robot_cmds;
@@ -39,7 +39,7 @@ class Host {
 
     RobotCommands robot_cmds = PrepareRobotCommands(soccer);
 
-    comm_manager.SetRobotCommands(robot_cmds);
+    host_comm.SetRobotCommands(robot_cmds);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(10));  // 100 Hz
   }
@@ -47,16 +47,14 @@ class Host {
   bool Running() { return soccer.Running() && running; }
 
   void Exit() {
-    comm_manager.Exit();
+    host_comm.Exit();
     soccer.Exit();
   }
 
-  ~Host() {
-    Exit();
-  }
+  ~Host() { Exit(); }
 
  private:
-  CommManager comm_manager;
+  HostComm host_comm;
   Game soccer;
 
   // Timing

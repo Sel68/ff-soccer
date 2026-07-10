@@ -18,20 +18,35 @@ struct NetworkConfig {
   static constexpr int udp_buffer_max_size = 1600;
 
   // Message sizees (WIRELESS)
-  static constexpr uint8_t radio_msg_size = 255;
+  static constexpr uint8_t radio_msg_size = 60;
   static constexpr uint8_t radio_msg_header_size = 2;
   static constexpr uint8_t radio_msg_crc_size = 2;
   static constexpr uint8_t radio_msg_payload_size =
       radio_msg_size - (radio_msg_header_size + radio_msg_crc_size);  // 255 - (2 + 2) = 251
+
+  // Event flags
+  static constexpr uint32_t radio_rx_irq = 1u << 0;
+  static constexpr uint32_t radio_tx_irq = 1u << 1;
+  static constexpr uint32_t radio_timeout_irq = 1u << 2;
 };
 
 struct NetworkTime {
   // Timing
-  static constexpr uint32_t network_cycle_time = 1000;
-  static constexpr uint32_t beacon_time = 30;
-  static constexpr uint32_t udp_time = 30;
-  static constexpr uint32_t robot_command_time = 30;
-  static constexpr uint32_t robot_response_time = 30;
+  static constexpr uint32_t ticks_rate = 4;
+  static constexpr uint32_t to_us = 1000;
+  static constexpr uint32_t network_cycle_time = 40 * to_us;  // 40 is fine
+  static constexpr uint32_t beacon_time = (2 * to_us);
+  static constexpr uint32_t udp_time = 5 * to_us;
+  static constexpr uint32_t robot_command_time = (2 * to_us);
+  static constexpr uint32_t robot_response_time = (2 * to_us);
+  static constexpr uint32_t receive_offset = 0 * to_us;
+
+  static constexpr uint32_t spi_timeout = 5 * to_us;
+
+  static constexpr uint32_t predicted_beacon_travel_time = 10 * to_us;
+  static constexpr uint32_t time_offset_diff_thresh = 5 * to_us;
+
+  static constexpr uint32_t sx1280_timeout_delay = 320;  // Microseconds
 
   static_assert(beacon_time + udp_time +
                         (robot_command_time + robot_response_time) * SystemConstants::num_robots <=

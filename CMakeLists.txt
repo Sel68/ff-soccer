@@ -1,10 +1,16 @@
 cmake_minimum_required(VERSION 3.22)
-project(robocup-pk)
+project(robocup-pakistan)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-message(STATUS "Build on stm? ${BUILD_ON_STM}")
+# Enable ccache if available
+find_program(CCACHE_PROGRAM ccache)
+if(CCACHE_PROGRAM)
+    message(STATUS "Using ccache: ${CCACHE_PROGRAM}")
+    set(CMAKE_C_COMPILER_LAUNCHER ${CCACHE_PROGRAM})
+    set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE_PROGRAM})
+endif()
 
 if(BUILD_ON_STM)
   add_subdirectory(libs)

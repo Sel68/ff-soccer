@@ -1,7 +1,7 @@
 #include <asio.hpp>
 
-#include "CommManager.h"
 #include "Game.h"
+#include "HostComm.h"
 #include "OmniKinematics.h"
 #include "Transmitter.h"
 

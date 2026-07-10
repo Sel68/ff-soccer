@@ -5,7 +5,6 @@
 
 #define PROTOBUF_BUFFER_SIZE 256
 static uint8_t inner_buffer[PROTOBUF_BUFFER_SIZE];
-static uint8_t outer_buffer[PROTOBUF_BUFFER_SIZE];
 
 /***************** MCUs ***************/
 #ifdef BUILD_ON_STM

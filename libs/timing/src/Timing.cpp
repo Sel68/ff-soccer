@@ -1,21 +1,28 @@
 #include "Timing.h"
 
 // Static pointer to the system tick function
-static OsTicksFunctionPtr OsTicksFunction = 0;
+// static OsTicksFunctionPtr OsTicksFunction = 0;
+OsTicksFunctionPtr OsTicksFunction = 0;
 
 // Time offset to master. slave_clock - time_offset = master_clock
 static int32_t time_offset = 0;
 
+static uint32_t tick_unit = 250;  // microseconds
+
 void RegisterClock(OsTicksFunctionPtr function_name) { OsTicksFunction = function_name; }
 
-uint32_t GetCurrentTimeMs() { return OsTicksFunction ? OsTicksFunction() : 0; }
+// uint32_t GetCurrentTimeUs() { return OsTicksFunction(); }
 
-uint32_t GetCurrentCalibratedTimeSTM() {
-  return OsTicksFunction ? OsTicksFunction() + time_offset : 0;
+uint32_t GetCurrentTimeMs() { return GetCurrentTimeUs() / 1000; }
+
+uint32_t GetCurrentCalibratedTimeUs() {
+  return OsTicksFunction ? (GetCurrentTimeUs() + time_offset) : 0;
 }
 
 // Direct setting
-void SetTimeOffset(int32_t new_offset) { time_offset = new_offset; }
+void SetTimeOffset(int32_t new_offset) {
+  time_offset = new_offset;
+}
 
 // Updates the offset which is subtracted when time is calculated
 void UpdateTimeOffset(int32_t new_offset, bool registering) {

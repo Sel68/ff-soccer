@@ -4,6 +4,8 @@
 #include <array>
 #include "SystemConstants.h"
 
+#include "SystemConstants.h"
+
 class ChassisVelocity {
  public:
   double vx;

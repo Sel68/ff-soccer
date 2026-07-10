@@ -21,12 +21,10 @@ std::array<double, SystemConstants::num_wheels> OmniKinematics::ChassisToWheels(
     max_observed = std::max(max_observed, std::abs(wheel_vels[i]));
   }
 
-  if (scale_limits && max_observed > max_wheel_vel) {
-    double lambda = max_wheel_vel / max_observed;
-    for (size_t i = 0; i < wheels.size(); ++i) {
-      wheel_vels[i] *= lambda;
-    }
-  }
+  // if (scale_limits && max_observed > max_wheel_vel) {
+  //   double lambda = max_wheel_vel / max_observed;
+  //   wheel_vels[i] *= lambda;
+  // }
   return wheel_vels;
 }
 

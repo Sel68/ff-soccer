@@ -2,8 +2,8 @@
 #ifndef UART_H
 #define UART_H
 
-#include <stdint.h>
 #include <stddef.h>  // size_t
+#include <stdint.h>
 
 #define ENABLE_UART_PRINT 1  // Comment to disable
 
