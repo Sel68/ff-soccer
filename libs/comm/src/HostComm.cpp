@@ -87,8 +87,6 @@ void HostComm::ReceptionThread() {
               << sender_endpoint.port() << " -> " << msg << std::endl;
 
     ProcessBaseStationMessage(msg);
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
   }
 }
 
