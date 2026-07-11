@@ -46,9 +46,9 @@ class Host {
     double dt = std::chrono::duration<double>(t_current - t_last).count();
     t_last = t_current;
 
-    std::vector<CameraValues> cam_curr_values = camera_comm.GetCameraValues();
+    std::vector<CameraValues> cam_curr_values = CameraComm::GetCameraValues();
 
-    soccer.ProcessInput(dt);
+    soccer.ProcessInput(dt, 50, 30, 0);
     soccer.Update(dt);
 
     RobotCommands robot_cmds = PrepareRobotCommands(soccer, cam_curr_values);
@@ -70,7 +70,6 @@ class Host {
  private:
   Game soccer; 
   HostComm host_comm;
-  CameraComm camera_comm;
 
   // Timing
   Clock::time_point t_current, t_last;
