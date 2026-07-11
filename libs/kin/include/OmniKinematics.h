@@ -1,12 +1,8 @@
 #ifndef OMNI_WHEELS_ANGLES_H
 #define OMNI_WHEELS_ANGLES_H
 
-/*
-TODO: Need to cut down a few things in eigen to build on the microcontroller
-*/
-
-#include <Eigen/Dense>
-#include <vector>
+#include <array>
+#include "SystemConstants.h"
 
 #include "SystemConstants.h"
 
@@ -35,12 +31,6 @@ class WheelConfig {
 
 class OmniKinematics {
  private:
-  // TODO:
-  /*
-    Please use std::array with fixed number of wheels. Number of wheels
-    will be a constant (constexpr). This code will go inside the microcontroller
-    and the unusual growth of std::vector's heap memory is unsuitable.
-  */
   std::array<WheelConfig, SystemConstants::num_wheels> wheels;
   double max_wheel_vel;
 
@@ -50,7 +40,8 @@ class OmniKinematics {
 
   std::array<double, SystemConstants::num_wheels> ChassisToWheels(ChassisVelocity target,
                                                                   bool scale_limits = true);
-  ChassisVelocity WheelsToChassis(const Eigen::VectorXd& wheel_vels);
+  ChassisVelocity WheelsToChassis(
+      const std::array<double, SystemConstants::num_wheels>& wheel_vels);
 };
 
 #endif

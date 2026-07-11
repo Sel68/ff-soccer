@@ -1,9 +1,7 @@
 #include "OmniKinematics.h"
 
-#include <Eigen/Dense>
 #include <algorithm>
 #include <cmath>
-#include <vector>
 
 OmniKinematics::OmniKinematics(
     const std::array<WheelConfig, SystemConstants::num_wheels>& wheel_configs,
@@ -30,24 +28,68 @@ std::array<double, SystemConstants::num_wheels> OmniKinematics::ChassisToWheels(
   return wheel_vels;
 }
 
-ChassisVelocity OmniKinematics::WheelsToChassis(const Eigen::VectorXd& wheel_vels) {
-  int n = wheels.size();
-  if (n == 0) return {0.0, 0.0, 0.0};
+ChassisVelocity OmniKinematics::WheelsToChassis(
+    const std::array<double, SystemConstants::num_wheels>& wheel_vels) {
+  double M[SystemConstants::num_wheels][3];
+  double V_w[SystemConstants::num_wheels];
 
-  Eigen::MatrixXd M(n, 3);
-  Eigen::VectorXd V_w(n);
-
-  for (int i = 0; i < n; ++i) {
-    M(i, 0) = std::cos(wheels[i].gamma);
-    M(i, 1) = std::sin(wheels[i].gamma);
-    M(i, 2) = wheels[i].R * std::sin(wheels[i].gamma - wheels[i].phi);
+  for (size_t i = 0; i < SystemConstants::num_wheels; ++i) {
+    M[i][0] = std::cos(wheels[i].gamma);
+    M[i][1] = std::sin(wheels[i].gamma);
+    M[i][2] = wheels[i].R * std::sin(wheels[i].gamma - wheels[i].phi);
 
     // Convert angular velocity of wheel to linear velocity of the wheel's contact point
-    V_w(i) = wheel_vels[i] * wheels[i].radius;
+    V_w[i] = wheel_vels[i] * wheels[i].radius;
   }
 
-  // solve M * V_c = V_w using least squares via QR decomposition
-  Eigen::Vector3d V_c = M.colPivHouseholderQr().solve(V_w);
+  // M_T_M = M^T * M (3x3)
+  double M_T_M[3][3] = {0};
+  for (int i = 0; i < 3; ++i) {
+    for (int j = 0; j < 3; ++j) {
+      for (size_t k = 0; k < SystemConstants::num_wheels; ++k) {
+        M_T_M[i][j] += M[k][i] * M[k][j];
+      }
+    }
+  }
 
-  return {V_c(0), V_c(1), V_c(2)};
+  // Inverse of 3x3 matrix M_T_M
+  double det = M_T_M[0][0] * (M_T_M[1][1] * M_T_M[2][2] - M_T_M[2][1] * M_T_M[1][2]) -
+               M_T_M[0][1] * (M_T_M[1][0] * M_T_M[2][2] - M_T_M[1][2] * M_T_M[2][0]) +
+               M_T_M[0][2] * (M_T_M[1][0] * M_T_M[2][1] - M_T_M[1][1] * M_T_M[2][0]);
+
+  if (std::abs(det) < 1e-6) {
+    return {0.0, 0.0, 0.0};
+  }
+
+  double invDet = 1.0 / det;
+  double M_T_M_inv[3][3];
+  M_T_M_inv[0][0] = (M_T_M[1][1] * M_T_M[2][2] - M_T_M[2][1] * M_T_M[1][2]) * invDet;
+  M_T_M_inv[0][1] = (M_T_M[0][2] * M_T_M[2][1] - M_T_M[0][1] * M_T_M[2][2]) * invDet;
+  M_T_M_inv[0][2] = (M_T_M[0][1] * M_T_M[1][2] - M_T_M[0][2] * M_T_M[1][1]) * invDet;
+  M_T_M_inv[1][0] = (M_T_M[1][2] * M_T_M[2][0] - M_T_M[1][0] * M_T_M[2][2]) * invDet;
+  M_T_M_inv[1][1] = (M_T_M[0][0] * M_T_M[2][2] - M_T_M[0][2] * M_T_M[2][0]) * invDet;
+  M_T_M_inv[1][2] = (M_T_M[1][0] * M_T_M[0][2] - M_T_M[0][0] * M_T_M[1][2]) * invDet;
+  M_T_M_inv[2][0] = (M_T_M[1][0] * M_T_M[2][1] - M_T_M[2][0] * M_T_M[1][1]) * invDet;
+  M_T_M_inv[2][1] = (M_T_M[2][0] * M_T_M[0][1] - M_T_M[0][0] * M_T_M[2][1]) * invDet;
+  M_T_M_inv[2][2] = (M_T_M[0][0] * M_T_M[1][1] - M_T_M[1][0] * M_T_M[0][1]) * invDet;
+
+  // pseudo_inv = M_T_M_inv * M^T (3xnum_wheels)
+  double pseudo_inv[3][SystemConstants::num_wheels] = {0};
+  for (int i = 0; i < 3; ++i) {
+    for (size_t j = 0; j < SystemConstants::num_wheels; ++j) {
+      for (int k = 0; k < 3; ++k) {
+        pseudo_inv[i][j] += M_T_M_inv[i][k] * M[j][k];  // M[j][k] is M^T[k][j]
+      }
+    }
+  }
+
+  // V_c = pseudo_inv * V_w (3x1)
+  double V_c[3] = {0};
+  for (int i = 0; i < 3; ++i) {
+    for (size_t j = 0; j < SystemConstants::num_wheels; ++j) {
+      V_c[i] += pseudo_inv[i][j] * V_w[j];
+    }
+  }
+
+  return {V_c[0], V_c[1], V_c[2]};
 }
