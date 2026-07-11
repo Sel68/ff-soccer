@@ -24,7 +24,7 @@ class Game {
  public:
   Game();
   ~Game();
-  void ProcessInput(double dt);
+  void ProcessInput(double dt, double posX, double posY, double theta);
   void Update(double dt);
   void Exit();
 
@@ -61,6 +61,7 @@ class Game {
   MainStrategy m_strategy;
 
   bool is_auto_mode = true;
+  bool passive = false;
 };
 
 #endif

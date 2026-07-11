@@ -19,7 +19,7 @@ int main() {
     double dt = t_current - t_last;
     t_last = t_current;
 
-    soccer.ProcessInput(dt);
+    soccer.ProcessInput(dt,50,30, 0);
     soccer.Update(dt);
   }
 

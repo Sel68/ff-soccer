@@ -269,7 +269,7 @@ void Game::UpdateSimulation(double dt) {
 
 void Game::Update(double dt) { UpdateSimulation(dt); }
 
-void Game::ProcessInput(double dt) {
+void Game::ProcessInput(double dt, double posX, double posY, double theta) {
   glfwPollEvents();
 
   if (keys[GLFW_KEY_J] && !keys_processed[GLFW_KEY_J]) {
@@ -321,68 +321,85 @@ void Game::ProcessInput(double dt) {
     if (!Player->lock) {
       if (this->state == GAME_ACTIVE) {
         float velocity = GameConfig::player_velocity * dt;
-        if (keys[GLFW_KEY_A]) {
-          if (Player->position.x >= 50.0f) {
-            Player->position.x -= velocity;
-            if (isStuckToThisPlayer)
-              ball->position.x -= velocity;
-          }
+        if(keys[GLFW_KEY_P]) {
+          passive = true;
         }
-        if (keys[GLFW_KEY_D]) {
-          if (Player->position.x <=
+        else if(keys[GLFW_KEY_O]){
+          passive = false;
+        }
+
+        if(passive){
+          Player->position.x = 50 + (posX + 1785) * 850 / 3570;
+          Player->position.y = 30 + (1190 - posY) * 520 / 2380;
+          Player->rotation = theta * 180 / 3.14; 
+        }
+
+        else{
+          if (keys[GLFW_KEY_A]) {
+            if (Player->position.x >= 50.0f) {
+              Player->position.x -= velocity;
+              if (isStuckToThisPlayer)
+                ball->position.x -= velocity;
+            }
+          }
+          if (keys[GLFW_KEY_D]) {
+            if (Player->position.x <=
               SystemConstants::screen_width - Player->size.x - 50.0f) {
-            Player->position.x += velocity;
-            if (isStuckToThisPlayer)
-              ball->position.x += velocity;
+              Player->position.x += velocity;
+              if (isStuckToThisPlayer)
+                ball->position.x += velocity;
+            }
+          }
+
+          if (keys[GLFW_KEY_W]) {
+            if (Player->position.y >= 30.0f) {
+              Player->position.y -= velocity;
+              if (isStuckToThisPlayer)
+                ball->position.y -= velocity;
+            }
+          }
+          if (keys[GLFW_KEY_S]) {
+            if (Player->position.y <=
+                SystemConstants::screen_height - Player->size.y - 30.0f) {
+              Player->position.y += velocity;
+              if (isStuckToThisPlayer)
+                ball->position.y += velocity;
+            }
+          }
+
+        // std::cout << "Player Position: (" << Player->position.x << ", " << Player->position.y << ")" << std::endl;
+
+          float rotation_velocity = GameConfig::player_rotation_velocity * dt;
+          float rot_change = 0.0f;
+          if (keys[GLFW_KEY_Q]) {
+            rot_change -= rotation_velocity;
+          }
+          if (keys[GLFW_KEY_E]) {
+            rot_change += rotation_velocity;
+          }
+
+          if (rot_change != 0.0f) {
+            Player->rotation += rot_change;
+            Player->rotation = std::fmod(Player->rotation, 360.0f);
+            if (Player->rotation < 0.0f)
+              Player->rotation += 360.0f;
+            if (isStuckToThisPlayer) {
+              glm::vec2 player_center = Player->position + Player->radius;
+              glm::vec2 ball_center = ball->position + ball->radius;
+              glm::vec2 diff = ball_center - player_center;
+
+              float angle = glm::radians(rot_change);
+              float cos_a = cos(angle);
+              float sin_a = sin(angle);
+
+              glm::vec2 new_diff(diff.x * cos_a - diff.y * sin_a,
+                                diff.x * sin_a + diff.y * cos_a);
+
+              ball->position = player_center + new_diff - ball->radius;
+            }
           }
         }
-
-        if (keys[GLFW_KEY_W]) {
-          if (Player->position.y >= 30.0f) {
-            Player->position.y -= velocity;
-            if (isStuckToThisPlayer)
-              ball->position.y -= velocity;
-          }
-        }
-        if (keys[GLFW_KEY_S]) {
-          if (Player->position.y <=
-              SystemConstants::screen_height - Player->size.y - 30.0f) {
-            Player->position.y += velocity;
-            if (isStuckToThisPlayer)
-              ball->position.y += velocity;
-          }
-        }
-
-        float rotation_velocity = GameConfig::player_rotation_velocity * dt;
-        float rot_change = 0.0f;
-        if (keys[GLFW_KEY_Q]) {
-          rot_change -= rotation_velocity;
-        }
-        if (keys[GLFW_KEY_E]) {
-          rot_change += rotation_velocity;
-        }
-
-        if (rot_change != 0.0f) {
-          Player->rotation += rot_change;
-          Player->rotation = std::fmod(Player->rotation, 360.0f);
-          if (Player->rotation < 0.0f)
-            Player->rotation += 360.0f;
-          if (isStuckToThisPlayer) {
-            glm::vec2 player_center = Player->position + Player->radius;
-            glm::vec2 ball_center = ball->position + ball->radius;
-            glm::vec2 diff = ball_center - player_center;
-
-            float angle = glm::radians(rot_change);
-            float cos_a = cos(angle);
-            float sin_a = sin(angle);
-
-            glm::vec2 new_diff(diff.x * cos_a - diff.y * sin_a,
-                               diff.x * sin_a + diff.y * cos_a);
-
-            ball->position = player_center + new_diff - ball->radius;
-          }
-        }
-      }
+    }
     } else if (Player == team2_players[0]) {
       if (this->state == GAME_ACTIVE) {
         float velocity = GameConfig::player_velocity * dt;
