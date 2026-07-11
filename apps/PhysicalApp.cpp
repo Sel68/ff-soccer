@@ -25,10 +25,10 @@ RobotCommands PrepareRobotCommands(Game& soccer, const std::vector<CameraValues>
     robot_cmds[robot_id].camY = cam_vals[cam_idx].y;
     robot_cmds[robot_id].camTheta = cam_vals[cam_idx].orientation;
 
-    // std::cout << robot_cmds[robot_id].id << " " << robot_cmds[robot_id].vx << " " << robot_cmds[robot_id].vy << " "
-    //   << robot_cmds[robot_id].w << " " << robot_cmds[robot_id].camX << " " << robot_cmds[robot_id].camY << " "
-    //   << robot_cmds[robot_id].camTheta << std::endl;
-
+    std::cout << robot_cmds[robot_id].id << " " << robot_cmds[robot_id].vx << " "
+              << robot_cmds[robot_id].vy << " " << robot_cmds[robot_id].w << " "
+              << robot_cmds[robot_id].camX << " " << robot_cmds[robot_id].camY << " "
+              << robot_cmds[robot_id].camTheta << std::endl;
   }
   return robot_cmds;
 }
@@ -48,7 +48,14 @@ class Host {
 
     std::vector<CameraValues> cam_curr_values = CameraComm::GetCameraValues();
 
-    soccer.ProcessInput(dt, 50, 30, 0);
+    if (!cam_curr_values.empty()) {
+      soccer.ProcessInput(dt, cam_curr_values[0].x, cam_curr_values[0].y,
+                          cam_curr_values[0].orientation);
+    } else {
+      soccer.ProcessInput(dt, 0.0f, 0.0f, 0.0f);
+    }
+
+    // soccer.ProcessInput(dt, 50, 30, 20);
     soccer.Update(dt);
 
     RobotCommands robot_cmds = PrepareRobotCommands(soccer, cam_curr_values);
@@ -68,7 +75,7 @@ class Host {
   ~Host() { Exit(); }
 
  private:
-  Game soccer; 
+  Game soccer;
   HostComm host_comm;
 
   // Timing
