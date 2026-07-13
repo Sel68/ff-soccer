@@ -3,34 +3,49 @@
 #include "GameConfig.h"
 
 GameObject::GameObject()
-    : position(0.0f, 0.0f), size(1.0f, 1.0f), velocity(0.0f), color(1.0f),
-      rotation(0.0f), is_solid(false), Destroyed(false), lock(false),
-      radius(12.5f), owner(nullptr), sticky(false), pass_through(false),
+    : position(0.0f, 0.0f),
+      size(1.0f, 1.0f),
+      velocity(0.0f),
+      color(1.0f),
+      charge(0.0f),
+      rotation(0.0f),
+      is_solid(false),
+      Destroyed(false),
+      lock(false),
+      radius(12.5f),
+      owner(nullptr),
+      sticky(false),
+      pass_through(false),
       sprite() {}
 
-GameObject::GameObject(glm::vec2 pos, glm::vec2 size, Texture2D sprite,
-                       bool isLock, glm::vec3 color, glm::vec2 velocity)
-    : position(pos), size(size), velocity(velocity), color(color),
-      rotation(0.0f), sprite(sprite), lock(isLock), is_solid(false),
+GameObject::GameObject(glm::vec2 pos, glm::vec2 size, Texture2D sprite, bool isLock,
+                       glm::vec3 color, glm::vec2 velocity)
+    : position(pos),
+      size(size),
+      velocity(velocity),
+      color(color),
+      rotation(0.0f),
+      sprite(sprite),
+      lock(isLock),
+      charge(0.0f),
+      is_solid(false),
       Destroyed(false) {}
 
-GameObject::GameObject(glm::vec2 pos, float radius, glm::vec2 velocity,
-                       Texture2D sprite, bool isLock)
-    : GameObject(pos, glm::vec2(radius * 2.0f, radius * 2.0f), sprite, isLock,
-                 glm::vec3(1.0f), velocity) {
+GameObject::GameObject(glm::vec2 pos, float radius, glm::vec2 velocity, Texture2D sprite,
+                       bool isLock)
+    : GameObject(pos, glm::vec2(radius * 2.0f, radius * 2.0f), sprite, isLock, glm::vec3(1.0f),
+                 velocity) {
   this->radius = radius;
   this->owner = nullptr;
   this->sticky = false;
   this->pass_through = false;
 }
 
-void GameObject::Draw(SpriteRenderer &renderer) {
-  renderer.DrawSprite(this->sprite, this->position, this->size, this->rotation,
-                      this->color);
+void GameObject::Draw(SpriteRenderer& renderer) {
+  renderer.DrawSprite(this->sprite, this->position, this->size, this->rotation, this->color);
 }
 
-glm::vec2 GameObject::Move(float dt, unsigned int window_width,
-                           unsigned int window_length) {
+glm::vec2 GameObject::Move(float dt, unsigned int window_width, unsigned int window_length) {
   if (owner == nullptr) {
     // Apply friction (linear deceleration)
     float speed = glm::length(velocity);
