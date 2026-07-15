@@ -44,6 +44,13 @@ class Game {
   void UpdateSimulation(double dt);
   void Cleanup();
 
+  void HandleManualKick();
+  void UpdateAutoStrategy(GameObject* movableBot, double dt);
+  void ProcessDebugKeys();
+  void ProcessPlayerInput(GameObject* player, double dt, double posX, double posY, double theta);
+  void HandleBallCollision(GameObject* player);
+  void HandleBotCollision(GameObject* p1, GameObject* p2);
+
   GameObject* ball;
   std::vector<GameObject*> team1_players;
   std::vector<GameObject*> team2_players;
