@@ -46,8 +46,10 @@ class Game {
 
   void HandleManualKick();
   void UpdateAutoStrategy(GameObject* movableBot, double dt);
+  void UpdateManualMotion(GameObject* robot, double dt);
   void ProcessDebugKeys();
   void ProcessPlayerInput(GameObject* player, double dt, double posX, double posY, double theta);
+  void ProcessMouseClickMovement();
   void HandleBallCollision(GameObject* player);
   void HandleBotCollision(GameObject* p1, GameObject* p2);
 
