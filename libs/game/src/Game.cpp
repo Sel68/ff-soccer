@@ -135,6 +135,14 @@ void Game::Update(double dt) { UpdateSimulation(dt); }
 void Game::ProcessInput(double dt, double posX, double posY, double theta) {
   glfwPollEvents();
 
+  // printing coordinates of the field where the mouse clicks
+  if (glfwGetMouseButton(this->game_window.gl_window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+    double xpos, ypos;
+    glfwGetCursorPos(this->game_window.gl_window, &xpos, &ypos);
+
+    std::cout << "Mouse clicked at: ("<< xpos << ", " << ypos << ")\n";
+  }
+
   ProcessDebugKeys();
 
   for (GameObject* p : team1_players) ProcessPlayerInput(p, dt, posX, posY, theta);

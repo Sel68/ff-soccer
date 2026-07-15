@@ -2,9 +2,10 @@
 #define MOTION_H
 
 #include "GameConfig.h"
+#include "trajectory.h"
 
 class Motion {
-public:
+ public:
   static bool m_debug_mode;
   static void setDebugMode(bool mode) { m_debug_mode = mode; }
 
@@ -25,31 +26,11 @@ public:
     double vtheta;
   };
 
-  struct Profile1D {
-    double maxSpeed;
-    double maxAccel;
-    double maxDecel;
-    double distToMax;
-    double distToStop;
-    double cruiseTime;
-    double timeToMax;
-    double timeToStop;
-    double totalTime;
-    double v0; // Initial velocity
-  };
-
   struct GeneratedProfile {
-    Profile1D xProfile;
-    Profile1D yProfile;
-    Profile1D thetaProfile;
-    double totalDistanceX;
-    double totalDistanceY;
-    double totalDistanceTheta;
-    double signX;
-    double signY;
-    double thetaSign;
-    double totalTime;
+    Synced2D planar;
+    SingleDOF theta;
     bool valid = false;
+    double totalTime = 0;
   };
 
   Motion() = default;
@@ -60,20 +41,13 @@ public:
                                                                      0.0});
 
   // Get the velocity at time t for a generated profile
-  VelocityState getVelocityState(const GeneratedProfile &profile, double t);
+  VelocityState getVelocityState(const GeneratedProfile& profile, double t);
 
-private:
+ private:
   struct KinematicState {
     double velocity;
     double distance;
   };
-
-  // Plans a 1D trapezoidal or triangular motion profile
-  Profile1D planProfile(double distance, MotionConstraints constraints,
-                        double v0 = 0.0);
-
-  KinematicState calculateKinematicState(double t, const Profile1D &profile,
-                                         double totalDistance);
 
   const MotionConstraints xDirectionConstraints = {
       GameConfig::motion_max_speed_x, GameConfig::motion_max_accel_x,
@@ -86,4 +60,4 @@ private:
       GameConfig::motion_max_decel_theta};
 };
 
-#endif // MOTION_H
+#endif  // MOTION_H
