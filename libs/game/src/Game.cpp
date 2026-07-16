@@ -118,10 +118,10 @@ void Game::UpdateSimulation(double dt) {
     if (!p->lock) movableBot = p;
 
   if (movableBot && this->state == GAME_ACTIVE) {
-    if (is_auto_mode) 
-        UpdateAutoStrategy(movableBot, dt);
-    else 
-        UpdateManualMotion(movableBot, dt);
+    if (is_auto_mode)
+      UpdateAutoStrategy(movableBot, dt);
+    else
+      UpdateManualMotion(movableBot, dt);
   }
 
   this->DoCollisions();
@@ -139,7 +139,7 @@ void Game::ProcessInput(double dt, double posX, double posY, double theta) {
   glfwPollEvents();
 
   ProcessDebugKeys();
-  ProcessMouseClickMovement(); 
+  ProcessMouseClickMovement();
 
   for (GameObject* p : team1_players) ProcessPlayerInput(p, dt, posX, posY, theta);
   for (GameObject* p : team2_players) ProcessPlayerInput(p, dt, posX, posY, theta);
@@ -222,6 +222,9 @@ void Game::SetCurrentAlgo(AlgoName algo) { current_algo = algo; }
 const std::vector<GameObject*>& Game::GetTeam1Players() const { return team1_players; }
 
 void Game::HandleManualKick() {
+  // kick signal is set/cleared by ProcessInput (K=1.0f, P=0.0f) and persists
+  // across frames — PrepareRobotCommands reads it from p->kick each cycle.
+
   if (keys[GLFW_KEY_K] && ball->owner != nullptr) {
     glm::vec2 face_dir(cos(glm::radians(ball->owner->rotation)),
                        sin(glm::radians(ball->owner->rotation)));
@@ -332,19 +335,19 @@ void Game::UpdateAutoStrategy(GameObject* movableBot, double dt) {
 }
 
 void Game::UpdateManualMotion(GameObject* robot, double dt) {
-    if (!robot->currentProfile.valid)return;
+  if (!robot->currentProfile.valid) return;
 
-    robot->current_segment_time += dt;
-    robot->current_velocities = robot->motion_library.getVelocityState(robot->currentProfile, robot->current_segment_time);
-    
-    double dx = robot->current_velocities.vx * dt;
-    double dy = robot->current_velocities.vy * dt;
-    double dtheta =
-        glm::degrees(robot->current_velocities.vtheta * dt);
+  robot->current_segment_time += dt;
+  robot->current_velocities =
+      robot->motion_library.getVelocityState(robot->currentProfile, robot->current_segment_time);
 
-    robot->position.x += dx;
-    robot->position.y += dy;
-    robot->rotation += dtheta;
+  double dx = robot->current_velocities.vx * dt;
+  double dy = robot->current_velocities.vy * dt;
+  double dtheta = glm::degrees(robot->current_velocities.vtheta * dt);
+
+  robot->position.x += dx;
+  robot->position.y += dy;
+  robot->rotation += dtheta;
 }
 
 void Game::ProcessDebugKeys() {
@@ -414,6 +417,12 @@ void Game::ProcessPlayerInput(GameObject* Player, double dt, double posX, double
         if (keys[GLFW_KEY_V]) {
           Player->charge = 0.0f;
         }
+        if (keys[GLFW_KEY_K]) {
+          Player->kick = 1.0f;
+        }
+        if (keys[GLFW_KEY_I]) {
+          Player->kick = 0.0f;
+        }
       }
 
       else {
@@ -447,6 +456,12 @@ void Game::ProcessPlayerInput(GameObject* Player, double dt, double posX, double
         }
         if (keys[GLFW_KEY_V]) {
           Player->charge = 0.0f;
+        }
+        if (keys[GLFW_KEY_K]) {
+          Player->kick = 1.0f;
+        }
+        if (keys[GLFW_KEY_I]) {
+          Player->kick = 0.0f;
         }
 
         // std::cout << "Player Position: (" << Player->position.x << ", " << Player->position.y
@@ -519,26 +534,23 @@ void Game::ProcessPlayerInput(GameObject* Player, double dt, double posX, double
   }
 }
 
-
 void Game::ProcessMouseClickMovement() {
-
   // printing coordinates of the field where the mouse clicks
   if (glfwGetMouseButton(this->game_window.gl_window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
     double xpos, ypos;
     glfwGetCursorPos(this->game_window.gl_window, &xpos, &ypos);
 
-    std::cout << "Mouse clicked at: ("<< xpos << ", " << ypos << ")\n";
+    std::cout << "Mouse clicked at: (" << xpos << ", " << ypos << ")\n";
   }
 
-
   /*
-  Handling the case when the mouse clicks in the manual mode, we use our custom 
+  Handling the case when the mouse clicks in the manual mode, we use our custom
   bang bang profiler to move there.
   */
- static bool prevLeftClick = false;
- bool leftClick = glfwGetMouseButton(this->game_window.gl_window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS; 
- if (!prevLeftClick && leftClick && !is_auto_mode) {
-
+  static bool prevLeftClick = false;
+  bool leftClick =
+      glfwGetMouseButton(this->game_window.gl_window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
+  if (!prevLeftClick && leftClick && !is_auto_mode) {
     double xpos, ypos;
     glfwGetCursorPos(this->game_window.gl_window, &xpos, &ypos);
 
@@ -548,11 +560,12 @@ void Game::ProcessMouseClickMovement() {
     Motion::Point start{robot->position.x, robot->position.y};
     Motion::Point end{xpos, ypos};
 
-    robot->currentProfile = robot->motion_library.generateProfile(start, end, glm::radians(robot->rotation), robot->current_velocities);
+    robot->currentProfile = robot->motion_library.generateProfile(
+        start, end, glm::radians(robot->rotation), robot->current_velocities);
     robot->current_segment_time = 0.0f;
- }
+  }
 
- prevLeftClick = leftClick;
+  prevLeftClick = leftClick;
 }
 
 void Game::HandleBallCollision(GameObject* player) {

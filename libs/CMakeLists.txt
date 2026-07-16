@@ -10,12 +10,12 @@ else()
     add_subdirectory(game)
     add_subdirectory(graphics)
     add_subdirectory(handler)
+    add_subdirectory(motion)
 endif()
 
 # Libraries used for all platforms
 add_subdirectory(external)
 add_subdirectory(kin)
-add_subdirectory(motion)
 add_subdirectory(cfg)
 add_subdirectory(msg)
 add_subdirectory(debug)

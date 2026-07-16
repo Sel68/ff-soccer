@@ -16,6 +16,7 @@ class GameObject {
   bool lock;
   float radius;
   float charge;
+  float kick;  // 1.0f = kick requested, 0.0f = idle
   GameObject* owner;
 
   // Motion tracking

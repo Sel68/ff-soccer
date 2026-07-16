@@ -45,7 +45,33 @@ RobotCommands PrepareRobotCommands(Game& soccer, const std::vector<CameraValues>
   int robot_id = 0;
   for (GameObject* p : soccer.GetTeam1Players()) {
     robot_id++;
-    robot_cmds[robot_id] = FormatRobotCommand(robot_id, p, cam_vals);
+    // if (robot_id > cam_vals.size()) break;
+    int cam_idx = robot_id - 1;
+
+    if (cam_idx < cam_vals.size()) {
+      robot_cmds[robot_id].id = cam_vals[cam_idx].id;
+      robot_cmds[robot_id].camX = cam_vals[cam_idx].x;
+      robot_cmds[robot_id].camY = cam_vals[cam_idx].y;
+      robot_cmds[robot_id].camTheta = cam_vals[cam_idx].orientation;
+    } else {
+      robot_cmds[robot_id].id = robot_id;
+      robot_cmds[robot_id].camX = 0.0f;
+      robot_cmds[robot_id].camY = 0.0f;
+      robot_cmds[robot_id].camTheta = 0.0f;
+    }
+
+    robot_cmds[robot_id].vx = p->velocity.x;
+    robot_cmds[robot_id].vy = p->velocity.y;
+    robot_cmds[robot_id].w = 243.1223;
+    robot_cmds[robot_id].chargeVal = p->charge;
+    robot_cmds[robot_id].kickVal = p->kick;
+    
+    std::cout << robot_cmds[robot_id].id << " " << robot_cmds[robot_id].vx << " "
+              << robot_cmds[robot_id].vy << " " << robot_cmds[robot_id].w << " "
+              << robot_cmds[robot_id].camX << " " << robot_cmds[robot_id].camY << " "
+              << robot_cmds[robot_id].camTheta << " " << robot_cmds[robot_id].chargeVal
+              << " " << robot_cmds[robot_id].kickVal
+              << std::endl;
   }
   return robot_cmds;
 }
