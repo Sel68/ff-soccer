@@ -31,17 +31,17 @@ class WheelConfig {
 
 class OmniKinematics {
  private:
-  std::array<WheelConfig, SystemConstants::num_wheels> wheels;
+  std::array<WheelConfig, SystemConstants::num_drive_motors> wheels;
   double max_wheel_vel;
 
  public:
-  OmniKinematics(const std::array<WheelConfig, SystemConstants::num_wheels>& wheel_configs,
+  OmniKinematics(const std::array<WheelConfig, SystemConstants::num_drive_motors>& wheel_configs,
                  double max_wheelspin);
 
-  std::array<double, SystemConstants::num_wheels> ChassisToWheels(ChassisVelocity target,
+  std::array<double, SystemConstants::num_drive_motors> ChassisToWheels(ChassisVelocity target,
                                                                   bool scale_limits = true);
   ChassisVelocity WheelsToChassis(
-      const std::array<double, SystemConstants::num_wheels>& wheel_vels);
+      const std::array<double, SystemConstants::num_drive_motors>& wheel_vels);
 };
 
 #endif

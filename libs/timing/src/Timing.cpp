@@ -7,8 +7,6 @@ OsTicksFunctionPtr OsTicksFunction = 0;
 // Time offset to master. slave_clock - time_offset = master_clock
 static int32_t time_offset = 0;
 
-static uint32_t tick_unit = 250;  // microseconds
-
 void RegisterClock(OsTicksFunctionPtr function_name) { OsTicksFunction = function_name; }
 
 // uint32_t GetCurrentTimeUs() { return OsTicksFunction(); }

@@ -9,7 +9,7 @@ const double PI = std::acos(-1.0);
 
 class OmniKinematicsTest : public ::testing::Test {
  protected:
-  std::array<WheelConfig, SystemConstants::num_wheels> wheel_configs;
+  std::array<WheelConfig, SystemConstants::num_drive_motors> wheel_configs;
   double max_spin;
   double R = 0.2;   // 20cm chassis radius
   double r = 0.05;  // 5cm wheel radius
@@ -30,7 +30,7 @@ TEST_F(OmniKinematicsTest, ZeroVelocity) {
   OmniKinematics kin(wheel_configs, max_spin);
   ChassisVelocity target = {0.0, 0.0, 0.0};
 
-  std::array<double, SystemConstants::num_wheels> vels = kin.ChassisToWheels(target);
+  std::array<double, SystemConstants::num_drive_motors> vels = kin.ChassisToWheels(target);
 
   ASSERT_EQ(vels.size(), 4);
   for (int i = 0; i < 4; ++i) {
@@ -42,7 +42,7 @@ TEST_F(OmniKinematicsTest, ForwardVelocityX) {
   OmniKinematics kin(wheel_configs, max_spin);
   ChassisVelocity target = {1.0, 0.0, 0.0};  // Move +1.0 m/s in X
 
-  std::array<double, SystemConstants::num_wheels> vels = kin.ChassisToWheels(target);
+  std::array<double, SystemConstants::num_drive_motors> vels = kin.ChassisToWheels(target);
 
   // W1 (gamma=pi/2): cos(pi/2)*1 = 0
   // W2 (gamma=pi): cos(pi)*1 = -1 -> vel = -1/0.05 = -20 rad/s
@@ -59,7 +59,7 @@ TEST_F(OmniKinematicsTest, ForwardVelocityY) {
   OmniKinematics kin(wheel_configs, max_spin);
   ChassisVelocity target = {0.0, 1.0, 0.0};  // Move +1.0 m/s in Y
 
-  std::array<double, SystemConstants::num_wheels> vels = kin.ChassisToWheels(target);
+  std::array<double, SystemConstants::num_drive_motors> vels = kin.ChassisToWheels(target);
 
   // W1 (gamma=pi/2): sin(pi/2)*1 = 1 -> 20 rad/s
   // W2 (gamma=pi): sin(pi)*1 = 0
@@ -76,7 +76,7 @@ TEST_F(OmniKinematicsTest, RotationPure) {
   OmniKinematics kin(wheel_configs, max_spin);
   ChassisVelocity target = {0.0, 0.0, 1.0};  // Rotate +1.0 rad/s
 
-  std::array<double, SystemConstants::num_wheels> vels = kin.ChassisToWheels(target);
+  std::array<double, SystemConstants::num_drive_motors> vels = kin.ChassisToWheels(target);
 
   // For each wheel: v_w = R * sin(gamma - phi) * vtheta
   // gamma - phi = pi/2 for all wheels. sin(pi/2) = 1
@@ -93,7 +93,7 @@ TEST_F(OmniKinematicsTest, RotationPure) {
 //   ChassisVelocity target = {1.0, 0.0,
 //                             0.0};  // Move +1.0 m/s in X (would normally require 20 rad/s)
 
-//   std::array<double, SystemConstants::num_wheels> vels =
+//   std::array<double, SystemConstants::num_drive_motors> vels =
 //       kin.ChassisToWheels(target, true);  // scale limits = true
 
 //   // W2 would be -20, W4 would be +20. Max observed is 20. Limit is 10.

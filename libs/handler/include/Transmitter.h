@@ -19,7 +19,7 @@ struct RobotTelemetryPacket {
   float vel_x;
   float vel_y;
   float vel_theta;
-  float wheel_speeds[SystemConstants::num_wheels];
+  float wheel_speeds[SystemConstants::num_drive_motors];
 };
 #pragma pack(pop)
 
@@ -33,7 +33,7 @@ class Transmitter {
 
   // didnt  make it static to allow multi transmissions
   void transmit(int robot_id, double px, double py, double ptheta, const ChassisVelocity& vel,
-                const std::array<double, SystemConstants::num_wheels>& wheels);
+                const std::array<double, SystemConstants::num_drive_motors>& wheels);
 };
 
 #endif

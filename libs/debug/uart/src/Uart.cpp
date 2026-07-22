@@ -6,8 +6,10 @@
 
 #if (USE_SMALL_BUFFER == 1)
 #define BUFFER_SIZE 60
+#warning BUFFER SIZE IS 60
 #else
 #define BUFFER_SIZE 256
+#warning BUFFER SIZE IS 256
 #endif
 
 char msg[BUFFER_SIZE];
