@@ -4,8 +4,16 @@
 #include <stdio.h>
 #include <string.h>  // strlen
 
-#define BUFFER_SIZE 256  // bytes
-char msg[BUFFER_SIZE];   // (robot/gateway)
+#if (USE_SMALL_BUFFER == 1)
+#define BUFFER_SIZE 60
+#warning BUFFER SIZE IS 60
+#else
+#define BUFFER_SIZE 256
+#warning BUFFER SIZE IS 256
+#endif
+
+// TODO: What about multi-DMA firing?
+static char msg[BUFFER_SIZE];
 
 static HALUartTransmitFunctionPtr HALUartTransmitFunction = NULL;
 
@@ -15,11 +23,11 @@ void RegisterUartTransmitFunction(HALUartTransmitFunctionPtr function_name) {
 
 // ***************************************************
 /*                  Debugging                */
-void uart_print(const char *data) {
-  if (HALUartTransmitFunction) HALUartTransmitFunction((const uint8_t *)data, strlen(data));
+void uart_print(const char* data) {
+  if (HALUartTransmitFunction) HALUartTransmitFunction((const uint8_t*)data, strlen(data));
 }
 
-void uart_printf(const char *format, ...) {
+void uart_printf(const char* format, ...) {
   va_list args;
   va_start(args, format);
 
@@ -28,7 +36,8 @@ void uart_printf(const char *format, ...) {
 
   if (length >= BUFFER_SIZE) {
     msg[BUFFER_SIZE - 1] = '\0';
+    length = BUFFER_SIZE - 1;
   }
 
-  if (HALUartTransmitFunction) HALUartTransmitFunction((const uint8_t *)msg, length);
+  if (HALUartTransmitFunction) HALUartTransmitFunction((const uint8_t*)msg, length);
 }

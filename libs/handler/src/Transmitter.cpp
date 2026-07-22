@@ -7,7 +7,7 @@ Transmitter::Transmitter(asio::io_context& ioc, const std::string& ip, unsigned 
 
 void Transmitter::transmit(int robot_id, double px, double py, double ptheta,
                            const ChassisVelocity& vel,
-                           const std::array<double, SystemConstants::num_wheels>& wheels) {
+                           const std::array<double, SystemConstants::num_drive_motors>& wheels) {
   RobotTelemetryPacket packet;
   packet.robot_id = robot_id;
   packet.pos_x = px;
@@ -17,7 +17,7 @@ void Transmitter::transmit(int robot_id, double px, double py, double ptheta,
   packet.vel_y = vel.vy;
   packet.vel_theta = vel.vtheta;
 
-  for (int i = 0; i < SystemConstants::num_wheels; ++i) {
+  for (int i = 0; i < SystemConstants::num_drive_motors; ++i) {
     packet.wheel_speeds[i] = wheels[i];
   }
 
