@@ -4,10 +4,6 @@
 #include <stdio.h>
 #include <string.h>  // strlen
 
-#ifndef USE_SMALL_BUFFER
-#define USE_SMALL_BUFFER 0
-#endif
-
 #if (USE_SMALL_BUFFER == 1)
 #define BUFFER_SIZE 60
 #warning BUFFER SIZE IS 60
@@ -16,7 +12,8 @@
 #warning BUFFER SIZE IS 256
 #endif
 
-char msg[BUFFER_SIZE];
+// TODO: What about multi-DMA firing?
+static char msg[BUFFER_SIZE];
 
 static HALUartTransmitFunctionPtr HALUartTransmitFunction = NULL;
 
@@ -39,6 +36,7 @@ void uart_printf(const char* format, ...) {
 
   if (length >= BUFFER_SIZE) {
     msg[BUFFER_SIZE - 1] = '\0';
+    length = BUFFER_SIZE - 1;
   }
 
   if (HALUartTransmitFunction) HALUartTransmitFunction((const uint8_t*)msg, length);
