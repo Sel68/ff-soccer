@@ -4,6 +4,10 @@
 #include <stdio.h>
 #include <string.h>  // strlen
 
+#ifndef USE_SMALL_BUFFER
+#define USE_SMALL_BUFFER 0
+#endif
+
 #if (USE_SMALL_BUFFER == 1)
 #define BUFFER_SIZE 60
 #warning BUFFER SIZE IS 60
