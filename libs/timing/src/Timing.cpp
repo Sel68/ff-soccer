@@ -23,7 +23,7 @@ void SetTimeOffset(int32_t new_offset) {
 }
 
 // Updates the offset which is subtracted when time is calculated
-void UpdateTimeOffset(int32_t new_offset, bool registering) {
+void UpdateTimeOffset(int32_t new_offset) {
   // if (registering) {
   SetTimeOffset(new_offset);
   // return;

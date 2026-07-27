@@ -23,6 +23,6 @@ struct StringPayloadDecode {
 };
 
 bool PayloadEncodeCallback(pb_ostream_t* stream, const pb_field_t* field, void* const* arg);
-bool PayloadDecodeCallback(pb_istream_t* stream, const pb_field_t* field, void** arg);
+bool PayloadDecodeCallback(pb_istream_t* stream, void** arg);
 
 #endif  // MESSAGE_INTERFACE_H

@@ -9,7 +9,7 @@ OmniKinematics::OmniKinematics(
     : wheels(wheel_configs), max_wheel_vel(max_wheelspin) {}
 
 std::array<double, SystemConstants::num_drive_motors> OmniKinematics::ChassisToWheels(
-    ChassisVelocity target, bool scale_limits) {
+    ChassisVelocity target) {
   std::array<double, SystemConstants::num_drive_motors> wheel_vels;
   double max_observed = 0.0;
 

@@ -30,7 +30,7 @@ uint32_t GetNextCalibratedCycleTime();
 void SetTimeOffset(int32_t new_offset);
 
 // Updates the offset which is subtracted when time is calculated
-void UpdateTimeOffset(int32_t new_offset, bool registering = false);
+void UpdateTimeOffset(int32_t new_offset);
 
 // Gets the time offset
 int32_t GetTimeOffset();

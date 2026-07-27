@@ -15,15 +15,18 @@
 #define UART_PRINTF(format, ...) ((void)0)
 #endif
 
+#ifndef COLOR_RED
 #define COLOR_RED "\033[0;31m"
 #define COLOR_BLUE "\033[0;36m"
 #define COLOR_GREEN "\033[0;32m"
 #define COLOR_RESET "\033[0m"
 #define COLOR_YELLOW "\033[33m"
+#endif
 
 typedef void (*HALUartTransmitFunctionPtr)(const uint8_t* data, uint16_t length);
 void RegisterUartTransmitFunction(HALUartTransmitFunctionPtr function_name);
 
+void uart_print(const uint8_t* data, uint16_t len);
 void uart_print(const char* data);
 void uart_printf(const char* format, ...);
 

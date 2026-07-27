@@ -8,7 +8,7 @@
 #include "pb_decode.h"
 #include "pb_encode.h"
 
-bool PayloadDecodeCallback(pb_istream_t* stream, const pb_field_t* field, void** arg) {
+bool PayloadDecodeCallback(pb_istream_t* stream, void** arg) {
   StringPayloadDecode* sp = (StringPayloadDecode*)(*arg);
   size_t bytes_to_read = stream->bytes_left;
 
