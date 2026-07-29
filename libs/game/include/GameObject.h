@@ -13,6 +13,7 @@ class GameObject {
  public:
   glm::vec2 position, size, velocity;
   float rotation;
+  float angular_velocity;
   bool lock;
   float radius;
   float charge;

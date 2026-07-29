@@ -10,34 +10,35 @@
 
 using Clock = std::chrono::steady_clock;
 
-RobotCommandMsg FormatRobotCommand(int robot_id, GameObject* p,
-                                   const std::vector<CameraValues>& cam_vals) {
-  RobotCommandMsg cmd;
-  int cam_idx = robot_id - 1;
+// RobotCommandMsg FormatRobotCommand(int robot_id, GameObject* p,
+//                                    const std::vector<CameraValues>& cam_vals) {
+//   RobotCommandMsg cmd;
+//   int cam_idx = robot_id - 1;
 
-  if (cam_idx < cam_vals.size()) {
-    cmd.id = cam_vals[cam_idx].id;
-    cmd.camX = cam_vals[cam_idx].x;
-    cmd.camY = cam_vals[cam_idx].y;
-    cmd.camTheta = cam_vals[cam_idx].orientation;
-  } else {
-    cmd.id = robot_id;
-    cmd.camX = 0.0f;
-    cmd.camY = 0.0f;
-    cmd.camTheta = 0.0f;
-  }
+//   if (cam_idx < cam_vals.size()) {
+//     cmd.id = cam_vals[cam_idx].id;
+//     cmd.camX = cam_vals[cam_idx].x;
+//     cmd.camY = cam_vals[cam_idx].y;
+//     cmd.camTheta = cam_vals[cam_idx].orientation;
+//   } else {
+//     cmd.id = robot_id;
+//     cmd.camX = 0.0f;
+//     cmd.camY = 0.0f;
+//     cmd.camTheta = 0.0f;
+//   }
 
-  cmd.vx = p->velocity.x;
-  cmd.vy = p->velocity.y;
-  cmd.w = 243.1223;
-  cmd.chargeVal = p->charge;
+//   cmd.vx = p->velocity.x;
+//   cmd.vy = p->velocity.y;
+//   cmd.w = 243.1223;
+//   cmd.chargeVal = p->charge;
 
-  // std::cout << cmd.id << " " << cmd.vx << " " << cmd.vy << " " << cmd.w << " " << cmd.camX << "
-  // "
-  //           << cmd.camY << " " << cmd.camTheta << " " << cmd.chargeVal << std::endl;
+//   // std::cout << cmd.id << " " << cmd.vx << " " << cmd.vy << " " << cmd.w << " " << cmd.camX <<
+//   "
+//   // "
+//   //           << cmd.camY << " " << cmd.camTheta << " " << cmd.chargeVal << std::endl;
 
-  return cmd;
-}
+//   return cmd;
+// }
 
 RobotCommands PrepareRobotCommands(Game& soccer, const std::vector<CameraValues>& cam_vals) {
   RobotCommands robot_cmds;
@@ -60,18 +61,24 @@ RobotCommands PrepareRobotCommands(Game& soccer, const std::vector<CameraValues>
       robot_cmds[robot_id].camTheta = 0.0f;
     }
 
-    robot_cmds[robot_id].vx = p->velocity.x;
-    robot_cmds[robot_id].vy = p->velocity.y;
-    robot_cmds[robot_id].w = 243.1223;
+    // robot_cmds[robot_id].vx = p->velocity.x;
+    // robot_cmds[robot_id].vy = p->velocity.y;
+    // std::cout << "X: " << p->velocity.x * (3570.0 / 820.0) / (1000.0) << std::endl;
+    // std::cout << "y: " << p->velocity.y * (2380.0 / 490.0) / (1000.0) << std::endl;
+    // std::cout << "rot vel: " << p->angular_velocity << std::endl;
+
+    robot_cmds[robot_id].vx = p->velocity.x * (3570.0 / 820.0) / (1000.0);
+    robot_cmds[robot_id].vy = p->velocity.y * (2380.0 / 490.0) / (1000.0);
+    robot_cmds[robot_id].w = p->angular_velocity;
     robot_cmds[robot_id].chargeVal = p->charge;
     robot_cmds[robot_id].kickVal = p->kick;
-    
-    std::cout << robot_cmds[robot_id].id << " " << robot_cmds[robot_id].vx << " "
-              << robot_cmds[robot_id].vy << " " << robot_cmds[robot_id].w << " "
-              << robot_cmds[robot_id].camX << " " << robot_cmds[robot_id].camY << " "
-              << robot_cmds[robot_id].camTheta << " " << robot_cmds[robot_id].chargeVal
-              << " " << robot_cmds[robot_id].kickVal
-              << std::endl;
+
+    // std::cout << robot_cmds[robot_id].id << " " << robot_cmds[robot_id].vx << " "
+    //           << robot_cmds[robot_id].vy << " " << robot_cmds[robot_id].w << " "
+    //           << robot_cmds[robot_id].camX << " " << robot_cmds[robot_id].camY << " "
+    //           << robot_cmds[robot_id].camTheta << " " << robot_cmds[robot_id].chargeVal
+    //           << " " << robot_cmds[robot_id].kickVal
+    //           << std::endl;
   }
   return robot_cmds;
 }

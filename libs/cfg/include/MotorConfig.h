@@ -25,7 +25,7 @@ enum class MotorFault {
 
 struct MotorConstants {
   // THINGS I CAN CHANGE
-  static constexpr float max_duty = 20.f;
+static constexpr float max_duty = 4.0;
   static constexpr float t_duty_ramp_ms = 2000;  // Reaches max duty in this time
 
   // HARDWARE CONSTRAINTS

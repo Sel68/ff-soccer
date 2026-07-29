@@ -396,6 +396,7 @@ void Game::ProcessDebugKeys() {
 void Game::ProcessPlayerInput(GameObject* Player, double dt, double posX, double posY,
                               double theta) {
   glm::vec2 oldPosition = Player->position;
+  float oldRotation = Player->rotation;
 
   bool isStuckToThisPlayer = ball->owner == Player;
   if (!Player->lock) {
@@ -529,8 +530,13 @@ void Game::ProcessPlayerInput(GameObject* Player, double dt, double posX, double
 
   if (dt > 0.0001) {
     Player->velocity = (Player->position - oldPosition) / static_cast<float>(dt);
+    float rot_diff = Player->rotation - oldRotation;
+    if (rot_diff > 180.0f) rot_diff -= 360.0f;
+    else if (rot_diff < -180.0f) rot_diff += 360.0f;
+    Player->angular_velocity = rot_diff / static_cast<float>(dt);
   } else {
     Player->velocity = glm::vec2(0.0f, 0.0f);
+    Player->angular_velocity = 0.0f;
   }
 }
 
