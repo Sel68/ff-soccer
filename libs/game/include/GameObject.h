@@ -18,6 +18,7 @@ class GameObject {
   float radius;
   float charge;
   float kick;  // 1.0f = kick requested, 0.0f = idle
+  float dribbler;
   GameObject* owner;
 
   // Motion tracking

@@ -38,8 +38,7 @@ class OmniKinematics {
   OmniKinematics(const std::array<WheelConfig, SystemConstants::num_drive_motors>& wheel_configs,
                  double max_wheelspin);
 
-  std::array<double, SystemConstants::num_drive_motors> ChassisToWheels(ChassisVelocity target
-                                                                  );
+  std::array<double, SystemConstants::num_drive_motors> ChassisToWheels(ChassisVelocity target);
   ChassisVelocity WheelsToChassis(
       const std::array<double, SystemConstants::num_drive_motors>& wheel_vels);
 };

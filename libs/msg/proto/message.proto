@@ -10,6 +10,7 @@ message RobotCommandMsg {
   float camTheta = 7;
   float chargeVal = 8;
   float kickVal = 9;
+  float dribbler = 10;
 }
 
 message RobotResponseMsg {

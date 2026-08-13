@@ -424,6 +424,12 @@ void Game::ProcessPlayerInput(GameObject* Player, double dt, double posX, double
         if (keys[GLFW_KEY_I]) {
           Player->kick = 0.0f;
         }
+        if (keys[GLFW_KEY_M]) {
+          Player->dribbler = 1.0f;
+        }
+        if (keys[GLFW_KEY_N]) {
+          Player->dribbler = 0.0f;
+        }
       }
 
       else {
@@ -463,6 +469,15 @@ void Game::ProcessPlayerInput(GameObject* Player, double dt, double posX, double
         }
         if (keys[GLFW_KEY_I]) {
           Player->kick = 0.0f;
+        }
+        if (keys[GLFW_KEY_U]) {
+          Player->kick = 0.4f;
+        }
+        if (keys[GLFW_KEY_M]) {
+          Player->dribbler = 1.0f;
+        }
+        if (keys[GLFW_KEY_N]) {
+          Player->dribbler = 0.0f;
         }
 
         // std::cout << "Player Position: (" << Player->position.x << ", " << Player->position.y
@@ -531,8 +546,10 @@ void Game::ProcessPlayerInput(GameObject* Player, double dt, double posX, double
   if (dt > 0.0001) {
     Player->velocity = (Player->position - oldPosition) / static_cast<float>(dt);
     float rot_diff = Player->rotation - oldRotation;
-    if (rot_diff > 180.0f) rot_diff -= 360.0f;
-    else if (rot_diff < -180.0f) rot_diff += 360.0f;
+    if (rot_diff > 180.0f)
+      rot_diff -= 360.0f;
+    else if (rot_diff < -180.0f)
+      rot_diff += 360.0f;
     Player->angular_velocity = rot_diff / static_cast<float>(dt);
   } else {
     Player->velocity = glm::vec2(0.0f, 0.0f);

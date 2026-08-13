@@ -59,7 +59,7 @@ ChassisVelocity OmniKinematics::WheelsToChassis(
 
   if (std::abs(det) < 1e-6) {
     return {0.0, 0.0, 0.0};
-  } 
+  }
 
   double invDet = 1.0 / det;
   double M_T_M_inv[3][3];
