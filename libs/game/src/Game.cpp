@@ -480,8 +480,8 @@ void Game::ProcessPlayerInput(GameObject* Player, double dt, double posX, double
           Player->dribbler = 0.0f;
         }
 
-        // std::cout << "Player Position: (" << Player->position.x << ", " << Player->position.y
-        // << ")" << std::endl;
+        std::cout << "Player Position: (" << Player->position.x << ", " << Player->position.y
+                  << ")" << std::endl;
 
         float rotation_velocity = GameConfig::player_rotation_velocity * dt;
         float rot_change = 0.0f;

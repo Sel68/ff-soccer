@@ -47,19 +47,19 @@ RobotCommands PrepareRobotCommands(Game& soccer, const std::vector<CameraValues>
   for (GameObject* p : soccer.GetTeam1Players()) {
     robot_id++;
     // if (robot_id > cam_vals.size()) break;
-    int cam_idx = robot_id - 1;
+    // int cam_idx = robot_id - 1;
 
-    if (cam_idx < cam_vals.size()) {
-      robot_cmds[robot_id].id = cam_vals[cam_idx].id;
-      robot_cmds[robot_id].camX = cam_vals[cam_idx].x;
-      robot_cmds[robot_id].camY = cam_vals[cam_idx].y;
-      robot_cmds[robot_id].camTheta = cam_vals[cam_idx].orientation;
-    } else {
-      robot_cmds[robot_id].id = robot_id;
-      robot_cmds[robot_id].camX = 0.0f;
-      robot_cmds[robot_id].camY = 0.0f;
-      robot_cmds[robot_id].camTheta = 0.0f;
-    }
+    // if (cam_idx < cam_vals.size()) {
+    //   robot_cmds[robot_id].id = cam_vals[cam_idx].id;
+    //   robot_cmds[robot_id].camX = cam_vals[cam_idx].x;
+    //   robot_cmds[robot_id].camY = cam_vals[cam_idx].y;
+    //   robot_cmds[robot_id].camTheta = cam_vals[cam_idx].orientation;
+    // } else {
+    //   robot_cmds[robot_id].id = robot_id;
+    //   robot_cmds[robot_id].camX = 0.0f;
+    //   robot_cmds[robot_id].camY = 0.0f;
+    //   robot_cmds[robot_id].camTheta = 0.0f;
+    // }
 
     // robot_cmds[robot_id].vx = p->velocity.x;
     // robot_cmds[robot_id].vy = p->velocity.y;
@@ -67,12 +67,14 @@ RobotCommands PrepareRobotCommands(Game& soccer, const std::vector<CameraValues>
     // std::cout << "y: " << p->velocity.y * (2380.0 / 490.0) / (1000.0) << std::endl;
     // std::cout << "rot vel: " << p->angular_velocity << std::endl;
 
+    robot_cmds[robot_id].id = robot_id;
+
     robot_cmds[robot_id].vx = (p->velocity.x * (3570.0 / 820.0) / (1000.0)) * 1000;
     robot_cmds[robot_id].vy = (p->velocity.y * (2380.0 / 490.0) / (1000.0)) * 1000;
     robot_cmds[robot_id].w = p->angular_velocity;
     robot_cmds[robot_id].chargeVal = p->charge;
     robot_cmds[robot_id].kickVal = p->kick;
-    robot_cmds[robot_id].dribbler = p->dribbler;
+    // robot_cmds[robot_id].dribbler = p->dribbler;
 
     // std::cout << robot_cmds[robot_id].id << " " << robot_cmds[robot_id].vx << " "
     //           << robot_cmds[robot_id].vy << " " << robot_cmds[robot_id].w << " "
