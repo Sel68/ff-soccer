@@ -21,6 +21,7 @@ enum class MotorFault {
   ENTER_FAULT_FUNCTION,
   TOO_SLOW_CONTROL_STEP,
   ADC_PROBLEM,
+  INVALID_HALL,
 };
 
 struct MotorConstants {

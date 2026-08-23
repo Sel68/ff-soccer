@@ -74,7 +74,7 @@ RobotCommands PrepareRobotCommands(Game& soccer, const std::vector<CameraValues>
     robot_cmds[robot_id].w = p->angular_velocity;
     robot_cmds[robot_id].chargeVal = p->charge;
     robot_cmds[robot_id].kickVal = p->kick;
-    // robot_cmds[robot_id].dribbler = p->dribbler;
+    robot_cmds[robot_id].dribbler = p->dribbler;
 
     // std::cout << robot_cmds[robot_id].id << " " << robot_cmds[robot_id].vx << " "
     //           << robot_cmds[robot_id].vy << " " << robot_cmds[robot_id].w << " "
