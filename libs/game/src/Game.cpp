@@ -50,23 +50,76 @@ void Game::Cleanup() {
 }
 
 void Game::ObjectPosInit() {
-  // Team 1 players
-  glm::vec2 playerPos1 =
-      glm::vec2(SystemConstants::screen_width * 0.125f,
-                SystemConstants::screen_height * 0.5f - GameConfig::player_radius);  // keeper
-  GameObject* p1 =
-      new GameObject(playerPos1, GameConfig::player_radius,
+  for (GameObject* p : team1_players) delete p;
+  team1_players.clear();
+  for (GameObject* p : team2_players) delete p;
+  team2_players.clear();
+  if (ball) { delete ball; ball = nullptr; }
+
+  // Team 1 (robot)
+  start_pos_team1 = {
+      glm::vec2(200.0f, 290.0f - GameConfig::player_radius),
+      glm::vec2(150.0f, 150.0f - GameConfig::player_radius),
+      glm::vec2(150.0f, 430.0f - GameConfig::player_radius)
+  };
+  
+  for (size_t i = 0; i < start_pos_team1.size(); ++i) {
+      GameObject* p = new GameObject(start_pos_team1[i], GameConfig::player_radius,
                      glm::vec2(GameConfig::player_velocity, GameConfig::player_velocity),
                      resource_manager.GetTexture("robot"), false);
-  team1_players.push_back(p1);
+      p->lock = (i != 0); // first bot is movable
+      team1_players.push_back(p);
+  }
+
+  // Team 2 (robot2)
+  start_pos_team2 = {
+      glm::vec2(750.0f, 100.0f - GameConfig::player_radius),
+      glm::vec2(750.0f, 480.0f - GameConfig::player_radius),
+      glm::vec2(850.0f, 100.0f - GameConfig::player_radius) // away from center
+  };
+
+  for (size_t i = 0; i < start_pos_team2.size(); ++i) {
+      GameObject* p = new GameObject(start_pos_team2[i], GameConfig::player_radius,
+                     glm::vec2(GameConfig::player_velocity, GameConfig::player_velocity),
+                     resource_manager.GetTexture("robot2"), false);
+      p->lock = true; // all team 2 bots are fixed
+      p->rotation = 180.0f; // face left
+      team2_players.push_back(p);
+  }
 
   // Ball
-  glm::vec2 ballPos = playerPos1 + glm::vec2(GameConfig::player_radius * 2.0f + 5.0f,
+  start_pos_ball = start_pos_team1[0] + glm::vec2(GameConfig::player_radius * 2.0f + 15.0f,
                                              GameConfig::player_radius - GameConfig::ball_radius);
   ball = new GameObject(
-      ballPos, GameConfig::ball_radius,
-      glm::vec2(GameConfig::initial_ball_velocity.first, GameConfig::initial_ball_velocity.second),
+      start_pos_ball, GameConfig::ball_radius,
+      glm::vec2(0.0f, 0.0f),
       resource_manager.GetTexture("face"), true);
+}
+
+void Game::ResetPositions() {
+    for (size_t i = 0; i < team1_players.size() && i < start_pos_team1.size(); ++i) {
+        team1_players[i]->position = start_pos_team1[i];
+        team1_players[i]->velocity = glm::vec2(0.0f);
+        team1_players[i]->rotation = 0.0f;
+        team1_players[i]->current_velocities = {0,0,0};
+        team1_players[i]->currentProfile.valid = false;
+        team1_players[i]->owner = nullptr;
+    }
+    for (size_t i = 0; i < team2_players.size() && i < start_pos_team2.size(); ++i) {
+        team2_players[i]->position = start_pos_team2[i];
+        team2_players[i]->velocity = glm::vec2(0.0f);
+        team2_players[i]->rotation = 180.0f; // face left
+        team2_players[i]->current_velocities = {0,0,0};
+        team2_players[i]->currentProfile.valid = false;
+        team2_players[i]->owner = nullptr;
+    }
+    if (ball) {
+        ball->position = start_pos_ball;
+        ball->velocity = glm::vec2(0.0f);
+        ball->owner = nullptr;
+    }
+    reset_timer = -1.0;
+    std::cout << "[INFO] [Game]: Play Reset!" << std::endl;
 }
 
 void Game::Init() {
@@ -86,6 +139,7 @@ void Game::Init() {
   resource_manager.LoadTexture(TEXTURE_DIR "background.jpg", false, "background");
   resource_manager.LoadTexture(TEXTURE_DIR "awesomeface.png", true, "face");
   resource_manager.LoadTexture(TEXTURE_DIR "robot.png", true, "robot");
+  resource_manager.LoadTexture(TEXTURE_DIR "robot2.png", true, "robot2");
 
   ObjectPosInit();  // initiliase players and ball positions
 
@@ -107,6 +161,13 @@ std::vector<Point2D> Game::Plan(std::pair<double, double> start, std::pair<doubl
 }
 
 void Game::UpdateSimulation(double dt) {
+  if (reset_timer > 0.0) {
+      reset_timer -= dt;
+      if (reset_timer <= 0.0) {
+          ResetPositions();
+      }
+  }
+
   HandleManualKick();
 
   ball->Move(dt, SystemConstants::screen_width, SystemConstants::screen_height);
@@ -230,6 +291,7 @@ void Game::HandleManualKick() {
                        sin(glm::radians(ball->owner->rotation)));
     ball->velocity = face_dir * 500.0f;
     ball->owner = nullptr;
+    reset_timer = 2.0;
   }
 }
 
@@ -263,6 +325,7 @@ void Game::UpdateAutoStrategy(GameObject* movableBot, double dt) {
                          sin(glm::radians(movableBot->rotation)));
       ball->velocity = face_dir * 500.0f;
       ball->owner = nullptr;
+      reset_timer = 2.0;
     }
 
     std::pair<double, double> start = screenToRRTX(movableBot->position.x, movableBot->position.y);
@@ -281,7 +344,7 @@ void Game::UpdateAutoStrategy(GameObject* movableBot, double dt) {
       glm::vec2 target(target_.first, target_.second);
       glm::vec2 diff = target - movableBot->position;
       if (glm::length(diff) > 1.0f) {
-        if (glm::length(target - movableBot->current_target) > 5.0f) {
+        if (glm::length(target - movableBot->current_target) > 20.0f) {
           movableBot->current_target = target;
           Motion::Point m_start{movableBot->position.x, movableBot->position.y};
           Motion::Point m_end{target.x, target.y};
@@ -375,6 +438,11 @@ void Game::ProcessDebugKeys() {
     MainStrategy::setDebugMode(is_strat_debug_mode);
     std::cout << "[INFO] [Game]: Strategy Debug Mode " << (is_strat_debug_mode ? "ON" : "OFF")
               << std::endl;
+  }
+
+  if (keys[GLFW_KEY_R] && !keys_processed[GLFW_KEY_R]) {
+    keys_processed[GLFW_KEY_R] = true;
+    ResetPositions();
   }
 
   if (keys[GLFW_KEY_L] && !keys_processed[GLFW_KEY_L]) {

@@ -28,7 +28,7 @@ StrategyResult MainStrategy::update(const StrategyContext& ctx) {
 
     result.target_pos = ctx.goal_pos;
     // ~10 degree threshold, 0.2 in radians
-    if (dist_to_goal < 250.0 && std::abs(angle_diff) < 0.2) {  // kick threshold
+    if (dist_to_goal < 800.0 && std::abs(angle_diff) < 0.2) {  // kick threshold
       result.kick = true;
       current_state = ActionState::KICKING;
     } else {

@@ -9,7 +9,7 @@
 */
 struct GameConfig {
   static constexpr float player_radius = 18.5f;
-  static constexpr float player_velocity = 2.0f;
+  static constexpr float player_velocity = 300.0f;
   static constexpr float player_rotation_velocity = 360.0f;
   static constexpr std::pair<float, float> initial_ball_velocity =
       std::pair<float, float>(150.0f, 150.0f);

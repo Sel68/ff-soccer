@@ -33,6 +33,7 @@ class Game {
                             std::vector<Obstacle> obstacles);
 
   bool Running();
+  void ResetPositions();
 
   const std::vector<GameObject*>& GetTeam1Players() const;
 
@@ -57,6 +58,11 @@ class Game {
   std::vector<GameObject*> team1_players;
   std::vector<GameObject*> team2_players;
   GameState state;
+  
+  std::vector<glm::vec2> start_pos_team1;
+  std::vector<glm::vec2> start_pos_team2;
+  glm::vec2 start_pos_ball;
+  double reset_timer = -1.0;
 
   // Graphics
   Window game_window;
